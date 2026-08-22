@@ -8,12 +8,26 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTripRequest;
 use App\Http\Requests\UpdateTripRequest;
 use App\Models\Trip;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TripController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $trips = Trip::with(['driver', 'vehicle'])->paginate(5);
+
+        $request->validate(
+            ['status' => ['sometimes', Rule::enum(TripStatus::class)]]
+        );
+
+        $query = Trip::with(['driver', 'vehicle']);
+
+        if ($request->has('status')) {
+            $query->where('status', $request->input('status'));
+
+        }
+
+        $trips = $query->paginate(5);
 
         return response()->json($trips);
 

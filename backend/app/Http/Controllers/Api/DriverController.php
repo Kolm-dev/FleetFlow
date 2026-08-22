@@ -2,16 +2,29 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\DriverStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
 use App\Models\Driver;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class DriverController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $drivers = Driver::with('vehicles')->get();
+        $request->validate([
+            'status' => ['sometimes', Rule::enum(DriverStatus::class)],
+        ]);
+
+        $query = Driver::with('vehicles');
+
+        if ($request->has('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $drivers = $query->get();
 
         return response()->json([
             'total' => $drivers->count(),
