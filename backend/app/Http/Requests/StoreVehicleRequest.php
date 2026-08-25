@@ -17,6 +17,7 @@ class StoreVehicleRequest extends FormRequest
             'brand' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'license_plate' => 'required|string|max:8|unique:vehicles',
+            'year' => 'sometimes|integer|min:1900|max:'.date('Y'),
             'driver_id' => 'required|integer|exists:drivers,id',
 
         ];

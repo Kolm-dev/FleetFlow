@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateTripRequest;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\Builder;
 
 class TripController extends Controller
 {
@@ -17,20 +18,40 @@ class TripController extends Controller
     {
 
         $request->validate(
-            ['status' => ['sometimes', Rule::enum(TripStatus::class)]]
+            [
+                'status' => [
+                    'sometimes',
+                    Rule::enum(TripStatus::class)
+                ],
+                'sort' => 'sometimes|string|in:price,created_at,-price,-created_at'
+            ]
         );
 
         $query = Trip::with(['driver', 'vehicle']);
 
         if ($request->has('status')) {
             $query->where('status', $request->input('status'));
-
         }
+
+        $this->sort($query, $request);
 
         $trips = $query->paginate(5);
 
         return response()->json($trips);
+    }
 
+    private function sort(Builder $query, Request $request)
+    {
+        if (! $request->has('sort')) {
+            return;
+        }
+
+        $sort = $request->query('sort');
+
+        $directionSort = str_starts_with($sort, '-') ? 'desc' : 'asc';
+        $whatSort = ltrim($sort, '-');
+
+        $query->orderBy($whatSort, $directionSort);
     }
 
     public function store(StoreTripRequest $tripRequest)
@@ -43,7 +64,6 @@ class TripController extends Controller
         ]);
 
         return response()->json($trip->load(['driver', 'vehicle']), 201);
-
     }
 
     public function show(int $id)
@@ -60,8 +80,20 @@ class TripController extends Controller
             $trip->driver->update([
                 'status' => DriverStatus::Available,
             ]);
-
         }
+
+        return response()->json($trip->load(['driver', 'vehicle']));
+    }
+
+    public function close(Trip $trip)
+    {
+        $trip->update([
+            'status' => TripStatus::Closed,
+        ]);
+
+        $trip->driver->update([
+            'status' => DriverStatus::Available,
+        ]);
 
         return response()->json($trip->load(['driver', 'vehicle']));
     }
@@ -82,6 +114,5 @@ class TripController extends Controller
             'message' => 'Trip was deleted',
             'trip' => $returnDeletedTrip,
         ], 200);
-
     }
 }

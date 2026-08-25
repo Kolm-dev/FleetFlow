@@ -135,4 +135,27 @@ class TripBusinessRulesTest extends TestCase
         $response->assertUnprocessable();
         $response->assertJsonValidationErrors('driver_id');
     }
+
+    public function test_can_close_trip_and_make_driver_available(): void
+    {
+        $driver = Driver::factory()->create(['status' => DriverStatus::OnTrip]);
+        $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+        $trip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+            'status' => TripStatus::Pending,
+        ]);
+
+        $response = $this->patchJson("/api/trips/{$trip->id}/close");
+
+        $response->assertOk();
+        $this->assertDatabaseHas('trips', [
+            'id' => $trip->id,
+            'status' => TripStatus::Closed->value,
+        ]);
+        $this->assertDatabaseHas('drivers', [
+            'id' => $driver->id,
+            'status' => DriverStatus::Available->value,
+        ]);
+    }
 }

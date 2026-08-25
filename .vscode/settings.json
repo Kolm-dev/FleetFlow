@@ -30,7 +30,7 @@
     "intelephense.environment.phpVersion": "8.3.0",
     "intelephense.files.maxSize": 5000000,
     "[php]": {
-        "editor.defaultFormatter": "open-southeners.laravel-pint"
+        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
     },
     "[blade]": {
         "editor.defaultFormatter": "shufo.vscode-blade-formatter"

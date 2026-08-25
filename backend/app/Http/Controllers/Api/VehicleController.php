@@ -6,28 +6,56 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
+use Illuminate\Http\Request;
 
 class VehicleController extends Controller
 {
     public function store(StoreVehicleRequest $request)
     {
+
+
+
         $vehicle = Vehicle::create($request->validated())->load('driver');
 
         return response()->json([
             'message' => 'Vehicle created.',
             'vehicle' => $vehicle,
         ], 201);
-
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $request->validate(
+            [
+                'driver_id' => 'sometimes|integer|exists:drivers,id',
+                'license_plate' => 'sometimes|string|max:8'
+            ]
+        );
 
-        $count = Vehicle::count();
-        $vehicles = Vehicle::with('driver')->get();
+        $query = Vehicle::with('driver');
 
-        return response()->json(['total' => $count, 'vehicles' => $vehicles], 200);
+        if ($request->has('license_plate')) {
+            $query->where('license_plate', strtoupper($request->query('license_plate')));
+        }
+
+
+
+        if ($request->has('driver_id')) {
+            $query->where('driver_id', $request->query('driver_id'));
+        }
+
+        $vehicles = $query->get();
+
+        return response()->json(
+            [
+                'total' => $vehicles->count(),
+                'vehicles' => $vehicles,
+            ],
+            200
+        );
     }
+
+
 
     public function show(int $id)
     {
@@ -63,6 +91,5 @@ class VehicleController extends Controller
             'message' => 'Vehicle deleted',
             'deleted_vehicle' => $deleted,
         ]);
-
     }
 }
