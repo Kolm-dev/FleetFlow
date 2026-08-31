@@ -27,8 +27,8 @@ class UpdateTripRequest extends FormRequest
             'distance' => 'sometimes|nullable|integer|min:0',
             'driver_id' => 'sometimes|integer|exists:drivers,id',
             'vehicle_id' => 'sometimes|integer|exists:vehicles,id',
-            'price' => 'nullable|numeric|min:0',
-            'status' => ['sometimes|string', $status],
+            'price' => 'sometimes|nullable|numeric|min:0',
+            'status' => ['sometimes', 'string', Rule::enum(TripStatus::class)],
         ];
     }
 
@@ -60,7 +60,7 @@ class UpdateTripRequest extends FormRequest
                 if ($vehicle->driver_id !== (int) $driverId) {
                     $validator->errors()->add(
                         'vehicle_id',
-                        'Vehicle doesn\'t not belong to this driver.'
+                        'Vehicle does not belong to this driver.'
                     );
                 }
             },
