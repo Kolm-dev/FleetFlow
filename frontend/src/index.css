@@ -415,3 +415,9 @@ img {
 .drivers-status-actions button + button {
     margin-left: 0;
 }
+
+.trip-form__empty-message {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #92400e;
+}

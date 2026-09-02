@@ -13,6 +13,7 @@ import { VehicleCard } from "@/pages/VehicleCard";
 import { VehicleEdit } from "@/pages/VehicleEdit";
 import VehicleCreate from "@/pages/VehicleCreate";
 import TripEdit from "@/pages/TripEdit";
+import { TripCreate } from "@/pages/TripCreate";
 
 export const App = () => {
     return (
@@ -35,6 +36,7 @@ export const App = () => {
 
                     <Route path="trips" element={<TripsList />} />
                     <Route path="trips/:tripsId/edit" element={<TripEdit />} />
+                    <Route path="trips/create" element={<TripCreate />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Routes>

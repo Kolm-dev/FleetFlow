@@ -38,8 +38,6 @@ export type CreateTripData = {
     distance?: number | null;
     price?: number | null;
     status?: TripStatus;
-    driver: Driver;
-    vehicle: Vehicle;
 };
 
 export type UpdateTripData = Partial<{

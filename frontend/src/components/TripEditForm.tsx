@@ -41,7 +41,9 @@ export const TripEditForm = ({
     const [distance, setDistance] = useState(trip.distance?.toString() ?? "");
     const [price, setPrice] = useState(trip.price?.toString() ?? "");
     const [status, setStatus] = useState<TripStatus>(trip.status);
-    const [driverId, setDriverId] = useState<number | undefined>(trip.driver_id);
+    const [driverId, setDriverId] = useState<number | undefined>(
+        trip.driver_id,
+    );
     const [vehicleId, setVehicleId] = useState<number | undefined>(
         trip.vehicle_id,
     );
@@ -121,7 +123,9 @@ export const TripEditForm = ({
                 Driver
                 <select
                     value={driverId ?? ""}
-                    onChange={(event) => handleDriverId(event.currentTarget.value)}
+                    onChange={(event) =>
+                        handleDriverId(event.currentTarget.value)
+                    }
                 >
                     {driversForSelect.map((driver) => (
                         <option key={driver.id} value={driver.id}>
@@ -141,13 +145,15 @@ export const TripEditForm = ({
                 >
                     {vehiclesForSelect.map((vehicle) => (
                         <option key={vehicle.id} value={vehicle.id}>
-                            {vehicle.brand} {vehicle.model} -{" "}
+                            {vehicle.brand} {vehicle.model} -
                             {vehicle.license_plate}
                         </option>
                     ))}
                 </select>
             </label>
-            {vehiclesForSelect.length === 0 && <p>No vehicles for this driver</p>}
+            {vehiclesForSelect.length === 0 && (
+                <p>No vehicles for this driver</p>
+            )}
             <button
                 type="submit"
                 disabled={

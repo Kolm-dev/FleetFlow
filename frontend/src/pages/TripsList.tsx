@@ -42,9 +42,8 @@ const TripsList = () => {
     const [page, setPage] = useState(1);
     const [status, setStatus] = useState<TripStatus | undefined>();
     const [sort, setSort] = useState<TripSort | undefined>();
-    const [selectedCardId, setSelectedCard] = useState<null | number>(null);
     const queryClient = useQueryClient();
-
+    const [selectedCardId, setSelectedCard] = useState<null | number>(null);
     const { isLoading, error, data, isFetching } = useQuery({
         queryKey: ["trips", { page, status, sort }],
         queryFn: () => getTrips({ page, status, sort }),
