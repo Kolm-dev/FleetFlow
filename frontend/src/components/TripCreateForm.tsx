@@ -1,6 +1,6 @@
 import type { Driver } from "@/types/driversTypes";
 import type { CreateTripData, TripStatus } from "@/types/tripsTypes";
-import React, { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 type TripCreatePropsType = {
     isCreating: boolean;
     availableDrivers: Driver[];

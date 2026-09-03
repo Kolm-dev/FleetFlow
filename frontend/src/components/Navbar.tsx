@@ -9,9 +9,11 @@ const Navbar = () => {
             <NavLink className="navbar__link" to="/trips">
                 Trips
             </NavLink>
+
             <NavLink className="navbar__link" to="/drivers">
                 Drivers
             </NavLink>
+
             <NavLink className="navbar__link" to="/vehicles">
                 Vehicles
             </NavLink>

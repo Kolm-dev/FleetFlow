@@ -1,6 +1,6 @@
 import { getVehicles } from "@/api/vehicles";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 const VehiclesList = () => {
     const navigate = useNavigate();
@@ -18,30 +18,42 @@ const VehiclesList = () => {
 
     return (
         <div>
-            <div>
-                <h1>Vehicles</h1>
-                <h4>Total found: {data.total}</h4>
+            <div className="page-header">
+                <div>
+                    <h1>Vehicles</h1>
+                    <p>Total found: {data.total}</p>
+                </div>
+                <NavLink className="create-link" to="/vehicles/create">
+                    + Create vehicle
+                </NavLink>
             </div>
 
-            <div>
+            <div className="vehicles-list">
                 {vehicles.length > 0 ? (
                     vehicles.map((vehicle, index) => (
-                        <div key={vehicle.id}>
-                            <p>
-                                <span>{index + 1}. </span>
-                                <span>
-                                    {vehicle.brand} {vehicle.model}
+                        <article className="vehicle-card" key={vehicle.id}>
+                            <div className="vehicle-card__header">
+                                <span className="vehicle-card__number">
+                                    #{index + 1}
                                 </span>
-                            </p>
-                            <p>
-                                <span>License plate: </span>
-                                <span>{vehicle.license_plate}</span>
-                            </p>
-                            <p>
-                                <span>Year: </span>
-                                <span>{vehicle.year ?? "Not specified"}</span>
-                            </p>
+                                <h2>
+                                    {vehicle.brand} {vehicle.model}
+                                </h2>
+                            </div>
+
+                            <dl className="vehicle-card__details">
+                                <div>
+                                    <dt>License plate</dt>
+                                    <dd>{vehicle.license_plate}</dd>
+                                </div>
+                                <div>
+                                    <dt>Year</dt>
+                                    <dd>{vehicle.year ?? "Not specified"}</dd>
+                                </div>
+                            </dl>
+
                             <button
+                                className="vehicle-card__button"
                                 type="button"
                                 onClick={() =>
                                     navigate(`/vehicles/${vehicle.id}`)
@@ -49,10 +61,10 @@ const VehiclesList = () => {
                             >
                                 Show vehicle
                             </button>
-                        </div>
+                        </article>
                     ))
                 ) : (
-                    <p>No vehicles found</p>
+                    <p className="empty-state">No vehicles found</p>
                 )}
             </div>
         </div>

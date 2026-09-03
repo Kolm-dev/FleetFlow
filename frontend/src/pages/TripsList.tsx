@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { TripSort, TripStatus } from "@/types/tripsTypes";
 import TripDetailsPanel from "@/components/TripDetailsPanel";
+import { NavLink } from "react-router";
 
 type PaginationProps = {
     page: number;
@@ -88,9 +89,17 @@ const TripsList = () => {
     const selectedTrip = trips.find((trip) => trip.id === selectedCardId);
     return (
         <div>
-            <p>
-                Page {current_page} of {last_page}. Total trips: {total}
-            </p>
+            <div className="page-header">
+                <div>
+                    <h1>Trips</h1>
+                    <p>
+                        Page {current_page} of {last_page}. Total trips: {total}
+                    </p>
+                </div>
+                <NavLink className="create-link" to="/trips/create">
+                    + Create trip
+                </NavLink>
+            </div>
 
             <div>
                 <button onClick={() => changeStatus()}>All</button>
