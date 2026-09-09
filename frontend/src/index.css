@@ -180,6 +180,52 @@ label {
     font-weight: 500;
 }
 
+.login {
+    width: min(100%, 420px);
+    margin: 48px auto;
+    border: 1px solid #d8d8d8;
+    padding: 24px;
+    background: #ffffff;
+}
+
+.login__header {
+    margin-bottom: 24px;
+}
+
+.login__header p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.login__form {
+    display: grid;
+    gap: 16px;
+}
+
+.login__form label {
+    margin-bottom: 0;
+}
+
+.login__form input {
+    max-width: none;
+}
+
+.login__error {
+    margin: 0;
+    border: 1px solid #f0b8b8;
+    padding: 10px 12px;
+    background: #fff4f4;
+    color: #9f1d1d;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.login__form button {
+    width: 100%;
+    min-height: 42px;
+    font-weight: 700;
+}
+
 h1,
 h2,
 p {
@@ -212,14 +258,21 @@ a.active {
     font-weight: 700;
 }
 
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: min(100% - 32px, 960px);
+    margin: 0 auto;
+    border-bottom: 1px solid #d8d8d8;
+}
+
 .navbar {
     display: flex;
     align-items: center;
     gap: 24px;
-    width: min(100% - 32px, 960px);
-    margin: 0 auto;
     padding: 20px 0;
-    border-bottom: 1px solid #d8d8d8;
 }
 
 .navbar__link {
