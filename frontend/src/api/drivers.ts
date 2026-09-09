@@ -27,14 +27,14 @@ export function getDriver(id: number) {
 export function createDriver(data: CreateDriverData) {
     return apiClient<CreatedDriver>("/drivers", {
         method: "POST",
-        body: JSON.stringify(data),
+        data: data,
     });
 }
 
 export function updateDriver(data: UpdateDriverData, id: number) {
     return apiClient<Driver>(`/drivers/${id}`, {
         method: "PATCH",
-        body: JSON.stringify(data),
+        data: data,
     });
 }
 

@@ -31,14 +31,14 @@ export function getVehicle(id: number) {
 export function createVehicle(data: CreateVehicleData) {
     return apiClient<CreatedVehicleResponse>("/vehicles", {
         method: "POST",
-        body: JSON.stringify(data),
+        data: data,
     });
 }
 
 export function updateVehicle(data: UpdateVehicleData, id: number) {
     return apiClient<Vehicle>(`/vehicles/${id}`, {
         method: "PATCH",
-        body: JSON.stringify(data),
+        data: data,
     });
 }
 

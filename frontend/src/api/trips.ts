@@ -34,14 +34,14 @@ export function getTrip(id: number) {
 export function createTrip(data: CreateTripData) {
     return apiClient<Trip>("/trips", {
         method: "POST",
-        body: JSON.stringify(data),
+        data: data,
     });
 }
 
 export function updateTrip(data: UpdateTripData, id: number) {
     return apiClient<Trip>(`/trips/${id}`, {
         method: "PATCH",
-        body: JSON.stringify(data),
+        data: data,
     });
 }
 
