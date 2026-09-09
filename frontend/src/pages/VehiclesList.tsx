@@ -1,4 +1,5 @@
 import { getVehicles } from "@/api/vehicles";
+import { Spinner } from "@/components/Spinner";
 import { useQuery } from "@tanstack/react-query";
 import { NavLink, useNavigate } from "react-router";
 
@@ -9,7 +10,7 @@ const VehiclesList = () => {
         queryFn: () => getVehicles(),
     });
 
-    if (isPending) return <div>Loading vehicles...</div>;
+    if (isPending) return <Spinner text="Loading vehicles..." />;
     if (isError) {
         return <div>Failed to load vehicles: {error.message}</div>;
     }

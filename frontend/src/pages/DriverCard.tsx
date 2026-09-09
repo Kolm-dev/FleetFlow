@@ -1,4 +1,5 @@
 import { deleteDriver, getDriver } from "@/api/drivers";
+import { Spinner } from "@/components/Spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 
@@ -25,7 +26,7 @@ export const DriverCard = () => {
         <div>
             {isError && <div>{error.message}</div>}
 
-            {isLoading && <p>Loading...</p>}
+            {isLoading && <Spinner />}
 
             {!isLoading && !driver && <p>Driver not found</p>}
 
@@ -104,7 +105,11 @@ export const DriverCard = () => {
                             hidden={isSuccess}
                             onClick={() => mutate(parseInt(driverId as string))}
                         >
-                            {isPending ? "DELETING..." : "DELETE"}
+                            {isPending ? (
+                                <Spinner text="DELETING..." />
+                            ) : (
+                                "DELETE"
+                            )}
                         </button>
                         <button
                             hidden={isSuccess}

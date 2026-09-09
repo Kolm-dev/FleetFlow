@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { TripSort, TripStatus } from "@/types/tripsTypes";
 import TripDetailsPanel from "@/components/TripDetailsPanel";
 import { NavLink } from "react-router";
+import { Spinner } from "@/components/Spinner";
 
 type PaginationProps = {
     page: number;
@@ -68,7 +69,7 @@ const TripsList = () => {
         },
     });
 
-    if (isLoading) return <p>Loading...</p>;
+    if (isLoading) return <Spinner />;
     if (error) return <p>{error.message}</p>;
     if (!data) return <p>No trips data.</p>;
 

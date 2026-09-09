@@ -1,4 +1,5 @@
 import { deleteVehicle, getVehicle } from "@/api/vehicles";
+import { Spinner } from "@/components/Spinner";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 
@@ -23,7 +24,7 @@ export const VehicleCard = () => {
         queryFn: () => getVehicle(parseInt(vehicleId as string)),
     });
 
-    if (isLoading) return <p>Loading...</p>;
+    if (isLoading) return <Spinner />;
 
     if (!vehicle) return <p>Vehicle not found</p>;
 

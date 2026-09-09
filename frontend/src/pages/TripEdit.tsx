@@ -1,5 +1,6 @@
 import { getDrivers } from "@/api/drivers";
 import { getTrip, updateTrip } from "@/api/trips";
+import { Spinner } from "@/components/Spinner";
 import { TripEditForm } from "@/components/TripEditForm";
 import type { UpdateTripData } from "@/types/tripsTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -34,7 +35,7 @@ const TripEdit = () => {
 
     if (tripId === undefined || Number.isNaN(tripId))
         return <p>Invalid trip id</p>;
-    if (isTripLoading || isDriversLoading) return <p>Loading...</p>;
+    if (isTripLoading || isDriversLoading) return <Spinner />;
     if (!trip) return <p>Trip not found</p>;
     if (!driversResponse) return <p>No drivers data</p>;
 

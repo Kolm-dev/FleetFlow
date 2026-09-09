@@ -1,4 +1,5 @@
 import { getDrivers } from "@/api/drivers";
+import { Spinner } from "@/components/Spinner";
 import type { DriverStatus } from "@/types/driversTypes";
 import { useQuery } from "@tanstack/react-query";
 import { NavLink, useNavigate, useSearchParams } from "react-router";
@@ -34,7 +35,7 @@ export const DriversList = () => {
         queryFn: () => (status ? getDrivers({ status }) : getDrivers()),
     });
 
-    if (isLoading) return <p>Loading...</p>;
+    if (isLoading) return <Spinner />;
     if (isError) {
         return <div>{error.message}</div>;
     }
