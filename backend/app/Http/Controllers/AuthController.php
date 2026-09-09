@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -26,6 +28,34 @@ class AuthController extends Controller
             return response()->json(
                 ['message' => 'Authorization failed.'], 401);
         }
+    }
+
+    public function register(Request $request)
+    {
+        $credentials = $request->validate([
+            'name' => ['required', 'string', 'unique:users,name'],
+            'password' => ['required', 'string', 'confirmed'],
+        ]);
+
+        $user = User::create([
+            'name' => $credentials['name'],
+            'password' => Hash::make($credentials['password']),
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
+            return response()->json([
+                'message' => 'Registation successful',
+                'new_user' => $user->name,
+            ], 201);
+
+        } else {
+            return response()->json([
+                'message' => 'Registration successful, but automatic login failed.',
+            ], 500);
+        }
+
     }
 
     public function logout(Request $request): JsonResponse
