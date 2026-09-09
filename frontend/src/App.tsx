@@ -14,30 +14,58 @@ import { VehicleEdit } from "@/pages/VehicleEdit";
 import VehicleCreate from "@/pages/VehicleCreate";
 import TripEdit from "@/pages/TripEdit";
 import { TripCreate } from "@/pages/TripCreate";
+import Authorization from "@/pages/Authorization";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import PublicOnlyRoute from "@/components/PublicOnlyRoute";
 
 export const App = () => {
     return (
         <>
             <Routes>
-                <Route element={<MainLayout />}>
-                    <Route index element={<Home />} />
-                    <Route path="drivers" element={<DriversList />} />
-                    <Route path="drivers/:driverId" element={<DriverCard />} />
-                    <Route path="drivers/:id/edit" element={<DriverEdit />} />
-                    <Route path="drivers/create" element={<DriverCreate />} />
+                <Route element={<PublicOnlyRoute />}>
+                    <Route path="authorization" element={<Authorization />} />
+                </Route>
+                <Route element={<ProtectedRoute />}>
+                    <Route element={<MainLayout />}>
+                        <Route index element={<Home />} />
 
-                    <Route path="vehicles" element={<VehiclesList />} />
-                    <Route
-                        path="vehicles/:vehicleId"
-                        element={<VehicleCard />}
-                    />
-                    <Route path="vehicles/:id/edit" element={<VehicleEdit />} />
-                    <Route path="vehicles/create" element={<VehicleCreate />} />
+                        <Route path="drivers" element={<DriversList />} />
+                        <Route
+                            path="drivers/:driverId"
+                            element={<DriverCard />}
+                        />
+                        <Route
+                            path="drivers/:id/edit"
+                            element={<DriverEdit />}
+                        />
+                        <Route
+                            path="drivers/create"
+                            element={<DriverCreate />}
+                        />
 
-                    <Route path="trips" element={<TripsList />} />
-                    <Route path="trips/:tripsId/edit" element={<TripEdit />} />
-                    <Route path="trips/create" element={<TripCreate />} />
-                    <Route path="*" element={<NotFound />} />
+                        <Route path="vehicles" element={<VehiclesList />} />
+                        <Route
+                            path="vehicles/:vehicleId"
+                            element={<VehicleCard />}
+                        />
+                        <Route
+                            path="vehicles/:id/edit"
+                            element={<VehicleEdit />}
+                        />
+                        <Route
+                            path="vehicles/create"
+                            element={<VehicleCreate />}
+                        />
+
+                        <Route path="trips" element={<TripsList />} />
+                        <Route
+                            path="trips/:tripsId/edit"
+                            element={<TripEdit />}
+                        />
+                        <Route path="trips/create" element={<TripCreate />} />
+
+                        <Route path="*" element={<NotFound />} />
+                    </Route>
                 </Route>
             </Routes>
         </>
