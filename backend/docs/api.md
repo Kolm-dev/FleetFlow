@@ -4,6 +4,29 @@ Base URL: `/api`
 
 All responses are JSON. Validation errors return `422`.
 
+## Auth
+
+Authentication uses Laravel Sanctum session cookies.
+
+Before login, request the Sanctum CSRF cookie:
+
+```http
+GET /sanctum/csrf-cookie
+```
+
+| Method | Endpoint  | Description                    |
+| ------ | --------- | ------------------------------ |
+| GET    | `/user`   | Get current authenticated user |
+| POST   | `/login`  | Login to account               |
+| POST   | `/logout` | Logout from the account        |
+
+Login fields:
+
+| Field      | Required | Rules  |
+| ---------- | -------: | ------ |
+| `name`     |      yes | string |
+| `password` |      yes | string |
+
 ## Statuses
 
 | Entity | Values                                |
