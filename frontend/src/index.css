@@ -288,6 +288,94 @@ a.active {
     text-decoration: underline;
 }
 
+.header__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 1px solid #d8d8d8;
+    padding-left: 16px;
+}
+
+.header__user {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    margin-bottom: 0;
+    color: #333333;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.logout-button {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* При наведении кнопка выхода повторяет поведение основных action-кнопок. */
+.logout-button:hover,
+.logout-button:focus-visible {
+    background: #ffffff;
+    color: #111111;
+}
+
+.logout-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.logout-modal__content {
+    width: min(100%, 420px);
+    border: 1px solid #d8d8d8;
+    padding: 24px;
+    background: #ffffff;
+}
+
+.logout-modal__content h2 {
+    margin-bottom: 8px;
+}
+
+.logout-modal__content p {
+    margin-bottom: 20px;
+    color: #555555;
+}
+
+.logout-modal__actions {
+    display: flex;
+    gap: 12px;
+}
+
+.logout-modal__actions button {
+    flex: 1;
+}
+
+.logout-modal__actions button + button {
+    margin-left: 0;
+}
+
+.logout-modal__cancel {
+    border-color: #d8d8d8;
+    background: #ffffff;
+    color: #111111;
+}
+
+.logout-modal__cancel:hover,
+.logout-modal__cancel:focus-visible {
+    background: #111111;
+    color: #ffffff;
+}
+
 .page-header {
     display: flex;
     align-items: center;
