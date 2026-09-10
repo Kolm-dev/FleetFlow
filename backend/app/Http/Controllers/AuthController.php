@@ -30,7 +30,7 @@ class AuthController extends Controller
         }
     }
 
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         $credentials = $request->validate([
             'name' => ['required', 'string', 'unique:users,name'],
@@ -42,20 +42,14 @@ class AuthController extends Controller
             'password' => Hash::make($credentials['password']),
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        Auth::login($user);
 
-            return response()->json([
-                'message' => 'Registation successful',
-                'new_user' => $user->name,
-            ], 201);
+        $request->session()->regenerate();
 
-        } else {
-            return response()->json([
-                'message' => 'Registration successful, but automatic login failed.',
-            ], 500);
-        }
-
+        return response()->json([
+            'message' => 'Registration successful',
+            'new_user' => $user->name,
+        ], 201);
     }
 
     public function logout(Request $request): JsonResponse

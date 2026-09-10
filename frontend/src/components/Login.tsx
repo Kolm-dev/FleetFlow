@@ -3,7 +3,7 @@ import { Spinner } from "@/components/Spinner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 export const Login = () => {
     const [name, setName] = useState("");
@@ -77,6 +77,11 @@ export const Login = () => {
                 >
                     {isPending ? <Spinner text="Logging in..." /> : "Login"}
                 </button>
+
+                <p className="login__switch">
+                    Don&apos;t have an account?{" "}
+                    <NavLink to="/registration">Create account</NavLink>
+                </p>
             </form>
         </section>
     );

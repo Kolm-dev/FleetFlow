@@ -17,6 +17,7 @@ import { TripCreate } from "@/pages/TripCreate";
 import Authorization from "@/pages/Authorization";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import PublicOnlyRoute from "@/components/PublicOnlyRoute";
+import { Register } from "@/components/Register";
 
 export const App = () => {
     return (
@@ -24,6 +25,7 @@ export const App = () => {
             <Routes>
                 <Route element={<PublicOnlyRoute />}>
                     <Route path="authorization" element={<Authorization />} />
+                    <Route path="registration" element={<Register />} />
                 </Route>
                 <Route element={<ProtectedRoute />}>
                     <Route element={<MainLayout />}>

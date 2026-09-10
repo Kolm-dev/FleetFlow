@@ -5,7 +5,12 @@ import { Navigate, Outlet } from "react-router";
 const PublicOnlyRoute = () => {
     const { data: user, isLoading } = useCurrentUser();
 
-    if (isLoading) return <Spinner />;
+    if (isLoading)
+        return (
+            <div className=".center-x-y">
+                <Spinner />
+            </div>
+        );
 
     if (user) return <Navigate to="/" replace />;
 
