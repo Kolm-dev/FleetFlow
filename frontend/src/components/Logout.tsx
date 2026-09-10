@@ -1,14 +1,18 @@
 import { logout } from "@/api/auth";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
 const Logout = () => {
+    const queryClient = useQueryClient();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const navigate = useNavigate();
     const { mutate: logoutMutate } = useMutation({
         mutationFn: logout,
-        onSuccess: () => navigate("/authorization"),
+        onSuccess: () => {
+            queryClient.setQueryData(["currentUser"], null);
+            navigate("/authorization", { replace: true });
+        },
     });
     const handleLogoutButton = () => {
         logoutMutate();

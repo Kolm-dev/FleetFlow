@@ -67,7 +67,12 @@ label {
     color: #333333;
     font-weight: 500;
 }
-
+.center-x-y {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
 .login {
     width: min(100%, 420px);
     margin: 48px auto;
