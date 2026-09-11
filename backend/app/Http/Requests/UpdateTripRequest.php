@@ -20,8 +20,6 @@ class UpdateTripRequest extends FormRequest
     public function rules(): array
     {
 
-        $status = Rule::enum(TripStatus::class);
-
         return [
             'title' => 'sometimes|string|max:255',
             'distance' => 'sometimes|nullable|integer|min:0',

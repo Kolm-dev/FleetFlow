@@ -7,11 +7,12 @@ use App\Enums\TripStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTripRequest;
 use App\Http\Requests\UpdateTripRequest;
+use App\Models\Driver;
 use App\Models\Trip;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class TripController extends Controller
 {
@@ -22,9 +23,9 @@ class TripController extends Controller
             [
                 'status' => [
                     'sometimes',
-                    Rule::enum(TripStatus::class)
+                    Rule::enum(TripStatus::class),
                 ],
-                'sort' => 'sometimes|string|in:price,created_at,-price,-created_at'
+                'sort' => 'sometimes|string|in:price,created_at,-price,-created_at',
             ]
         );
 
@@ -57,7 +58,7 @@ class TripController extends Controller
 
     public function store(StoreTripRequest $tripRequest)
     {
-        $trip = DB::transaction(function () use ($tripRequest) { 
+        $trip = DB::transaction(function () use ($tripRequest) {
             $trip = Trip::create($tripRequest->validated());
 
             $trip->driver->update([
@@ -78,15 +79,45 @@ class TripController extends Controller
     public function update(UpdateTripRequest $request, int $id)
     {
         $trip = Trip::findOrFail($id);
-        $trip->update($request->validated());
 
-        if ($trip->status === TripStatus::Closed) {
-            $trip->driver->update([
-                'status' => DriverStatus::Available,
-            ]);
-        }
 
-        return response()->json($trip->load(['driver', 'vehicle']));
+        $currentDriver = $trip->driver;
+
+        $trip = DB::transaction(function () use ($request, $trip, $currentDriver) {
+            $trip->update($request->validated());
+
+
+            $driverWasChanged = $trip->driver_id !== $currentDriver->id;
+            $tripIsClosed = $trip->status === TripStatus::Closed;
+
+            //  закрыли-> освобождаем водителя
+            if ($tripIsClosed) {
+                $currentDriver->update([
+                    'status' => DriverStatus::Available,
+                ]);
+
+                return $trip;
+            }
+
+            // меняем водителя: old -> available, new -> on trip
+            if ($driverWasChanged) {
+                $currentDriver->update([
+                    'status' => DriverStatus::Available,
+                ]);
+
+                $newDriver = Driver::findOrFail($trip->driver_id);
+
+                $newDriver->update([
+                    'status' => DriverStatus::OnTrip,
+                ]);
+            }
+
+            return $trip;
+        });
+
+        return response()->json(
+            $trip->load(['driver', 'vehicle'])
+        );
     }
 
     public function close(Trip $trip)
