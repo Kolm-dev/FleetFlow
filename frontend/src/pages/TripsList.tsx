@@ -120,8 +120,8 @@ const TripsList = () => {
                 }
             >
                 <option value="">Reset sorting</option>
-                <option value="price">Price: High to Low</option>
-                <option value="-price">Price: Low to High</option>
+                <option value="price">Price: Low to Hight</option>
+                <option value="-price">Price: High to Low</option>
                 <option value="created_at">Created later</option>
                 <option value="-created_at">Created earlier</option>
             </select>
