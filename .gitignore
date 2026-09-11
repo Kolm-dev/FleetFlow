@@ -1,4 +1,27 @@
-https://github.com/Kolm-dev/FleetFlow.git
+# Environment
+.env
+.env.*
+!.env.example
 
-.vscode/
+# Dependencies
+/vendor/
+node_modules/
+
+# Laravel
+/storage/*.key
+/storage/pail
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+
+# PHPUnit
 .phpunit.result.cache
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
