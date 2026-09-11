@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTripRequest;
 use App\Http\Requests\UpdateTripRequest;
 use App\Models\Trip;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Eloquent\Builder;
@@ -56,12 +57,15 @@ class TripController extends Controller
 
     public function store(StoreTripRequest $tripRequest)
     {
+        $trip = DB::transaction(function () use ($tripRequest) { 
+            $trip = Trip::create($tripRequest->validated());
 
-        $trip = Trip::create($tripRequest->validated());
+            $trip->driver->update([
+                'status' => DriverStatus::OnTrip,
+            ]);
 
-        $trip->driver->update([
-            'status' => DriverStatus::OnTrip,
-        ]);
+            return $trip;
+        });
 
         return response()->json($trip->load(['driver', 'vehicle']), 201);
     }
