@@ -4,12 +4,25 @@ namespace Tests\Feature;
 
 use App\Models\Driver;
 use App\Models\Vehicle;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class VehicleControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $user = User::create([
+            'name' => 'name',
+            "password" => bcrypt('password')
+        ]);
+
+        $this->actingAs($user);
+    }
 
     public function test_vehicle_created_successfully()
     {

@@ -6,6 +6,7 @@ use App\Enums\DriverStatus;
 use App\Enums\TripStatus;
 use App\Models\Driver;
 use App\Models\Trip;
+use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,6 +14,18 @@ use Tests\TestCase;
 class FilterTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $user = User::create([
+            'name' => 'test-user',
+            'password' => bcrypt('password'),
+        ]);
+        $this->actingAs($user);
+
+    }
 
     public function test_drivers_can_be_filtered_by_status(): void
     {

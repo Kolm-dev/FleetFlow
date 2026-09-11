@@ -7,12 +7,28 @@ use App\Enums\TripStatus;
 use App\Models\Driver;
 use App\Models\Trip;
 use App\Models\Vehicle;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Override;
 use Tests\TestCase;
 
 class TripBusinessRulesTest extends TestCase
 {
     use RefreshDatabase;
+
+    #[Override]
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $user = User::create([
+            'name' => 'name',
+            "password" => bcrypt('password')
+        ]);
+
+        $this->actingAs($user);
+
+    }
 
     public function test_can_create_trip_with_available_driver_and_his_vehicle(): void
     {
