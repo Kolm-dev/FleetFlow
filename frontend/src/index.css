@@ -645,6 +645,26 @@ img {
     text-align: center;
 }
 
+.error-message {
+    margin: 0;
+    border: 1px solid #f0b8b8;
+    padding: 10px 12px;
+    background: #fff4f4;
+    color: #9f1d1d;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.success-message {
+    margin: 0;
+    border: 1px solid #9bd3ad;
+    padding: 10px 12px;
+    background: #f0fff4;
+    color: #166534;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 .trip-form__empty-message {
     margin-top: 6px;
     font-size: 14px;

@@ -1,19 +1,20 @@
 import { deleteDriver, getDriver } from "@/api/drivers";
 import { Spinner } from "@/components/Spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
 export const DriverCard = () => {
     const { driverId } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const [redirectCountdown, setRedirectCountdown] = useState(5);
     const { mutate, isError, error, isPending, isSuccess } = useMutation({
         mutationFn: (id: number) => deleteDriver(id),
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ["drivers"],
             });
-            navigate("/drivers");
         },
     });
 
@@ -22,13 +23,53 @@ export const DriverCard = () => {
         queryKey: [driverId, "driver"],
         queryFn: () => getDriver(parseInt(driverId as string)),
     });
+
+    useEffect(() => {
+        if (!isSuccess) return;
+
+        const intervalId = window.setInterval(() => {
+            setRedirectCountdown((currentCountdown) => {
+                const nextCountdown = Number(
+                    (currentCountdown - 0.1).toFixed(1),
+                );
+
+                return Math.max(nextCountdown, 0);
+            });
+        }, 100);
+
+        return () => window.clearInterval(intervalId);
+    }, [isSuccess]);
+
+    useEffect(() => {
+        if (isSuccess && redirectCountdown <= 0) {
+            navigate("/drivers");
+        }
+    }, [isSuccess, navigate, redirectCountdown]);
+
+    if (isSuccess) {
+        return (
+            <div className="success-message">
+                <p>
+                    {driver?.name} - {driver?.phone_number} was successfully
+                    deleted!
+                </p>
+                <p>
+                    Redirecting to drivers list in{" "}
+                    {redirectCountdown.toFixed(1)}s
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div>
             {isError && <div>{error.message}</div>}
 
             {isLoading && <Spinner />}
 
-            {!isLoading && !driver && <p>Driver not found</p>}
+            {!isLoading && !driver && (
+                <p className="error-message">Driver not found</p>
+            )}
 
             {driver && (
                 <>
@@ -121,13 +162,6 @@ export const DriverCard = () => {
                         </button>
                     </div>
                 </>
-            )}
-
-            {isSuccess && (
-                <p>
-                    {driver?.name} - {driver?.phone_number} was successfully
-                    deleted!
-                </p>
             )}
         </div>
     );

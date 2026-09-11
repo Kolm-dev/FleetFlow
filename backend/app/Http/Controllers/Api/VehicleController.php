@@ -13,8 +13,6 @@ class VehicleController extends Controller
     public function store(StoreVehicleRequest $request)
     {
 
-
-
         $vehicle = Vehicle::create($request->validated())->load('driver');
 
         return response()->json([
@@ -28,7 +26,7 @@ class VehicleController extends Controller
         $request->validate(
             [
                 'driver_id' => 'sometimes|integer|exists:drivers,id',
-                'license_plate' => 'sometimes|string|max:8'
+                'license_plate' => 'sometimes|string|max:8',
             ]
         );
 
@@ -37,8 +35,6 @@ class VehicleController extends Controller
         if ($request->has('license_plate')) {
             $query->where('license_plate', strtoupper($request->query('license_plate')));
         }
-
-
 
         if ($request->has('driver_id')) {
             $query->where('driver_id', $request->query('driver_id'));
@@ -55,11 +51,11 @@ class VehicleController extends Controller
         );
     }
 
-
-
-    public function show(int $id)
+    public function show(Vehicle $vehicle)
     {
-        return response()->json(Vehicle::with('driver')->findOrFail($id));
+        return response()->json([
+            'vehicle' => $vehicle->load('driver'),
+        ]);
     }
 
     public function update(int $id, UpdateVehicleRequest $request)
@@ -73,23 +69,10 @@ class VehicleController extends Controller
         ]);
     }
 
-    public function destroy(int $id)
+    public function destroy(Vehicle $vehicle)
     {
 
-        $vehicle = Vehicle::findOrFail($id);
-
-        $deleted = [
-            'id' => $vehicle->id,
-            'brand' => $vehicle->brand,
-            'model' => $vehicle->model,
-            'license_plate' => $vehicle->license_plate,
-        ];
-
         $vehicle->delete();
-
-        return response()->json([
-            'message' => 'Vehicle deleted',
-            'deleted_vehicle' => $deleted,
-        ]);
+        return response()->noContent();
     }
 }

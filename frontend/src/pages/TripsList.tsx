@@ -1,7 +1,7 @@
 import { closeTrip, getTrips } from "@/api/trips";
 import { TripCard } from "@/components/TripCard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TripSort, TripStatus } from "@/types/tripsTypes";
 import TripDetailsPanel from "@/components/TripDetailsPanel";
 import { NavLink } from "react-router";
@@ -44,6 +44,10 @@ const TripsList = () => {
     const [page, setPage] = useState(1);
     const [status, setStatus] = useState<TripStatus | undefined>();
     const [sort, setSort] = useState<TripSort | undefined>();
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const successMessageRef = useRef<HTMLParagraphElement | null>(null);
+    const scrollReturnPositionRef = useRef(0);
+    const scrollReturnTimeoutRef = useRef<number | null>(null);
     const queryClient = useQueryClient();
     const [selectedCardId, setSelectedCard] = useState<null | number>(null);
     const { isLoading, error, data, isFetching } = useQuery({
@@ -54,6 +58,8 @@ const TripsList = () => {
     const { mutate } = useMutation({
         mutationFn: (id: number) => closeTrip(id),
         onSuccess: (trip) => {
+            scrollReturnPositionRef.current = window.scrollY;
+
             queryClient.invalidateQueries({
                 queryKey: ["trips"],
             });
@@ -63,11 +69,39 @@ const TripsList = () => {
                 ? `${trip.vehicle.brand} ${trip.vehicle.model}`
                 : "vehicle";
 
-            alert(
+            setSuccessMessage(
                 `${driverName} and ${vehicleName} are now available and will be back on the road soon.`,
             );
         },
     });
+
+    useEffect(() => {
+        if (!successMessage) return;
+
+        if (scrollReturnTimeoutRef.current !== null) {
+            window.clearTimeout(scrollReturnTimeoutRef.current);
+        }
+
+        window.requestAnimationFrame(() => {
+            successMessageRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
+        });
+
+        scrollReturnTimeoutRef.current = window.setTimeout(() => {
+            window.scrollTo({
+                top: scrollReturnPositionRef.current,
+                behavior: "smooth",
+            });
+        }, 3500);
+
+        return () => {
+            if (scrollReturnTimeoutRef.current !== null) {
+                window.clearTimeout(scrollReturnTimeoutRef.current);
+            }
+        };
+    }, [successMessage]);
 
     if (isLoading) return <Spinner />;
     if (error) return <p>{error.message}</p>;
@@ -108,6 +142,12 @@ const TripsList = () => {
                 <button onClick={() => changeStatus("pending")}>Pending</button>
                 <button onClick={() => changeStatus("closed")}>Closed</button>
             </div>
+
+            {successMessage && (
+                <p ref={successMessageRef} className="success-message">
+                    {successMessage}
+                </p>
+            )}
 
             <select
                 value={sort ?? ""}

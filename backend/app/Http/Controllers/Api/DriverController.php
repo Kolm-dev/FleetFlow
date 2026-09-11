@@ -32,16 +32,18 @@ class DriverController extends Controller
         ]);
     }
 
-    public function show(int $id)
+    public function show(Driver $driver)
     {
-        return response()->json(Driver::with('vehicles')->findOrFail($id));
+        return response()->json([
+            'driver' => $driver->load('vehicles'),
+        ]);
     }
 
-    public function destroy(int $id)
+    public function destroy(Driver $driver)
     {
-        Driver::findOrFail($id)->delete();
+        $driver->delete();
 
-        return response()->json(null, 204);
+        return response()->noContent();
     }
 
     public function update(UpdateDriverRequest $request, int $id)

@@ -3,6 +3,7 @@ import type {
     CreateTripData,
     PaginatedTrips,
     Trip,
+    TripResponse,
     TripsFilters,
     UpdateTripData,
 } from "@/types/tripsTypes";
@@ -27,8 +28,9 @@ export function getTrips(filters?: TripsFilters) {
     return apiClient<PaginatedTrips>(`/trips${query ? `?${query}` : ""}`);
 }
 
-export function getTrip(id: number) {
-    return apiClient<Trip>(`/trips/${id}`);
+export async function getTrip(id: number) {
+    const response = await apiClient<TripResponse>(`/trips/${id}`);
+    return response.trip;
 }
 
 export function createTrip(data: CreateTripData) {

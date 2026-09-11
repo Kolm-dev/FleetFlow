@@ -27,6 +27,10 @@ export type DriversResponse = {
     drivers: Driver[];
 };
 
+export type DriverResponse = {
+    driver: Driver;
+};
+
 export type UpdateDriverData = Partial<CreateDriverData>;
 
 export type CreatedDriver = {

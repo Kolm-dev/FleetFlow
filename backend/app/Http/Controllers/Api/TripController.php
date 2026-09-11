@@ -31,9 +31,9 @@ class TripController extends Controller
 
         $query = Trip::with(['driver', 'vehicle']);
 
-        if ($request->has('status')) {
+        $query->when($request->has('status'), function ($query) use ($request) {
             $query->where('status', $request->input('status'));
-        }
+        });
 
         $this->sort($query, $request);
 
@@ -71,21 +71,26 @@ class TripController extends Controller
         return response()->json($trip->load(['driver', 'vehicle']), 201);
     }
 
-    public function show(int $id)
+    public function show(Trip $trip)
     {
-        return response()->json(Trip::with(['driver', 'vehicle'])->findOrFail($id));
+
+        $trip->load(['driver', 'vehicle']);
+
+        return response()->json(
+            [
+                'trip' => $trip,
+            ]
+        );
     }
 
     public function update(UpdateTripRequest $request, int $id)
     {
         $trip = Trip::findOrFail($id);
 
-
         $currentDriver = $trip->driver;
 
         $trip = DB::transaction(function () use ($request, $trip, $currentDriver) {
             $trip->update($request->validated());
-
 
             $driverWasChanged = $trip->driver_id !== $currentDriver->id;
             $tripIsClosed = $trip->status === TripStatus::Closed;
@@ -133,21 +138,10 @@ class TripController extends Controller
         return response()->json($trip->load(['driver', 'vehicle']));
     }
 
-    public function destroy(int $id)
+    public function destroy(Trip $trip)
     {
-        $trip = Trip::findOrFail($id);
-
-        $returnDeletedTrip = [
-            'id' => $trip->id,
-            'title' => $trip->title,
-            'created_at' => $trip->created_at,
-        ];
-
         $trip->delete();
 
-        return response()->json([
-            'message' => 'Trip was deleted',
-            'trip' => $returnDeletedTrip,
-        ], 200);
+        return response()->noContent(); //
     }
 }

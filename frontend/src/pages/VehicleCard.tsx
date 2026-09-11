@@ -1,20 +1,21 @@
 import { deleteVehicle, getVehicle } from "@/api/vehicles";
 import { Spinner } from "@/components/Spinner";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 
 export const VehicleCard = () => {
     const { vehicleId } = useParams();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    const [redirectCountdown, setRedirectCountdown] = useState(5);
+    const [deletedVehicleLabel, setDeletedVehicleLabel] = useState("");
     const { mutate, isSuccess, isPending } = useMutation({
         mutationFn: (id: number) => deleteVehicle(id),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["vehicles", vehicleId],
+                queryKey: ["vehicles"],
             });
-
-            setTimeout(() => navigate("/vehicles"), 1500);
         },
     });
 
@@ -23,6 +24,40 @@ export const VehicleCard = () => {
         queryKey: ["vehicles", vehicleId],
         queryFn: () => getVehicle(parseInt(vehicleId as string)),
     });
+
+    useEffect(() => {
+        if (!isSuccess) return;
+
+        const intervalId = window.setInterval(() => {
+            setRedirectCountdown((currentCountdown) => {
+                const nextCountdown = Number(
+                    (currentCountdown - 0.1).toFixed(1),
+                );
+
+                return Math.max(nextCountdown, 0);
+            });
+        }, 100);
+
+        return () => window.clearInterval(intervalId);
+    }, [isSuccess]);
+
+    useEffect(() => {
+        if (isSuccess && redirectCountdown <= 0) {
+            navigate("/vehicles");
+        }
+    }, [isSuccess, navigate, redirectCountdown]);
+
+    if (isSuccess) {
+        return (
+            <div className="success-message">
+                <p>{deletedVehicleLabel} was successfully deleted!</p>
+                <p>
+                    Redirecting to vehicles list in{" "}
+                    {redirectCountdown.toFixed(1)}s
+                </p>
+            </div>
+        );
+    }
 
     if (isLoading) return <Spinner />;
 
@@ -80,7 +115,12 @@ export const VehicleCard = () => {
                 <button
                     disabled={isPending}
                     hidden={isSuccess}
-                    onClick={() => mutate(parseInt(vehicleId as string))}
+                    onClick={() => {
+                        setDeletedVehicleLabel(
+                            `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`,
+                        );
+                        mutate(parseInt(vehicleId as string));
+                    }}
                 >
                     {isPending ? "DELETING..." : "DELETE"}
                 </button>
@@ -91,13 +131,6 @@ export const VehicleCard = () => {
                     Edit
                 </button>
             </div>
-
-            {isSuccess && (
-                <p>
-                    {vehicle.brand} {vehicle.model} - {vehicle.license_plate}{" "}
-                    was successfully deleted!
-                </p>
-            )}
         </div>
     );
 };

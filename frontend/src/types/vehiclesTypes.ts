@@ -28,6 +28,10 @@ export type VehiclesResponse = {
     vehicles: Vehicle[];
 };
 
+export type VehicleResponse = {
+    vehicle: Vehicle;
+};
+
 export type CreatedVehicleResponse = {
     message: string;
     vehicle: Vehicle;

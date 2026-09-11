@@ -3,6 +3,7 @@ import type {
     CreateDriverData,
     CreatedDriver,
     Driver,
+    DriverResponse,
     DriversFilters,
     DriversResponse,
     UpdateDriverData,
@@ -20,8 +21,9 @@ export function getDrivers(filters?: DriversFilters) {
     return apiClient<DriversResponse>(`/drivers${query ? `?${query}` : ""}`);
 }
 
-export function getDriver(id: number) {
-    return apiClient<Driver>(`/drivers/${id}`);
+export async function getDriver(id: number) {
+    const response = await apiClient<DriverResponse>(`/drivers/${id}`);
+    return response.driver;
 }
 
 export function createDriver(data: CreateDriverData) {

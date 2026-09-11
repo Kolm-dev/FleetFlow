@@ -31,6 +31,10 @@ export type PaginatedTrips = {
     total: number;
 };
 
+export type TripResponse = {
+    trip: Trip;
+};
+
 export type CreateTripData = {
     title: string;
     driver_id: number;

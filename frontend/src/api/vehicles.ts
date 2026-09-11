@@ -4,6 +4,7 @@ import type {
     CreateVehicleData,
     UpdateVehicleData,
     Vehicle,
+    VehicleResponse,
     VehiclesFilters,
     VehiclesResponse,
 } from "@/types/vehiclesTypes";
@@ -24,8 +25,9 @@ export function getVehicles(filters?: VehiclesFilters) {
     return apiClient<VehiclesResponse>(`/vehicles${query ? `?${query}` : ""}`);
 }
 
-export function getVehicle(id: number) {
-    return apiClient<Vehicle>(`/vehicles/${id}`);
+export async function getVehicle(id: number) {
+    const response = await apiClient<VehicleResponse>(`/vehicles/${id}`);
+    return response.vehicle;
 }
 
 export function createVehicle(data: CreateVehicleData) {
