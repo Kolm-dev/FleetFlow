@@ -67,6 +67,21 @@ Create fields:
 Update fields: `name`, `phone_number`, `status`, `photo`.
 All update fields are optional.
 
+Show response:
+
+```json
+{
+    "driver": {
+        "id": 1,
+        "name": "Dr. Jayden Lynch",
+        "phone_number": "+1.480.475.8257",
+        "status": "available",
+        "photo": null,
+        "vehicles": []
+    }
+}
+```
+
 ## Stats
 
 | Method | Endpoint | Description |
@@ -130,6 +145,22 @@ Create fields:
 Update fields: `brand`, `model`, `license_plate`, `year`, `driver_id`.
 All update fields are optional.
 
+Show response:
+
+```json
+{
+    "vehicle": {
+        "id": 1,
+        "brand": "Volvo",
+        "model": "FH",
+        "license_plate": "AA1234BB",
+        "year": 2022,
+        "driver_id": 1,
+        "driver": {}
+    }
+}
+```
+
 Notes:
 
 - `license_plate` is converted to uppercase automatically.
@@ -137,14 +168,15 @@ Notes:
 
 ## Trips
 
-| Method | Endpoint            | Description                                     |
-| ------ | ------------------- | ----------------------------------------------- |
-| GET    | `/trips`            | Paginated list of trips with driver and vehicle |
-| GET    | `/trips/{id}`       | Get one trip with driver and vehicle            |
-| POST   | `/trips`            | Create trip                                     |
-| PATCH  | `/trips/{id}`       | Update trip                                     |
-| PATCH  | `/trips/{id}/close` | Close trip and make driver available            |
-| DELETE | `/trips/{id}`       | Delete trip                                     |
+| Method | Endpoint                 | Description                                     |
+| ------ | ------------------------ | ----------------------------------------------- |
+| GET    | `/trips`                 | Paginated list of trips with driver and vehicle |
+| GET    | `/trips/{id}`            | Get one trip with driver and vehicle            |
+| POST   | `/trips`                 | Create trip                                     |
+| PATCH  | `/trips/{id}`            | Update trip                                     |
+| PATCH  | `/trips/{id}/close`      | Close trip and make driver available            |
+| POST   | `/trips/calculate-price` | Calculate recommended trip price                |
+| DELETE | `/trips/{id}`            | Delete trip                                     |
 
 Filters:
 
@@ -162,6 +194,24 @@ GET /api/trips?page=2
 GET /api/trips?sort=-price
 ```
 
+Show response:
+
+```json
+{
+    "trip": {
+        "id": 1,
+        "title": "Warsaw to Berlin",
+        "driver_id": 1,
+        "vehicle_id": 1,
+        "distance": 571,
+        "price": "2000.00",
+        "status": "pending",
+        "driver": {},
+        "vehicle": {}
+    }
+}
+```
+
 Create fields:
 
 | Field        | Required | Rules                       |
@@ -176,6 +226,34 @@ Create fields:
 Update fields: `title`, `distance`, `price`, `driver_id`, `vehicle_id`, `status`.
 All update fields are optional.
 
+Calculate price fields:
+
+| Field      | Required | Rules                        |
+| ---------- | -------: | ---------------------------- |
+| `distance` |      yes | numeric, gt 0 (great than 0) |
+
+Example:
+
+```http
+POST /api/trips/calculate-price
+```
+
+Request:
+
+```json
+{
+    "distance": 571
+}
+```
+
+Response:
+
+```json
+{
+    "recommended_price": 7152
+}
+```
+
 Business rules:
 
 - Trip can be created only with an `available` driver.
@@ -183,6 +261,34 @@ Business rules:
 - After trip creation, driver status becomes `on_trip`.
 - If `driver_id` is changed during update, the new driver must be `available`.
 - If trip status becomes `closed`, driver status becomes `available`.
+
+## Pricing Settings
+
+| Method | Endpoint            | Description                  |
+| ------ | ------------------- | ---------------------------- |
+| GET    | `/pricing-settings` | Get current pricing settings |
+| PATCH  | `/pricing-settings` | Update pricing settings      |
+
+Response:
+
+```json
+{
+    "price_per_km": "12.00",
+    "base_price": "300.00",
+    "minimum_price": "500.00",
+    "updated_at": "2026-09-13T21:18:19.000000Z"
+}
+```
+
+Update fields:
+
+| Field           | Required | Rules          |
+| --------------- | -------: | -------------- |
+| `price_per_km`  |       no | numeric, min 0 |
+| `base_price`    |       no | numeric, min 0 |
+| `minimum_price` |       no | numeric, min 0 |
+
+All update fields are optional.
 
 ## HTTP Status Codes
 
