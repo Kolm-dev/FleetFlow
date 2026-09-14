@@ -34,10 +34,11 @@ const TripEdit = () => {
     });
 
     if (tripId === undefined || Number.isNaN(tripId))
-        return <p>Invalid trip id</p>;
+        return <p className="error-message">Invalid trip id</p>;
     if (isTripLoading || isDriversLoading) return <Spinner />;
-    if (!trip) return <p>Trip not found</p>;
-    if (!driversResponse) return <p>No drivers data</p>;
+    if (!trip) return <p className="error-message">Trip not found</p>;
+    if (!driversResponse)
+        return <p className="error-message">No drivers data</p>;
 
     return (
         <TripEditForm

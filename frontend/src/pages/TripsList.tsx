@@ -136,7 +136,7 @@ const TripsList = () => {
                 </NavLink>
             </div>
 
-            <div>
+            <div className="status-filter-actions">
                 <button onClick={() => changeStatus()}>All</button>
                 <button onClick={() => changeStatus("planned")}>Planned</button>
                 <button onClick={() => changeStatus("pending")}>Pending</button>

@@ -21,14 +21,25 @@ export const TripCard = ({ onClose, onDetailsClick, trip }: TripCardProps) => {
                 {formatValue(trip.price)}
             </p>
 
-            <br />
-            <button onClick={() => navigate(`/trips/${trip.id}/edit`)}>
-                Edit
-            </button>
-            {trip.status !== "closed" && (
-                <button onClick={() => onClose(trip.id)}>Close</button>
-            )}
-            <button onClick={() => onDetailsClick()}>Details</button>
+            <div className="trip-card__actions">
+                <button
+                    className="button-control"
+                    onClick={() => navigate(`/trips/${trip.id}/edit`)}
+                >
+                    Edit
+                </button>
+                {trip.status !== "closed" && (
+                    <button
+                        className="button-control"
+                        onClick={() => onClose(trip.id)}
+                    >
+                        Close
+                    </button>
+                )}
+                <button className="button-control" onClick={onDetailsClick}>
+                    Details
+                </button>
+            </div>
         </div>
     );
 };

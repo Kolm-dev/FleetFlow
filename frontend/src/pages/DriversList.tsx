@@ -99,7 +99,7 @@ export const DriversList = () => {
                                         navigate(`/drivers/${driver.id}`)
                                     }
                                 >
-                                    Show driver
+                                    View profile
                                 </button>
                             </div>
                         </article>

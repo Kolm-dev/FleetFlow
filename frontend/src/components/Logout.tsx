@@ -3,7 +3,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-const Logout = () => {
+type LogoutProps = {
+    onConfirmOpenChange?: (isOpen: boolean) => void;
+};
+
+const Logout = ({ onConfirmOpenChange }: LogoutProps) => {
     const queryClient = useQueryClient();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const navigate = useNavigate();
@@ -17,12 +21,23 @@ const Logout = () => {
     const handleLogoutButton = () => {
         logoutMutate();
     };
+
+    const openConfirm = () => {
+        setIsConfirmOpen(true);
+        onConfirmOpenChange?.(true);
+    };
+
+    const closeConfirm = () => {
+        setIsConfirmOpen(false);
+        onConfirmOpenChange?.(false);
+    };
+
     return (
         <>
             <button
                 className="logout-button"
                 type="button"
-                onClick={() => setIsConfirmOpen(true)}
+                onClick={openConfirm}
             >
                 Logout
             </button>
@@ -44,7 +59,7 @@ const Logout = () => {
                             <button
                                 className="logout-modal__cancel"
                                 type="button"
-                                onClick={() => setIsConfirmOpen(false)}
+                                onClick={closeConfirm}
                             >
                                 Cancel
                             </button>
