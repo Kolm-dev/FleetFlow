@@ -18,6 +18,7 @@ import Authorization from "@/pages/Authorization";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import PublicOnlyRoute from "@/components/PublicOnlyRoute";
 import { Register } from "@/components/Register";
+import { PricingSettings } from "@/pages/PricingSettings";
 
 export const App = () => {
     return (
@@ -65,6 +66,11 @@ export const App = () => {
                             element={<TripEdit />}
                         />
                         <Route path="trips/create" element={<TripCreate />} />
+
+                        <Route
+                            path="pricing-settings"
+                            element={<PricingSettings />}
+                        />
 
                         <Route path="*" element={<NotFound />} />
                     </Route>

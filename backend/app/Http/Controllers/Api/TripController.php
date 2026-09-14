@@ -9,6 +9,7 @@ use App\Http\Requests\StoreTripRequest;
 use App\Http\Requests\UpdateTripRequest;
 use App\Models\Driver;
 use App\Models\Trip;
+use App\Services\TripPriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -143,5 +144,17 @@ class TripController extends Controller
         $trip->delete();
 
         return response()->noContent(); //
+    }
+
+    public function calculatePrice(Request $request, TripPriceCalculator $calculator)
+    {
+        $data = $request->validate([
+            'distance' => ['required', 'numeric', 'gt:0'],
+        ]);
+
+        return response()->json([
+            'recommended_price' => $calculator->calculate($data['distance']),
+        ]);
+
     }
 }
