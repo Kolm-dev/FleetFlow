@@ -52,13 +52,19 @@ class DriverController extends Controller
 
         $driver->update($request->validated());
 
-        return response()->json($driver, 200);
+        return response()->json([
+            'message' => 'Driver updated successfully.',
+            'driver' => $driver->load('vehicles'),
+        ]);
     }
 
     public function store(StoreDriverRequest $request)
     {
         $driver = Driver::create($request->validated());
 
-        return response()->json($driver, 201);
+        return response()->json([
+            'message' => 'Driver created successfully.',
+            'driver' => $driver->load('vehicles'),
+        ], 201);
     }
 }

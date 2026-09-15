@@ -1,9 +1,8 @@
 import { apiClient } from "@/api/client";
 import type {
-    CreatedVehicleResponse,
     CreateVehicleData,
     UpdateVehicleData,
-    Vehicle,
+    VehicleActionResponse,
     VehicleResponse,
     VehiclesFilters,
     VehiclesResponse,
@@ -31,14 +30,14 @@ export async function getVehicle(id: number) {
 }
 
 export function createVehicle(data: CreateVehicleData) {
-    return apiClient<CreatedVehicleResponse>("/vehicles", {
+    return apiClient<VehicleActionResponse>("/vehicles", {
         method: "POST",
         data: data,
     });
 }
 
 export function updateVehicle(data: UpdateVehicleData, id: number) {
-    return apiClient<Vehicle>(`/vehicles/${id}`, {
+    return apiClient<VehicleActionResponse>(`/vehicles/${id}`, {
         method: "PATCH",
         data: data,
     });

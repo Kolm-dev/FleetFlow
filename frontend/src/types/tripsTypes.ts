@@ -34,6 +34,7 @@ export type PaginatedTrips = {
 export type TripResponse = {
     trip: Trip;
 };
+
 export type TripActionResponse = {
     message: string;
     trip: Trip;

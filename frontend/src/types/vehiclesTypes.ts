@@ -32,7 +32,7 @@ export type VehicleResponse = {
     vehicle: Vehicle;
 };
 
-export type CreatedVehicleResponse = {
+export type VehicleActionResponse = {
     message: string;
     vehicle: Vehicle;
 };

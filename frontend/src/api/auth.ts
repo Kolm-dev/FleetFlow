@@ -41,8 +41,8 @@ export type LoginErrorResponse = {
 };
 
 type User = {
+    id: number;
     name: string;
-    password: string;
 };
 
 export const login = async (credentials: LoginCredentials) => {

@@ -13,12 +13,7 @@ class PricingSettingController extends Controller
         $setting = PricingSetting::firstOrFail();
 
         return response()->json([
-
-            'price_per_km' => $setting->price_per_km,
-            'base_price' => $setting->base_price,
-            'minimum_price' => $setting->minimum_price,
-            'updated_at' => $setting->updated_at,
-
+            'pricing_setting' => $setting,
         ]);
     }
 
@@ -34,6 +29,9 @@ class PricingSettingController extends Controller
         $setting = PricingSetting::firstOrFail();
         $setting->update($data);
 
-        return response()->json($setting);
+        return response()->json([
+            'message' => 'Pricing settings updated successfully.',
+            'pricing_setting' => $setting,
+        ]);
     }
 }

@@ -10,12 +10,12 @@ export const DriverCreate = () => {
 
     const { mutate, isPending } = useMutation({
         mutationFn: (data: CreateDriverData) => createDriver(data),
-        onSuccess(createdDriver) {
+        onSuccess(response) {
             queryClient.invalidateQueries({
                 queryKey: ["drivers"],
             });
 
-            navigate(`/drivers/${createdDriver.id}`);
+            navigate(`/drivers/${response.driver.id}`);
         },
     });
 

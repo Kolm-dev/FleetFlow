@@ -18,13 +18,13 @@ export const TripCreate = () => {
         isPending: isCreating,
     } = useMutation({
         mutationFn: (trip: CreateTripData) => createTrip(trip),
-        onSuccess: (createdTrip) => {
+        onSuccess: (response) => {
             queryClient.invalidateQueries({
                 queryKey: ["trips"],
             });
             navigate("/trips", {
                 state: {
-                    selectedTripId: createdTrip.id
+                    selectedTripId: response.trip.id,
                 },
             });
         },

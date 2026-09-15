@@ -2,7 +2,6 @@ import { apiClient } from "@/api/client";
 import type {
     CreateTripData,
     PaginatedTrips,
-    Trip,
     TripActionResponse,
     TripResponse,
     TripsFilters,
@@ -35,14 +34,14 @@ export async function getTrip(id: number) {
 }
 
 export function createTrip(data: CreateTripData) {
-    return apiClient<Trip>("/trips", {
+    return apiClient<TripActionResponse>("/trips", {
         method: "POST",
         data: data,
     });
 }
 
 export function updateTrip(data: UpdateTripData, id: number) {
-    return apiClient<Trip>(`/trips/${id}`, {
+    return apiClient<TripActionResponse>(`/trips/${id}`, {
         method: "PATCH",
         data: data,
     });

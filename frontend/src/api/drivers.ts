@@ -1,8 +1,7 @@
 import { apiClient } from "@/api/client";
 import type {
     CreateDriverData,
-    CreatedDriver,
-    Driver,
+    DriverActionResponse,
     DriverResponse,
     DriversFilters,
     DriversResponse,
@@ -27,14 +26,14 @@ export async function getDriver(id: number) {
 }
 
 export function createDriver(data: CreateDriverData) {
-    return apiClient<CreatedDriver>("/drivers", {
+    return apiClient<DriverActionResponse>("/drivers", {
         method: "POST",
         data: data,
     });
 }
 
 export function updateDriver(data: UpdateDriverData, id: number) {
-    return apiClient<Driver>(`/drivers/${id}`, {
+    return apiClient<DriverActionResponse>(`/drivers/${id}`, {
         method: "PATCH",
         data: data,
     });

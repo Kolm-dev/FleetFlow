@@ -13,5 +13,6 @@ export type Stats = {
         planned: number;
         pending: number;
         closed: number;
+        cancelled: number;
     };
 };

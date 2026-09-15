@@ -69,7 +69,10 @@ class TripController extends Controller
             return $trip;
         });
 
-        return response()->json($trip->load(['driver', 'vehicle']), 201);
+        return response()->json([
+            'message' => 'Trip created successfully.',
+            'trip' => $trip->load(['driver', 'vehicle']),
+        ], 201);
     }
 
     public function show(Trip $trip)
@@ -121,9 +124,10 @@ class TripController extends Controller
             return $trip;
         });
 
-        return response()->json(
-            $trip->load(['driver', 'vehicle'])
-        );
+        return response()->json([
+            'message' => 'Trip updated successfully.',
+            'trip' => $trip->load(['driver', 'vehicle']),
+        ]);
     }
 
     public function close(Trip $trip)
@@ -136,7 +140,10 @@ class TripController extends Controller
             'status' => DriverStatus::Available,
         ]);
 
-        return response()->json($trip->load(['driver', 'vehicle']));
+        return response()->json([
+            'message' => 'Trip closed successfully.',
+            'trip' => $trip->load(['driver', 'vehicle']),
+        ]);
     }
 
     public function cancel(Trip $trip)
@@ -154,7 +161,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip cancelled successfully.',
-            'trip' => $trip->fresh(),
+            'trip' => $trip->fresh(['driver', 'vehicle']),
         ]);
     }
 

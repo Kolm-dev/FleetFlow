@@ -31,14 +31,9 @@ export type DriverResponse = {
     driver: Driver;
 };
 
-export type UpdateDriverData = Partial<CreateDriverData>;
-
-export type CreatedDriver = {
-    created_at: string;
-    id: number;
-    name: string;
-    phone_number: string;
-    status: DriverStatus;
-    updated_at: string;
-    photo?: string | null;
+export type DriverActionResponse = {
+    message: string;
+    driver: Driver;
 };
+
+export type UpdateDriverData = Partial<CreateDriverData>;

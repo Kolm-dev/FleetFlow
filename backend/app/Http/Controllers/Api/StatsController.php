@@ -33,6 +33,7 @@ class StatsController extends Controller
             'planned' => Trip::where('status', TripStatus::Planned)->count(),
             'pending' => Trip::where('status', TripStatus::Pending)->count(),
             'closed' => Trip::where('status', TripStatus::Closed)->count(),
+            'cancelled' => Trip::where('status', TripStatus::Cancelled)->count(),
         ];
     }
 

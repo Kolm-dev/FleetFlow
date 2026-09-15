@@ -1,301 +1,145 @@
 # FleetFlow API
 
-Base URL: `/api`
+Base API URL: `/api`
 
-All responses are JSON. Validation errors return `422`.
+All protected routes use Laravel Sanctum session cookies. Validation errors return `422`.
 
-## Auth
-
-Authentication uses Laravel Sanctum session cookies.
-
-Before login, request the Sanctum CSRF cookie:
+Before login, request the CSRF cookie:
 
 ```http
 GET /sanctum/csrf-cookie
 ```
 
-| Method | Endpoint  | Description                    |
-| ------ | --------- | ------------------------------ |
-| GET    | `/user`   | Get current authenticated user |
-| POST   | `/login`  | Login to account               |
-| POST   | `/logout` | Logout from the account        |
+## Response Shape
 
-Login fields:
+Lists return collection data:
 
-| Field      | Required | Rules  |
-| ---------- | -------: | ------ |
-| `name`     |      yes | string |
-| `password` |      yes | string |
+```json
+{
+    "total": 1,
+    "drivers": []
+}
+```
+
+Show routes return one named object:
+
+```json
+{
+    "driver": {}
+}
+```
+
+Create, update, and action routes return a message with the changed object:
+
+```json
+{
+    "message": "Driver updated successfully.",
+    "driver": {}
+}
+```
+
+Delete routes return `204 No Content`.
+
+## Auth
+
+| Method | Endpoint    | Description                    |
+| ------ | ----------- | ------------------------------ |
+| GET    | `/user`     | Get current authenticated user |
+| POST   | `/login`    | Login                          |
+| POST   | `/logout`   | Logout                         |
+| POST   | `/register` | Register                       |
+
+Login fields: `name`, `password`.
+Register fields: `name`, `password`, `password_confirmation`.
 
 ## Statuses
 
-| Entity | Values                                |
-| ------ | ------------------------------------- |
-| Driver | `available`, `on_trip`, `unavailable` |
-| Trip   | `planned`, `pending`, `closed`        |
+| Entity | Values                                      |
+| ------ | ------------------------------------------- |
+| Driver | `available`, `on_trip`, `unavailable`       |
+| Trip   | `planned`, `pending`, `closed`, `cancelled` |
 
 ## Drivers
 
-| Method | Endpoint        | Description                  |
-| ------ | --------------- | ---------------------------- |
-| GET    | `/drivers`      | List drivers with vehicles   |
-| GET    | `/drivers/{id}` | Get one driver with vehicles |
-| POST   | `/drivers`      | Create driver                |
-| PATCH  | `/drivers/{id}` | Update driver                |
-| DELETE | `/drivers/{id}` | Delete driver                |
+| Method | Endpoint        | Response              |
+| ------ | --------------- | --------------------- |
+| GET    | `/drivers`      | `{ total, drivers }`  |
+| GET    | `/drivers/{id}` | `{ driver }`          |
+| POST   | `/drivers`      | `{ message, driver }` |
+| PATCH  | `/drivers/{id}` | `{ message, driver }` |
+| DELETE | `/drivers/{id}` | `204 No Content`      |
 
-Filters:
+Filter: `status`.
 
-| Query    | Type   | Values                                |
-| -------- | ------ | ------------------------------------- |
-| `status` | string | `available`, `on_trip`, `unavailable` |
+Create fields: `name`, `phone_number`, `status`, `photo`.
+Update fields: same fields, all optional.
 
-Example:
-
-```http
-GET /api/drivers?status=available
-```
-
-Create fields:
-
-| Field          | Required | Rules           |
-| -------------- | -------: | --------------- |
-| `name`         |      yes | string, max 255 |
-| `phone_number` |      yes | string, max 20  |
-| `status`       |       no | driver status   |
-
-Update fields: `name`, `phone_number`, `status`, `photo`.
-All update fields are optional.
-
-Show response:
-
-```json
-{
-    "driver": {
-        "id": 1,
-        "name": "Dr. Jayden Lynch",
-        "phone_number": "+1.480.475.8257",
-        "status": "available",
-        "photo": null,
-        "vehicles": []
-    }
-}
-```
-
-## Stats
-
-| Method | Endpoint | Description |
-| ------ | -------- | ----------- |
-| GET    | `/stats` | API summary |
-
-Returns counters grouped by `drivers`, `vehicles`, and `trips`.
-
-Driver stats:
-
-- `total`
-- `available`
-- `on_trip`
-- `unavailable`
-
-Vehicle stats:
-
-- `total`
-
-Trip stats:
-
-- `total`
-- `planned`
-- `pending`
-- `closed`
+Driver object includes assigned `vehicles`.
 
 ## Vehicles
 
-| Method | Endpoint         | Description                 |
-| ------ | ---------------- | --------------------------- |
-| GET    | `/vehicles`      | List vehicles with driver   |
-| GET    | `/vehicles/{id}` | Get one vehicle with driver |
-| POST   | `/vehicles`      | Create vehicle              |
-| PATCH  | `/vehicles/{id}` | Update vehicle              |
-| DELETE | `/vehicles/{id}` | Delete vehicle              |
+| Method | Endpoint         | Response               |
+| ------ | ---------------- | ---------------------- |
+| GET    | `/vehicles`      | `{ total, vehicles }`  |
+| GET    | `/vehicles/{id}` | `{ vehicle }`          |
+| POST   | `/vehicles`      | `{ message, vehicle }` |
+| PATCH  | `/vehicles/{id}` | `{ message, vehicle }` |
+| DELETE | `/vehicles/{id}` | `204 No Content`       |
 
-Filters:
+Filters: `driver_id`, `license_plate`.
 
-| Query           | Type    | Rules                      |
-| --------------- | ------- | -------------------------- |
-| `driver_id`     | integer | must exist in `drivers.id` |
-| `license_plate` | string  | exact plate filter, max 8  |
+Create fields: `brand`, `model`, `license_plate`, `year`, `driver_id`.
+Update fields: same fields, all optional.
 
-Example:
-
-```http
-GET /api/vehicles?driver_id=1
-GET /api/vehicles?license_plate=AA1234BB
-```
-
-Create fields:
-
-| Field           | Required | Rules                      |
-| --------------- | -------: | -------------------------- |
-| `brand`         |      yes | string, max 255            |
-| `model`         |      yes | string, max 255            |
-| `license_plate` |      yes | string, unique, max 8      |
-| `year`          |       no | integer, 1900-current year |
-| `driver_id`     |      yes | must exist in `drivers.id` |
-
-Update fields: `brand`, `model`, `license_plate`, `year`, `driver_id`.
-All update fields are optional.
-
-Show response:
-
-```json
-{
-    "vehicle": {
-        "id": 1,
-        "brand": "Volvo",
-        "model": "FH",
-        "license_plate": "AA1234BB",
-        "year": 2022,
-        "driver_id": 1,
-        "driver": {}
-    }
-}
-```
-
-Notes:
-
-- `license_plate` is converted to uppercase automatically.
-- `year` must be between `1900` and the current year.
+Vehicle object includes assigned `driver`.
+`license_plate` is converted to uppercase automatically.
 
 ## Trips
 
-| Method | Endpoint                 | Description                                     |
-| ------ | ------------------------ | ----------------------------------------------- |
-| GET    | `/trips`                 | Paginated list of trips with driver and vehicle |
-| GET    | `/trips/{id}`            | Get one trip with driver and vehicle            |
-| POST   | `/trips`                 | Create trip                                     |
-| PATCH  | `/trips/{id}`            | Update trip                                     |
-| PATCH  | `/trips/{id}/close`      | Close trip and make driver available            |
-| POST   | `/trips/calculate-price` | Calculate recommended trip price                |
-| DELETE | `/trips/{id}`            | Delete trip                                     |
+| Method | Endpoint                 | Response                |
+| ------ | ------------------------ | ----------------------- |
+| GET    | `/trips`                 | paginated trips         |
+| GET    | `/trips/{id}`            | `{ trip }`              |
+| POST   | `/trips`                 | `{ message, trip }`     |
+| PATCH  | `/trips/{id}`            | `{ message, trip }`     |
+| PATCH  | `/trips/{id}/close`      | `{ message, trip }`     |
+| PATCH  | `/trips/{id}/cancel`     | `{ message, trip }`     |
+| DELETE | `/trips/{id}`            | `204 No Content`        |
+| POST   | `/trips/calculate-price` | `{ recommended_price }` |
 
-Filters:
+Filters: `status`, `page`, `sort`.
 
-| Query    | Type    | Values                                         |
-| -------- | ------- | ---------------------------------------------- |
-| `status` | string  | `planned`, `pending`, `closed`                 |
-| `page`   | integer | pagination page                                |
-| `sort`   | string  | `price`, `-price`, `created_at`, `-created_at` |
+Sort values: `price`, `-price`, `created_at`, `-created_at`.
 
-Examples:
+Create fields: `title`, `driver_id`, `vehicle_id`, `distance`, `price`, `status`.
+Update fields: same fields, all optional.
 
-```http
-GET /api/trips?status=planned
-GET /api/trips?page=2
-GET /api/trips?sort=-price
-```
-
-Show response:
-
-```json
-{
-    "trip": {
-        "id": 1,
-        "title": "Warsaw to Berlin",
-        "driver_id": 1,
-        "vehicle_id": 1,
-        "distance": 571,
-        "price": "2000.00",
-        "status": "pending",
-        "driver": {},
-        "vehicle": {}
-    }
-}
-```
-
-Create fields:
-
-| Field        | Required | Rules                       |
-| ------------ | -------: | --------------------------- |
-| `title`      |      yes | string, max 255             |
-| `driver_id`  |      yes | must exist in `drivers.id`  |
-| `vehicle_id` |      yes | must exist in `vehicles.id` |
-| `distance`   |       no | integer, min 0              |
-| `price`      |       no | numeric, min 0              |
-| `status`     |       no | trip status                 |
-
-Update fields: `title`, `distance`, `price`, `driver_id`, `vehicle_id`, `status`.
-All update fields are optional.
-
-Calculate price fields:
-
-| Field      | Required | Rules                        |
-| ---------- | -------: | ---------------------------- |
-| `distance` |      yes | numeric, gt 0 (great than 0) |
-
-Example:
-
-```http
-POST /api/trips/calculate-price
-```
-
-Request:
-
-```json
-{
-    "distance": 571
-}
-```
-
-Response:
-
-```json
-{
-    "recommended_price": 7152
-}
-```
+Trip object includes `driver` and `vehicle`.
 
 Business rules:
 
-- Trip can be created only with an `available` driver.
-- Vehicle must belong to the selected driver.
-- After trip creation, driver status becomes `on_trip`.
-- If `driver_id` is changed during update, the new driver must be `available`.
-- If trip status becomes `closed`, driver status becomes `available`.
+- A trip can be created only with an `available` driver.
+- The vehicle must belong to the selected driver.
+- Closing or cancelling a trip makes the driver `available`.
+- A `closed` or `cancelled` trip cannot be cancelled again.
 
 ## Pricing Settings
 
-| Method | Endpoint            | Description                  |
-| ------ | ------------------- | ---------------------------- |
-| GET    | `/pricing-settings` | Get current pricing settings |
-| PATCH  | `/pricing-settings` | Update pricing settings      |
+| Method | Endpoint            | Response                       |
+| ------ | ------------------- | ------------------------------ |
+| GET    | `/pricing-settings` | `{ pricing_setting }`          |
+| PATCH  | `/pricing-settings` | `{ message, pricing_setting }` |
 
-Response:
+Fields: `price_per_km`, `base_price`, `minimum_price`.
 
-```json
-{
-    "price_per_km": "12.00",
-    "base_price": "300.00",
-    "minimum_price": "500.00",
-    "updated_at": "2026-09-13T21:18:19.000000Z"
-}
-```
+## Stats
 
-Update fields:
+| Method | Endpoint | Response                       |
+| ------ | -------- | ------------------------------ |
+| GET    | `/stats` | `{ drivers, vehicles, trips }` |
 
-| Field           | Required | Rules          |
-| --------------- | -------: | -------------- |
-| `price_per_km`  |       no | numeric, min 0 |
-| `base_price`    |       no | numeric, min 0 |
-| `minimum_price` |       no | numeric, min 0 |
+Stats counters:
 
-All update fields are optional.
-
-## HTTP Status Codes
-
-| Code | Meaning             |
-| ---: | ------------------- |
-|  200 | Success             |
-|  201 | Created             |
-|  204 | Deleted, no content |
-|  404 | Not found           |
-|  422 | Validation error    |
+- drivers: `total`, `available`, `on_trip`, `unavailable`
+- vehicles: `total`
+- trips: `total`, `planned`, `pending`, `closed`, `cancelled`

@@ -10,5 +10,10 @@ class User extends Authenticatable
         'name', 'password',
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     public $timestamps = false;
 }

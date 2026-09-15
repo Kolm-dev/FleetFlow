@@ -16,7 +16,7 @@ class VehicleController extends Controller
         $vehicle = Vehicle::create($request->validated())->load('driver');
 
         return response()->json([
-            'message' => 'Vehicle created.',
+            'message' => 'Vehicle created successfully.',
             'vehicle' => $vehicle,
         ], 201);
     }
@@ -64,8 +64,8 @@ class VehicleController extends Controller
         $vehicle->update($request->validated());
 
         return response()->json([
-            'message' => 'Vehicle updated',
-            'vehicle' => $vehicle,
+            'message' => 'Vehicle updated successfully.',
+            'vehicle' => $vehicle->load('driver'),
         ]);
     }
 
@@ -73,6 +73,7 @@ class VehicleController extends Controller
     {
 
         $vehicle->delete();
+
         return response()->noContent();
     }
 }

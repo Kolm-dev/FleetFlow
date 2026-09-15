@@ -5,6 +5,15 @@ export type PricingSetting = {
     updated_at: string | null;
 };
 
+export type PricingSettingResponse = {
+    pricing_setting: PricingSetting;
+};
+
+export type PricingSettingActionResponse = {
+    message: string;
+    pricing_setting: PricingSetting;
+};
+
 export type CalculatePriceResponse = {
     recommended_price: number;
 };
