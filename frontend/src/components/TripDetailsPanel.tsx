@@ -2,6 +2,7 @@ import type { Trip } from "@/types/tripsTypes";
 
 export type TripDetailsType = {
     onClose: () => void;
+    onCancelled: () => void;
     trip: Trip;
 };
 
@@ -21,14 +22,28 @@ const formatDate = (value?: string) => {
     }).format(new Date(value));
 };
 
-const TripDetailsPanel = ({ onClose, trip }: TripDetailsType) => {
+const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
+    const canCancel = trip.status !== "closed" && trip.status !== "cancelled";
+
     return (
         <div className="trip-details-overlay">
             <div className="trip-details-modal">
                 <div className="trip-details-header">
                     <div>
-                        <p className="trip-details-label">Trip #{trip.id}</p>
-                        <h2>{trip.title}</h2>
+                        <p className="trip-details-label">Trip #{trip.id} </p>
+
+                        <div className="trip-details-title-row">
+                            <h2>{trip.title}</h2>
+                            {canCancel && (
+                                <button
+                                    type="button"
+                                    className="trip-details-cancel"
+                                    onClick={onCancelled}
+                                >
+                                    Cancel trip
+                                </button>
+                            )}
+                        </div>
                     </div>
                     <button className="trip-details-close" onClick={onClose}>
                         Close

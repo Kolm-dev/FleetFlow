@@ -3,6 +3,7 @@ import type {
     CreateTripData,
     PaginatedTrips,
     Trip,
+    TripActionResponse,
     TripResponse,
     TripsFilters,
     UpdateTripData,
@@ -48,7 +49,13 @@ export function updateTrip(data: UpdateTripData, id: number) {
 }
 
 export function closeTrip(id: number) {
-    return apiClient<Trip>(`/trips/${id}/close`, {
+    return apiClient<TripActionResponse>(`/trips/${id}/close`, {
+        method: "PATCH",
+    });
+}
+
+export function cancelTrip(id: number) {
+    return apiClient<TripActionResponse>(`/trips/${id}/cancel`, {
         method: "PATCH",
     });
 }

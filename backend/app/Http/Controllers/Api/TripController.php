@@ -139,6 +139,25 @@ class TripController extends Controller
         return response()->json($trip->load(['driver', 'vehicle']));
     }
 
+    public function cancel(Trip $trip)
+    {
+        if (in_array($trip->status, [TripStatus::Cancelled, TripStatus::Closed], true)) {
+            return response()->json([
+                'message' => 'Trip cannot be updated because it is already cancelled or closed.',
+            ], 422);
+        }
+        DB::transaction(function () use ($trip) {
+            $trip->update(['status' => TripStatus::Cancelled]);
+            $trip->driver->update(['status' => DriverStatus::Available]);
+
+        });
+
+        return response()->json([
+            'message' => 'Trip cancelled successfully.',
+            'trip' => $trip->fresh(),
+        ]);
+    }
+
     public function destroy(Trip $trip)
     {
         $trip->delete();

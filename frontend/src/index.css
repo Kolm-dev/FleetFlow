@@ -667,6 +667,36 @@ select:disabled {
     font-size: 14px;
 }
 
+.trip-details-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.trip-details-title-row h2 {
+    margin: 0;
+}
+
+.trip-details-cancel {
+    min-height: 30px;
+    border-color: var(--color-border);
+    padding: 5px 10px;
+    background: var(--color-bg);
+    color: var(--color-muted);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.trip-details-cancel:hover,
+.trip-details-cancel:focus-visible {
+    border-color: var(--color-danger);
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+    outline: none;
+}
+
 .trip-details-section {
     margin-top: 20px;
 }

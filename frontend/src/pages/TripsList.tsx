@@ -1,4 +1,4 @@
-import { closeTrip, getTrips } from "@/api/trips";
+import { closeTrip, cancelTrip, getTrips } from "@/api/trips";
 import { TripCard } from "@/components/TripCard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -55,9 +55,9 @@ const TripsList = () => {
         queryFn: () => getTrips({ page, status, sort }),
     });
 
-    const { mutate } = useMutation({
+    const { mutate: closeTripMutation } = useMutation({
         mutationFn: (id: number) => closeTrip(id),
-        onSuccess: (trip) => {
+        onSuccess: ({ trip }) => {
             scrollReturnPositionRef.current = window.scrollY;
 
             queryClient.invalidateQueries({
@@ -72,6 +72,20 @@ const TripsList = () => {
             setSuccessMessage(
                 `${driverName} and ${vehicleName} are now available and will be back on the road soon.`,
             );
+        },
+    });
+
+    const { mutate: cancelTripMutation } = useMutation({
+        mutationFn: (id: number) => cancelTrip(id),
+        onSuccess: ({ message }) => {
+            scrollReturnPositionRef.current = window.scrollY;
+
+            queryClient.invalidateQueries({
+                queryKey: ["trips"],
+            });
+
+            setSelectedCard(null);
+            setSuccessMessage(message);
         },
     });
 
@@ -141,6 +155,9 @@ const TripsList = () => {
                 <button onClick={() => changeStatus("planned")}>Planned</button>
                 <button onClick={() => changeStatus("pending")}>Pending</button>
                 <button onClick={() => changeStatus("closed")}>Closed</button>
+                <button onClick={() => changeStatus("cancelled")}>
+                    Cancelled
+                </button>
             </div>
 
             {successMessage && (
@@ -168,7 +185,7 @@ const TripsList = () => {
 
             {trips.map((trip) => (
                 <TripCard
-                    onClose={() => mutate(trip.id)}
+                    onClose={() => closeTripMutation(trip.id)}
                     key={trip.id}
                     trip={trip}
                     onDetailsClick={() => setSelectedCard(trip.id)}
@@ -179,6 +196,7 @@ const TripsList = () => {
                     <TripDetailsPanel
                         trip={selectedTrip}
                         onClose={() => setSelectedCard(null)}
+                        onCancelled={() => cancelTripMutation(selectedTrip.id)}
                     />
                 )}
             </>

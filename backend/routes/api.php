@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('pricing-settings', [PricingSettingController::class, 'show']);
     Route::patch('pricing-settings', [PricingSettingController::class, 'update']);
     Route::post('trips/calculate-price', [TripController::class, 'calculatePrice']);
+    Route::patch('/trips/{trip}/cancel', [TripController::class, 'cancel']);
     Route::patch('trips/{trip}/close', [TripController::class, 'close']);
     Route::apiResource('trips', TripController::class);
 

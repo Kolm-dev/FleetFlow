@@ -14,7 +14,7 @@ export interface Trip {
     vehicle?: Vehicle;
 }
 
-export type TripStatus = "closed" | "pending" | "planned";
+export type TripStatus = "closed" | "pending" | "planned" | "cancelled";
 export type TripSort = "price" | "-price" | "created_at" | "-created_at";
 
 export type TripsFilters = {
@@ -32,6 +32,10 @@ export type PaginatedTrips = {
 };
 
 export type TripResponse = {
+    trip: Trip;
+};
+export type TripActionResponse = {
+    message: string;
     trip: Trip;
 };
 
