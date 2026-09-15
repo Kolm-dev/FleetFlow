@@ -1,10 +1,9 @@
 import { getVehicles } from "@/api/vehicles";
 import { Spinner } from "@/components/Spinner";
 import { useQuery } from "@tanstack/react-query";
-import { NavLink, useNavigate } from "react-router";
+import { NavLink } from "react-router";
 
 const VehiclesList = () => {
-    const navigate = useNavigate();
     const { data, isPending, isError, error } = useQuery({
         queryKey: ["vehicles"],
         queryFn: () => getVehicles(),
@@ -32,7 +31,11 @@ const VehiclesList = () => {
             <div className="vehicles-list">
                 {vehicles.length > 0 ? (
                     vehicles.map((vehicle, index) => (
-                        <article className="vehicle-card" key={vehicle.id}>
+                        <NavLink
+                            className="vehicle-card"
+                            key={vehicle.id}
+                            to={`/vehicles/${vehicle.id}`}
+                        >
                             <div className="vehicle-card__header">
                                 <span className="vehicle-card__number">
                                     #{index + 1}
@@ -52,17 +55,7 @@ const VehiclesList = () => {
                                     <dd>{vehicle.year ?? "Not specified"}</dd>
                                 </div>
                             </dl>
-
-                            <button
-                                className="vehicle-card__button"
-                                type="button"
-                                onClick={() =>
-                                    navigate(`/vehicles/${vehicle.id}`)
-                                }
-                            >
-                                Show vehicle
-                            </button>
-                        </article>
+                        </NavLink>
                     ))
                 ) : (
                     <p className="empty-state">No vehicles found</p>
