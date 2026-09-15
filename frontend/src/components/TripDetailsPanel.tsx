@@ -1,4 +1,6 @@
+import { ConfirmModal } from "@/components/ConfirmModal";
 import type { Trip } from "@/types/tripsTypes";
+import { useState } from "react";
 
 export type TripDetailsType = {
     onClose: () => void;
@@ -23,7 +25,13 @@ const formatDate = (value?: string) => {
 };
 
 const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
+    const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
     const canCancel = trip.status !== "closed" && trip.status !== "cancelled";
+
+    const handleConfirmCancel = () => {
+        setIsCancelConfirmOpen(false);
+        onCancelled();
+    };
 
     return (
         <div className="trip-details-overlay">
@@ -38,7 +46,9 @@ const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
                                 <button
                                     type="button"
                                     className="trip-details-cancel"
-                                    onClick={onCancelled}
+                                    onClick={() =>
+                                        setIsCancelConfirmOpen(true)
+                                    }
                                 >
                                     Cancel trip
                                 </button>
@@ -127,6 +137,15 @@ const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
                         <p className="trip-details-empty">No vehicle data.</p>
                     )}
                 </div>
+
+                <ConfirmModal
+                    isOpen={isCancelConfirmOpen}
+                    title="Cancel trip?"
+                    message={`Trip "${trip.title}" will be cancelled and the driver will become available.`}
+                    confirmText="Cancel trip"
+                    onConfirm={handleConfirmCancel}
+                    onCancel={() => setIsCancelConfirmOpen(false)}
+                />
             </div>
         </div>
     );

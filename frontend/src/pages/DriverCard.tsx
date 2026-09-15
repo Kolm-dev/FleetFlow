@@ -1,4 +1,5 @@
 import { deleteDriver, getDriver } from "@/api/drivers";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ export const DriverCard = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [redirectCountdown, setRedirectCountdown] = useState(5);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const { mutate, isError, error, isPending, isSuccess } = useMutation({
         mutationFn: (id: number) => deleteDriver(id),
         onSuccess: () => {
@@ -45,6 +47,13 @@ export const DriverCard = () => {
             navigate("/drivers");
         }
     }, [isSuccess, navigate, redirectCountdown]);
+
+    const handleConfirmDelete = () => {
+        if (!driverId) return;
+
+        setIsDeleteConfirmOpen(false);
+        mutate(parseInt(driverId));
+    };
 
     if (isSuccess) {
         return (
@@ -144,7 +153,7 @@ export const DriverCard = () => {
                         <button
                             disabled={isPending}
                             hidden={isSuccess}
-                            onClick={() => mutate(parseInt(driverId as string))}
+                            onClick={() => setIsDeleteConfirmOpen(true)}
                         >
                             {isPending ? (
                                 <Spinner text="DELETING..." />
@@ -160,6 +169,15 @@ export const DriverCard = () => {
                         >
                             Edit
                         </button>
+                        <ConfirmModal
+                            isOpen={isDeleteConfirmOpen}
+                            title="Delete driver?"
+                            message={`Driver "${driver.name}" will be permanently deleted.`}
+                            confirmText="Delete driver"
+                            isConfirming={isPending}
+                            onConfirm={handleConfirmDelete}
+                            onCancel={() => setIsDeleteConfirmOpen(false)}
+                        />
                     </div>
                 </>
             )}

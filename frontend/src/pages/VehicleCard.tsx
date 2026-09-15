@@ -1,4 +1,5 @@
 import { deleteVehicle, getVehicle } from "@/api/vehicles";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ export const VehicleCard = () => {
     const navigate = useNavigate();
     const [redirectCountdown, setRedirectCountdown] = useState(5);
     const [deletedVehicleLabel, setDeletedVehicleLabel] = useState("");
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const { mutate, isSuccess, isPending } = useMutation({
         mutationFn: (id: number) => deleteVehicle(id),
         onSuccess: () => {
@@ -46,6 +48,16 @@ export const VehicleCard = () => {
             navigate("/vehicles");
         }
     }, [isSuccess, navigate, redirectCountdown]);
+
+    const handleConfirmDelete = () => {
+        if (!vehicleId || !vehicle) return;
+
+        setDeletedVehicleLabel(
+            `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`,
+        );
+        setIsDeleteConfirmOpen(false);
+        mutate(parseInt(vehicleId));
+    };
 
     if (isSuccess) {
         return (
@@ -115,12 +127,7 @@ export const VehicleCard = () => {
                 <button
                     disabled={isPending}
                     hidden={isSuccess}
-                    onClick={() => {
-                        setDeletedVehicleLabel(
-                            `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`,
-                        );
-                        mutate(parseInt(vehicleId as string));
-                    }}
+                    onClick={() => setIsDeleteConfirmOpen(true)}
                 >
                     {isPending ? "DELETING..." : "DELETE"}
                 </button>
@@ -130,6 +137,15 @@ export const VehicleCard = () => {
                 >
                     Edit
                 </button>
+                <ConfirmModal
+                    isOpen={isDeleteConfirmOpen}
+                    title="Delete vehicle?"
+                    message={`Vehicle "${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}" will be permanently deleted.`}
+                    confirmText="Delete vehicle"
+                    isConfirming={isPending}
+                    onConfirm={handleConfirmDelete}
+                    onCancel={() => setIsDeleteConfirmOpen(false)}
+                />
             </div>
         </div>
     );
