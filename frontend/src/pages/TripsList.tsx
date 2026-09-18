@@ -1,52 +1,42 @@
 import { closeTrip, cancelTrip, getTrips } from "@/api/trips";
-import { TripCard } from "@/components/TripCard";
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import type { TripSort, TripStatus } from "@/types/tripsTypes";
-import TripDetailsPanel from "@/components/TripDetailsPanel";
-import { NavLink } from "react-router";
+import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
-import { useDebounce } from "@/hooks/useDebounce.ts";
+import TripDetailsPanel from "@/components/TripDetailsPanel";
+import { TripsContent } from "@/components/TripsContent";
+import { TripsHeader } from "@/components/TripsHeader";
+import { TripsStatusFilter } from "@/components/TripsStatusFilter";
+import { TripsToolbar } from "@/components/TripsToolbar";
+import { useSuccessMessageScroll } from "@/hooks/useSuccessMessageScroll";
+import { useTripsFilters } from "@/hooks/useTripsFilters";
+import type { Trip } from "@/types/tripsTypes";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
-type PaginationProps = {
-    page: number;
-    lastPage: number;
-    isFetching: boolean;
-    onPreviousPage: () => void;
-    onNextPage: () => void;
+const getCloseTripSuccessMessage = (trip: Trip) => {
+    const driverName = trip.driver?.name ?? "Driver";
+    const vehicleName = trip.vehicle ? `${trip.vehicle.brand} ${trip.vehicle.model}` : "vehicle";
+
+    return `${driverName} and ${vehicleName} are now available and will be back on the road soon.`;
 };
 
-const Pagination = ({ page, lastPage, isFetching, onPreviousPage, onNextPage }: PaginationProps) => (
-    <div>
-        <button
-            type="button"
-            disabled={page === 1 || isFetching}
-            onClick={onPreviousPage}
-        >
-            Previous
-        </button>
-        <button
-            type="button"
-            disabled={page === lastPage || isFetching}
-            onClick={onNextPage}
-        >
-            Next
-        </button>
-    </div>
-);
-
 const TripsList = () => {
-    const [page, setPage] = useState(1);
-    const [status, setStatus] = useState<TripStatus | undefined>();
-    const [sort, setSort] = useState<TripSort | undefined>();
-    const [searchInput, setSearchInput] = useState("");
-    const search = useDebounce(searchInput.trim(), 500);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const successMessageRef = useRef<HTMLParagraphElement | null>(null);
-    const scrollReturnPositionRef = useRef(0);
-    const scrollReturnTimeoutRef = useRef<number | null>(null);
-    const queryClient = useQueryClient();
     const [selectedCardId, setSelectedCard] = useState<null | number>(null);
+    const queryClient = useQueryClient();
+    const {
+        page,
+        status,
+        sort,
+        search,
+        searchInput,
+        changeStatus,
+        changeSort,
+        changeSearchInput,
+        goToPreviousPage,
+        goToNextPage,
+    } = useTripsFilters();
+    const { successMessageRef, scrollReturnPositionRef } = useSuccessMessageScroll(successMessage);
+
     const { isLoading, error, data, isFetching } = useQuery({
         queryKey: ["trips", { page, status, sort, search }],
         queryFn: () => getTrips({ page, status, sort, search }),
@@ -62,10 +52,7 @@ const TripsList = () => {
                 queryKey: ["trips"],
             });
 
-            const driverName = trip.driver?.name ?? "Driver";
-            const vehicleName = trip.vehicle ? `${trip.vehicle.brand} ${trip.vehicle.model}` : "vehicle";
-
-            setSuccessMessage(`${driverName} and ${vehicleName} are now available and will be back on the road soon.`);
+            setSuccessMessage(getCloseTripSuccessMessage(trip));
         },
     });
 
@@ -83,82 +70,22 @@ const TripsList = () => {
         },
     });
 
-    useEffect(() => {
-        if (!successMessage) return;
-
-        if (scrollReturnTimeoutRef.current !== null) {
-            window.clearTimeout(scrollReturnTimeoutRef.current);
-        }
-
-        window.requestAnimationFrame(() => {
-            successMessageRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-            });
-        });
-
-        scrollReturnTimeoutRef.current = window.setTimeout(() => {
-            window.scrollTo({
-                top: scrollReturnPositionRef.current,
-                behavior: "smooth",
-            });
-        }, 3500);
-
-        return () => {
-            if (scrollReturnTimeoutRef.current !== null) {
-                window.clearTimeout(scrollReturnTimeoutRef.current);
-            }
-        };
-    }, [successMessage]);
-
     if (isLoading) return <Spinner />;
     if (error) return <p>{error.message}</p>;
     if (!data) return <p>No trips data.</p>;
 
     const { data: trips, current_page, last_page, total } = data;
-    const goToPreviousPage = () => setPage(currentPage => currentPage - 1);
-    const goToNextPage = () => setPage(currentPage => currentPage + 1);
-
-    const changeStatus = (status?: TripStatus) => {
-        setStatus(status);
-        setPage(1);
-    };
-
-    const changeSort = (sort?: TripSort) => {
-        setSort(sort);
-        setPage(1);
-    };
-
-    const changeSearchInput = (searchValue: string) => {
-        setSearchInput(searchValue);
-        setPage(1);
-    };
-
     const selectedTrip = trips.find(trip => trip.id === selectedCardId);
+
     return (
         <div>
-            <div className="page-header">
-                <div>
-                    <h1>Trips</h1>
-                    <p>
-                        Page {current_page} of {last_page}. Total trips: {total}
-                    </p>
-                </div>
-                <NavLink
-                    className="create-link"
-                    to="/trips/create"
-                >
-                    + Create trip
-                </NavLink>
-            </div>
+            <TripsHeader
+                currentPage={current_page}
+                lastPage={last_page}
+                total={total}
+            />
 
-            <div className="status-filter-actions">
-                <button onClick={() => changeStatus()}>All</button>
-                <button onClick={() => changeStatus("planned")}>Planned</button>
-                <button onClick={() => changeStatus("pending")}>Pending</button>
-                <button onClick={() => changeStatus("closed")}>Closed</button>
-                <button onClick={() => changeStatus("cancelled")}>Cancelled</button>
-            </div>
+            <TripsStatusFilter onStatusChange={changeStatus} />
 
             {successMessage && (
                 <p
@@ -169,57 +96,28 @@ const TripsList = () => {
                 </p>
             )}
 
-            <div className="trips-toolbar">
-                <label>
-                    Search
-                    <input
-                        type="search"
-                        value={searchInput}
-                        placeholder="Title or ID"
-                        onChange={event => changeSearchInput(event.target.value)}
-                    />
-                </label>
-
-                <label>
-                    Sorting
-                    <select
-                        value={sort ?? ""}
-                        onChange={event =>
-                            changeSort(event.target.value ? (event.target.value as TripSort) : undefined)
-                        }
-                    >
-                        <option value="">Reset sorting</option>
-                        <option value="price">Price: Low to Hight</option>
-                        <option value="-price">Price: High to Low</option>
-                        <option value="created_at">Created later</option>
-                        <option value="-created_at">Created earlier</option>
-                    </select>
-                </label>
-            </div>
+            <TripsToolbar
+                searchInput={searchInput}
+                sort={sort}
+                onSearchChange={changeSearchInput}
+                onSortChange={changeSort}
+            />
 
             {isFetching && !isLoading && <p className="trips-updating">Updating trips...</p>}
 
-            {trips.length > 0 ? (
-                trips.map(trip => (
-                    <TripCard
-                        onClose={() => closeTripMutation(trip.id)}
-                        key={trip.id}
-                        trip={trip}
-                        onDetailsClick={() => setSelectedCard(trip.id)}
-                    />
-                ))
-            ) : (
-                <p className="empty-state">No trips found</p>
+            <TripsContent
+                trips={trips}
+                onCloseTrip={closeTripMutation}
+                onDetailsClick={setSelectedCard}
+            />
+
+            {selectedTrip && (
+                <TripDetailsPanel
+                    trip={selectedTrip}
+                    onClose={() => setSelectedCard(null)}
+                    onCancelled={() => cancelTripMutation(selectedTrip.id)}
+                />
             )}
-            <>
-                {selectedTrip && (
-                    <TripDetailsPanel
-                        trip={selectedTrip}
-                        onClose={() => setSelectedCard(null)}
-                        onCancelled={() => cancelTripMutation(selectedTrip.id)}
-                    />
-                )}
-            </>
 
             <Pagination
                 page={page}
