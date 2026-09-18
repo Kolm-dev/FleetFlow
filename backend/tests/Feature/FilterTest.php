@@ -93,4 +93,59 @@ class FilterTest extends TestCase
         $response->assertUnprocessable();
         $response->assertJsonValidationErrors('status');
     }
+
+    public function test_trips_can_be_searched_by_title(): void
+    {
+        $driver = Driver::factory()->create();
+        $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+
+        $matchedTrip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+            'title' => 'Airport delivery',
+        ]);
+
+        $otherTrip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+            'title' => 'Warehouse route',
+        ]);
+
+        $response = $this->getJson('/api/trips?search=airport');
+
+        $response->assertOk();
+        $response->assertJsonPath('total', 1);
+        $response->assertJsonFragment([
+            'id' => $matchedTrip->id,
+        ]);
+        $response->assertJsonMissing([
+            'id' => $otherTrip->id,
+        ]);
+    }
+
+    public function test_trips_can_be_searched_by_id(): void
+    {
+        $driver = Driver::factory()->create();
+        $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+
+        $matchedTrip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+        ]);
+
+        $otherTrip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+        ]);
+
+        $response = $this->getJson("/api/trips?search={$matchedTrip->id}");
+
+        $response->assertOk();
+        $response->assertJsonFragment([
+            'id' => $matchedTrip->id,
+        ]);
+        $response->assertJsonMissing([
+            'id' => $otherTrip->id,
+        ]);
+    }
 }

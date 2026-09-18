@@ -21,6 +21,7 @@ export type TripsFilters = {
     status?: TripStatus;
     page?: number;
     sort?: TripSort;
+    search?: string;
 };
 
 export type PaginatedTrips = {

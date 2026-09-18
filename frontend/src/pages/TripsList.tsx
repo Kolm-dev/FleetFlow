@@ -1,11 +1,12 @@
 import { closeTrip, cancelTrip, getTrips } from "@/api/trips";
 import { TripCard } from "@/components/TripCard";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import type { TripSort, TripStatus } from "@/types/tripsTypes";
 import TripDetailsPanel from "@/components/TripDetailsPanel";
 import { NavLink } from "react-router";
 import { Spinner } from "@/components/Spinner";
+import { useDebounce } from "@/hooks/useDebounce.ts";
 
 type PaginationProps = {
     page: number;
@@ -15,13 +16,7 @@ type PaginationProps = {
     onNextPage: () => void;
 };
 
-const Pagination = ({
-    page,
-    lastPage,
-    isFetching,
-    onPreviousPage,
-    onNextPage,
-}: PaginationProps) => (
+const Pagination = ({ page, lastPage, isFetching, onPreviousPage, onNextPage }: PaginationProps) => (
     <div>
         <button
             type="button"
@@ -44,6 +39,8 @@ const TripsList = () => {
     const [page, setPage] = useState(1);
     const [status, setStatus] = useState<TripStatus | undefined>();
     const [sort, setSort] = useState<TripSort | undefined>();
+    const [searchInput, setSearchInput] = useState("");
+    const search = useDebounce(searchInput.trim(), 500);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const successMessageRef = useRef<HTMLParagraphElement | null>(null);
     const scrollReturnPositionRef = useRef(0);
@@ -51,8 +48,9 @@ const TripsList = () => {
     const queryClient = useQueryClient();
     const [selectedCardId, setSelectedCard] = useState<null | number>(null);
     const { isLoading, error, data, isFetching } = useQuery({
-        queryKey: ["trips", { page, status, sort }],
-        queryFn: () => getTrips({ page, status, sort }),
+        queryKey: ["trips", { page, status, sort, search }],
+        queryFn: () => getTrips({ page, status, sort, search }),
+        placeholderData: keepPreviousData,
     });
 
     const { mutate: closeTripMutation } = useMutation({
@@ -65,13 +63,9 @@ const TripsList = () => {
             });
 
             const driverName = trip.driver?.name ?? "Driver";
-            const vehicleName = trip.vehicle
-                ? `${trip.vehicle.brand} ${trip.vehicle.model}`
-                : "vehicle";
+            const vehicleName = trip.vehicle ? `${trip.vehicle.brand} ${trip.vehicle.model}` : "vehicle";
 
-            setSuccessMessage(
-                `${driverName} and ${vehicleName} are now available and will be back on the road soon.`,
-            );
+            setSuccessMessage(`${driverName} and ${vehicleName} are now available and will be back on the road soon.`);
         },
     });
 
@@ -122,8 +116,8 @@ const TripsList = () => {
     if (!data) return <p>No trips data.</p>;
 
     const { data: trips, current_page, last_page, total } = data;
-    const goToPreviousPage = () => setPage((currentPage) => currentPage - 1);
-    const goToNextPage = () => setPage((currentPage) => currentPage + 1);
+    const goToPreviousPage = () => setPage(currentPage => currentPage - 1);
+    const goToNextPage = () => setPage(currentPage => currentPage + 1);
 
     const changeStatus = (status?: TripStatus) => {
         setStatus(status);
@@ -135,7 +129,12 @@ const TripsList = () => {
         setPage(1);
     };
 
-    const selectedTrip = trips.find((trip) => trip.id === selectedCardId);
+    const changeSearchInput = (searchValue: string) => {
+        setSearchInput(searchValue);
+        setPage(1);
+    };
+
+    const selectedTrip = trips.find(trip => trip.id === selectedCardId);
     return (
         <div>
             <div className="page-header">
@@ -145,7 +144,10 @@ const TripsList = () => {
                         Page {current_page} of {last_page}. Total trips: {total}
                     </p>
                 </div>
-                <NavLink className="create-link" to="/trips/create">
+                <NavLink
+                    className="create-link"
+                    to="/trips/create"
+                >
                     + Create trip
                 </NavLink>
             </div>
@@ -155,42 +157,60 @@ const TripsList = () => {
                 <button onClick={() => changeStatus("planned")}>Planned</button>
                 <button onClick={() => changeStatus("pending")}>Pending</button>
                 <button onClick={() => changeStatus("closed")}>Closed</button>
-                <button onClick={() => changeStatus("cancelled")}>
-                    Cancelled
-                </button>
+                <button onClick={() => changeStatus("cancelled")}>Cancelled</button>
             </div>
 
             {successMessage && (
-                <p ref={successMessageRef} className="success-message">
+                <p
+                    ref={successMessageRef}
+                    className="success-message"
+                >
                     {successMessage}
                 </p>
             )}
 
-            <select
-                value={sort ?? ""}
-                onChange={(event) =>
-                    changeSort(
-                        event.target.value
-                            ? (event.target.value as TripSort)
-                            : undefined,
-                    )
-                }
-            >
-                <option value="">Reset sorting</option>
-                <option value="price">Price: Low to Hight</option>
-                <option value="-price">Price: High to Low</option>
-                <option value="created_at">Created later</option>
-                <option value="-created_at">Created earlier</option>
-            </select>
+            <div className="trips-toolbar">
+                <label>
+                    Search
+                    <input
+                        type="search"
+                        value={searchInput}
+                        placeholder="Title or ID"
+                        onChange={event => changeSearchInput(event.target.value)}
+                    />
+                </label>
 
-            {trips.map((trip) => (
-                <TripCard
-                    onClose={() => closeTripMutation(trip.id)}
-                    key={trip.id}
-                    trip={trip}
-                    onDetailsClick={() => setSelectedCard(trip.id)}
-                />
-            ))}
+                <label>
+                    Sorting
+                    <select
+                        value={sort ?? ""}
+                        onChange={event =>
+                            changeSort(event.target.value ? (event.target.value as TripSort) : undefined)
+                        }
+                    >
+                        <option value="">Reset sorting</option>
+                        <option value="price">Price: Low to Hight</option>
+                        <option value="-price">Price: High to Low</option>
+                        <option value="created_at">Created later</option>
+                        <option value="-created_at">Created earlier</option>
+                    </select>
+                </label>
+            </div>
+
+            {isFetching && !isLoading && <p className="trips-updating">Updating trips...</p>}
+
+            {trips.length > 0 ? (
+                trips.map(trip => (
+                    <TripCard
+                        onClose={() => closeTripMutation(trip.id)}
+                        key={trip.id}
+                        trip={trip}
+                        onDetailsClick={() => setSelectedCard(trip.id)}
+                    />
+                ))
+            ) : (
+                <p className="empty-state">No trips found</p>
+            )}
             <>
                 {selectedTrip && (
                     <TripDetailsPanel

@@ -23,6 +23,9 @@ export function getTrips(filters?: TripsFilters) {
         params.set("sort", filters.sort);
     }
 
+    if (filters?.search?.trim()) {
+        params.set("search", filters.search.trim());
+    }
     const query = params.toString();
 
     return apiClient<PaginatedTrips>(`/trips${query ? `?${query}` : ""}`);

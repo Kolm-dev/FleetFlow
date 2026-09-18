@@ -27,6 +27,7 @@ class TripController extends Controller
                     Rule::enum(TripStatus::class),
                 ],
                 'sort' => 'sometimes|string|in:price,created_at,-price,-created_at',
+                'search' => 'sometimes|string|max:255',
             ]
         );
 
@@ -34,6 +35,19 @@ class TripController extends Controller
 
         $query->when($request->has('status'), function ($query) use ($request) {
             $query->where('status', $request->input('status'));
+        });
+
+        $query->when($request->filled('search'), function (Builder $query) use ($request) {
+            $search = trim($request->input('search'));
+            $normalizedSearch = mb_strtolower($search);
+
+            $query->where(function (Builder $query) use ($search, $normalizedSearch) {
+                $query->whereRaw('LOWER(title) LIKE ?', ["%{$normalizedSearch}%"]);
+
+                if (ctype_digit($search)) {
+                    $query->orWhere('id', (int) $search);
+                }
+            });
         });
 
         $this->sort($query, $request);
