@@ -107,9 +107,23 @@ Vehicle object includes assigned `driver`.
 | DELETE | `/trips/{id}`            | `204 No Content`        |
 | POST   | `/trips/calculate-price` | `{ recommended_price }` |
 
-Filters: `status`, `page`, `sort`.
+Filters: `status`, `page`, `sort`, `search`.
 
 Sort values: `price`, `-price`, `created_at`, `-created_at`.
+
+Search:
+
+- `search` matches trip `title` case-insensitively.
+- If `search` is a number, it also matches trip `id`.
+- Search can be combined with `status`, `sort`, and `page`.
+
+Example:
+
+```http
+GET /api/trips?search=Kyiv&status=planned&sort=-price&page=2
+```
+
+Frontend keeps these filters in the URL, so the Trips page can be refreshed or shared without losing the current search, status, sort, or page.
 
 Create fields: `title`, `driver_id`, `vehicle_id`, `distance`, `price`, `status`.
 Update fields: same fields, all optional.
