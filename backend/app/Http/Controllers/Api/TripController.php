@@ -220,6 +220,14 @@ class TripController extends Controller
 
     public function destroy(Trip $trip)
     {
+        if ($trip->status === TripStatus::Pending) {
+            return response()->json([
+                'message' => 'Trip cannot be deleted because it is already in use.',
+
+            ], 422);
+        }
+
+
         $trip->delete();
 
         return response()->noContent(); //

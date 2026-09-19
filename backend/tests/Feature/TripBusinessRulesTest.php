@@ -174,4 +174,23 @@ class TripBusinessRulesTest extends TestCase
             'status' => DriverStatus::Available->value,
         ]);
     }
+
+    public function test_cannot_delete_pending_trip(): void
+    {
+        $driver = Driver::factory()->create(['status' => DriverStatus::OnTrip]);
+        $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+        $trip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+            'status' => TripStatus::Pending,
+        ]);
+
+        $response = $this->deleteJson("/api/trips/{$trip->id}");
+
+        $response->assertUnprocessable();
+        $response->assertJsonPath('message', 'Trip cannot be deleted because it is already in use.');
+        $this->assertDatabaseHas('trips', [
+            'id' => $trip->id,
+        ]);
+    }
 }

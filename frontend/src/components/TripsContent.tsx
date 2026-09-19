@@ -4,11 +4,12 @@ import type { Trip } from "@/types/tripsTypes";
 type TripsContentProps = {
     trips: Trip[];
     onCloseTrip: (tripId: number) => void;
+    onDeleteTrip: (tripId: number) => void;
     onDetailsClick: (tripId: number) => void;
     onStartTrip: (tripId: number) => void;
 };
 
-export const TripsContent = ({ trips, onCloseTrip, onStartTrip, onDetailsClick }: TripsContentProps) => {
+export const TripsContent = ({ trips, onCloseTrip, onDeleteTrip, onStartTrip, onDetailsClick }: TripsContentProps) => {
     if (trips.length === 0) {
         return <p className="empty-state">No trips found</p>;
     }
@@ -17,6 +18,7 @@ export const TripsContent = ({ trips, onCloseTrip, onStartTrip, onDetailsClick }
         <TripCard
             onStart={() => onStartTrip(trip.id)}
             onClose={() => onCloseTrip(trip.id)}
+            onDelete={() => onDeleteTrip(trip.id)}
             key={trip.id}
             trip={trip}
             onDetailsClick={() => onDetailsClick(trip.id)}

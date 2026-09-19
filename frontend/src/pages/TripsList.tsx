@@ -1,4 +1,4 @@
-import { closeTrip, cancelTrip, getTrips, startTrip } from "@/api/trips";
+import { closeTrip, cancelTrip, deleteTrip, getTrips, startTrip } from "@/api/trips";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
 import TripDetailsPanel from "@/components/TripDetailsPanel";
@@ -43,10 +43,8 @@ const TripsList = () => {
         goToNextPage,
     } = useTripsFilters();
     const { successMessageRef, scrollReturnPositionRef } = useSuccessMessageScroll(successMessage);
-    const {
-        errorMessageRef,
-        scrollReturnPositionRef: errorScrollReturnPositionRef,
-    } = useErrorMessageScroll(errorMessage);
+    const { errorMessageRef, scrollReturnPositionRef: errorScrollReturnPositionRef } =
+        useErrorMessageScroll(errorMessage);
 
     const { isLoading, error, data, isFetching } = useQuery({
         queryKey: ["trips", { page, status, sort, search }],
@@ -68,10 +66,7 @@ const TripsList = () => {
         onError: error => {
             errorScrollReturnPositionRef.current = window.scrollY;
 
-            const message =
-                axios.isAxiosError<TripActionErrorResponse>(error)
-                ? error.response?.data.message
-                : null;
+            const message = axios.isAxiosError<TripActionErrorResponse>(error) ? error.response?.data.message : null;
 
             setSuccessMessage(null);
             setErrorMessage(message ?? "Could not start trip.");
@@ -103,6 +98,25 @@ const TripsList = () => {
             setSelectedCard(null);
             setErrorMessage(null);
             setSuccessMessage(message);
+        },
+    });
+
+    const { mutate: deleteTripMutation } = useMutation({
+        mutationFn: (id: number) => deleteTrip(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["trips"],
+            });
+
+            setSelectedCard(null);
+            setErrorMessage(null);
+            setSuccessMessage("Trip deleted successfully.");
+        },
+        onError: error => {
+            const message = axios.isAxiosError<TripActionErrorResponse>(error) ? error.response?.data.message : null;
+
+            setSuccessMessage(null);
+            setErrorMessage(message ?? "Could not delete trip.");
         },
     });
 
@@ -154,6 +168,7 @@ const TripsList = () => {
                 onStartTrip={startTripMutation}
                 trips={trips}
                 onCloseTrip={closeTripMutation}
+                onDeleteTrip={deleteTripMutation}
                 onDetailsClick={setSelectedCard}
             />
 

@@ -1,17 +1,28 @@
 import type { Trip } from "@/types/tripsTypes";
 import { useNavigate } from "react-router";
+import { ConfirmModal } from "@/components/ConfirmModal";
+import { useState } from "react";
 
 type TripCardProps = {
     trip: Trip;
     onStart: (id: number) => void;
     onClose: (id: number) => void;
+    onDelete: (id: number) => void;
     onDetailsClick: () => void;
 };
 
 const formatValue = (value: number | null) => value ?? "-";
 
-export const TripCard = ({ onStart, onClose, onDetailsClick, trip }: TripCardProps) => {
+export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: TripCardProps) => {
     const navigate = useNavigate();
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const isActiveTrip = trip.status === "pending";
+
+    const handleConfirmDelete = () => {
+        onDelete(trip.id);
+        setIsDeleteConfirmOpen(false);
+    };
+
     return (
         <div>
             <p>
@@ -51,7 +62,24 @@ export const TripCard = ({ onStart, onClose, onDetailsClick, trip }: TripCardPro
                 >
                     Details
                 </button>
+                <button
+                    className="button-control"
+                    disabled={isActiveTrip}
+                    title={isActiveTrip ? "Active trips cannot be deleted." : "Delete trip"}
+                    onClick={() => setIsDeleteConfirmOpen(true)}
+                >
+                    Delete
+                </button>
             </div>
+
+            <ConfirmModal
+                isOpen={isDeleteConfirmOpen}
+                title="Delete trip?"
+                message={`Trip "${trip.title}" will be permanently deleted.`}
+                confirmText="Delete trip"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setIsDeleteConfirmOpen(false)}
+            />
         </div>
     );
 };
