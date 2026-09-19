@@ -50,6 +50,12 @@ export function updateTrip(data: UpdateTripData, id: number) {
     });
 }
 
+export function startTrip(id: number) {
+    return apiClient<TripActionResponse>(`/trips/${id}/start`, {
+        method: "PATCH",
+    });
+}
+
 export function closeTrip(id: number) {
     return apiClient<TripActionResponse>(`/trips/${id}/close`, {
         method: "PATCH",

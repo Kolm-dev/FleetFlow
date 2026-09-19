@@ -102,6 +102,7 @@ Vehicle object includes assigned `driver`.
 | GET    | `/trips/{id}`            | `{ trip }`              |
 | POST   | `/trips`                 | `{ message, trip }`     |
 | PATCH  | `/trips/{id}`            | `{ message, trip }`     |
+| PATCH  | `/trips/{id}/start`      | `{ message, trip }`     |
 | PATCH  | `/trips/{id}/close`      | `{ message, trip }`     |
 | PATCH  | `/trips/{id}/cancel`     | `{ message, trip }`     |
 | DELETE | `/trips/{id}`            | `204 No Content`        |
@@ -134,6 +135,7 @@ Business rules:
 
 - A trip can be created only with an `available` driver.
 - The vehicle must belong to the selected driver.
+- Starting a trip requires a `planned` trip and an `available` driver; otherwise the response message explains the reason.
 - Closing or cancelling a trip makes the driver `available`.
 - A `closed` or `cancelled` trip cannot be cancelled again.
 

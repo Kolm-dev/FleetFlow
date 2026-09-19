@@ -3,13 +3,14 @@ import { useNavigate } from "react-router";
 
 type TripCardProps = {
     trip: Trip;
+    onStart: (id: number) => void;
     onClose: (id: number) => void;
     onDetailsClick: () => void;
 };
 
 const formatValue = (value: number | null) => value ?? "-";
 
-export const TripCard = ({ onClose, onDetailsClick, trip }: TripCardProps) => {
+export const TripCard = ({ onStart, onClose, onDetailsClick, trip }: TripCardProps) => {
     const navigate = useNavigate();
     return (
         <div>
@@ -28,6 +29,14 @@ export const TripCard = ({ onClose, onDetailsClick, trip }: TripCardProps) => {
                 >
                     Edit
                 </button>
+                {trip.status === "planned" && (
+                    <button
+                        className="button-control"
+                        onClick={() => onStart(trip.id)}
+                    >
+                        Start
+                    </button>
+                )}
                 {trip.status !== "closed" && (
                     <button
                         className="button-control"
@@ -36,7 +45,10 @@ export const TripCard = ({ onClose, onDetailsClick, trip }: TripCardProps) => {
                         Close
                     </button>
                 )}
-                <button className="button-control" onClick={onDetailsClick}>
+                <button
+                    className="button-control"
+                    onClick={onDetailsClick}
+                >
                     Details
                 </button>
             </div>

@@ -76,9 +76,9 @@ class TripController extends Controller
         $trip = DB::transaction(function () use ($tripRequest) {
             $trip = Trip::create($tripRequest->validated());
 
-            $trip->driver->update([
-                'status' => DriverStatus::OnTrip,
-            ]);
+//            $trip->driver->update([
+//                'status' => DriverStatus::OnTrip,
+//            ]);
 
             return $trip;
         });
@@ -144,6 +144,45 @@ class TripController extends Controller
         ]);
     }
 
+    public function start(Trip $trip)
+    {
+        $driverIsAvailable = $trip->driver->status === DriverStatus::Available;
+        $tripIsPlanned = $trip->status === TripStatus::Planned;
+        $reasons = [];
+
+
+        if (! $tripIsPlanned) {
+            $reasons[] = 'trip is not planned';
+        }
+
+        if (! $driverIsAvailable) {
+            $reasons[] = 'driver is not available';
+        }
+
+        if ($reasons ) {
+            return response()->json([
+                'message' => 'Trip cannot be started because ' . implode(' and ', $reasons) . '.',
+                'trip' => $trip,
+            ]);
+        }
+
+            DB::transaction(function () use ($trip) {
+                $trip->update([
+                    'status' => TripStatus::Pending,
+                ]);
+
+                $trip->driver->update([
+                    'status' => DriverStatus::OnTrip,
+                ]);
+            });
+
+        return response()->json([
+            'message' => 'Trip was started successfully.',
+            'trip' => $trip,
+
+        ]);
+
+    }
     public function close(Trip $trip)
     {
         $trip->update([
