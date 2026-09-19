@@ -12,8 +12,8 @@ const getValidPage = (page: string | null) => {
     return Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 };
 
-const getValidStatus = (status: string | null) => {
-    return TRIP_STATUSES.includes(status as TripStatus) ? (status as TripStatus) : undefined;
+const isValidStatus = (status: string): status is TripStatus => {
+    return TRIP_STATUSES.includes(status as TripStatus);
 };
 
 const getValidSort = (sort: string | null) => {
@@ -23,7 +23,7 @@ const getValidSort = (sort: string | null) => {
 export const useTripsFilters = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const page = getValidPage(searchParams.get("page"));
-    const status = getValidStatus(searchParams.get("status"));
+    const status = searchParams.getAll("status[]").filter(isValidStatus);
     const sort = getValidSort(searchParams.get("sort"));
     const urlSearch = searchParams.get("search")?.trim() || "";
     const [searchInput, setSearchInput] = useState(urlSearch);
@@ -82,10 +82,26 @@ export const useTripsFilters = () => {
     const goToPreviousPage = () => setPageParam(page - 1);
     const goToNextPage = () => setPageParam(page + 1);
 
-    const changeStatus = (nextStatus?: TripStatus) => {
-        updateSearchParams({
-            status: nextStatus,
-        });
+    const changeStatus = (nextStatus: TripStatus) => {
+        const nextStatuses = status.includes(nextStatus)
+            ? status.filter(currentStatus => currentStatus !== nextStatus)
+            : [...status, nextStatus];
+        setSearchParams(
+            currentParams => {
+                const nextParams = new URLSearchParams(currentParams);
+
+                nextParams.delete("status[]");
+
+                nextStatuses.forEach(status => {
+                    nextParams.append("status[]", status);
+                });
+
+                nextParams.delete("page");
+
+                return nextParams;
+            },
+            { replace: true }
+        );
     };
 
     const changeSort = (nextSort?: TripSort) => {

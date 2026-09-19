@@ -397,11 +397,11 @@ select:disabled {
 .drivers-status-actions,
 .status-filter-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
-.drivers-status-actions button,
-.status-filter-actions button {
+.drivers-status-actions button {
     flex: 1;
     border-color: var(--color-border-strong);
     background: linear-gradient(var(--color-bg), var(--color-bg-control));
@@ -413,9 +413,7 @@ select:disabled {
 }
 
 .drivers-status-actions button:hover,
-.drivers-status-actions button:focus-visible,
-.status-filter-actions button:hover,
-.status-filter-actions button:focus-visible {
+.drivers-status-actions button:focus-visible {
     border-color: var(--color-text);
     background: var(--color-bg-hover);
     box-shadow:
@@ -426,16 +424,48 @@ select:disabled {
     transform: translateY(-1px);
 }
 
-.drivers-status-actions button:active,
-.status-filter-actions button:active {
+.drivers-status-actions button:active {
     background: var(--color-disabled-bg);
     box-shadow: inset 0 1px 3px rgb(0 0 0 / 14%);
     transform: translateY(1px);
 }
 
-.drivers-status-actions button + button,
-.status-filter-actions button + button {
+.drivers-status-actions button + button {
     margin-left: 0;
+}
+
+.status-filter-checkbox {
+    display: inline-flex;
+    align-items: center;
+    flex: 1 1 140px;
+    gap: 8px;
+    min-height: 40px;
+    margin-bottom: 0;
+    border: 1px solid var(--color-border-strong);
+    padding: 8px 12px;
+    background: linear-gradient(var(--color-bg), var(--color-bg-control));
+    box-shadow:
+        var(--shadow-filter),
+        inset 0 1px 0 rgb(255 255 255 / 80%);
+    color: var(--color-text);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.status-filter-checkbox:hover,
+.status-filter-checkbox:focus-within {
+    border-color: var(--color-text);
+    background: var(--color-bg-hover);
+    box-shadow:
+        var(--shadow-filter-hover),
+        inset 0 1px 0 rgb(255 255 255 / 80%);
+}
+
+.status-filter-checkbox input {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
 }
 
 /* =======Header and navigation======= */

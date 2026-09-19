@@ -18,7 +18,7 @@ export type TripStatus = "closed" | "pending" | "planned" | "cancelled";
 export type TripSort = "price" | "-price" | "created_at" | "-created_at";
 
 export type TripsFilters = {
-    status?: TripStatus;
+    status?: TripStatus[];
     page?: number;
     sort?: TripSort;
     search?: string;

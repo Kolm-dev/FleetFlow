@@ -1,15 +1,31 @@
 import type { TripStatus } from "@/types/tripsTypes";
 
 type TripsStatusFilterProps = {
-    onStatusChange: (status?: TripStatus) => void;
+    selectedStatuses: TripStatus[];
+    onStatusChange: (status: TripStatus) => void;
 };
 
-export const TripsStatusFilter = ({ onStatusChange }: TripsStatusFilterProps) => (
+const STATUS_OPTIONS: { label: string; value: TripStatus }[] = [
+    { label: "Planned", value: "planned" },
+    { label: "Pending", value: "pending" },
+    { label: "Closed", value: "closed" },
+    { label: "Cancelled", value: "cancelled" },
+];
+
+export const TripsStatusFilter = ({ selectedStatuses, onStatusChange }: TripsStatusFilterProps) => (
     <div className="status-filter-actions">
-        <button onClick={() => onStatusChange()}>All</button>
-        <button onClick={() => onStatusChange("planned")}>Planned</button>
-        <button onClick={() => onStatusChange("pending")}>Pending</button>
-        <button onClick={() => onStatusChange("closed")}>Closed</button>
-        <button onClick={() => onStatusChange("cancelled")}>Cancelled</button>
+        {STATUS_OPTIONS.map(({ label, value }) => (
+            <label
+                className="status-filter-checkbox"
+                key={value}
+            >
+                <input
+                    type="checkbox"
+                    checked={selectedStatuses.includes(value)}
+                    onChange={() => onStatusChange(value)}
+                />
+                {label}
+            </label>
+        ))}
     </div>
 );

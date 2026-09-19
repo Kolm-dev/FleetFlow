@@ -135,7 +135,10 @@ const TripsList = () => {
                 total={total}
             />
 
-            <TripsStatusFilter onStatusChange={changeStatus} />
+            <TripsStatusFilter
+                selectedStatuses={status}
+                onStatusChange={changeStatus}
+            />
 
             {successMessage && (
                 <p

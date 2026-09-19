@@ -12,7 +12,9 @@ export function getTrips(filters?: TripsFilters) {
     const params = new URLSearchParams();
 
     if (filters?.status) {
-        params.set("status", filters.status);
+        filters.status.forEach(status => {
+            params.append("status[]", status);
+        });
     }
 
     if (filters?.page) {

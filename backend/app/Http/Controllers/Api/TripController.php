@@ -22,10 +22,8 @@ class TripController extends Controller
 
         $request->validate(
             [
-                'status' => [
-                    'sometimes',
-                    Rule::enum(TripStatus::class),
-                ],
+                'status' => ['sometimes', 'array'],
+                'status.*' => [Rule::enum(TripStatus::class)],
                 'sort' => 'sometimes|string|in:price,created_at,-price,-created_at',
                 'search' => 'sometimes|string|max:255',
             ]
@@ -33,8 +31,8 @@ class TripController extends Controller
 
         $query = Trip::with(['driver', 'vehicle']);
 
-        $query->when($request->has('status'), function ($query) use ($request) {
-            $query->where('status', $request->input('status'));
+        $query->when($request->filled('status'), function ($query) use ($request) {
+            $query->whereIn('status', $request->input('status'));
         });
 
         $query->when($request->filled('search'), function (Builder $query) use ($request) {
