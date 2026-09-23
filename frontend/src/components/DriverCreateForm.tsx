@@ -71,7 +71,7 @@ export const DriverCreateForm = ({
                 <option value="unavailable">Unavailable</option>
             </select>
 
-            <button type="submit" disabled={isPending}>
+            <button className="entity-action entity-action--create" type="submit" disabled={isPending}>
                 {isPending ? "Creating..." : "Create!"}
             </button>
         </form>

@@ -15,10 +15,10 @@ export const TripsHeader = ({ currentPage, lastPage, total }: TripsHeaderProps) 
             </p>
         </div>
         <NavLink
-            className="create-link"
+            className="create-link entity-action--create"
             to="/trips/create"
         >
-            + Create trip
+            Create trip
         </NavLink>
     </div>
 );

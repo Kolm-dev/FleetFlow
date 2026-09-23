@@ -66,7 +66,7 @@ export const PricingSettingsForm = ({
             </label>
 
             <div className="pricing-settings-form__actions">
-                <button type="submit">Save settings</button>
+                <button className="entity-action entity-action--update" type="submit">Save settings</button>
                 <button type="button" onClick={onClose}>
                     Cancel
                 </button>

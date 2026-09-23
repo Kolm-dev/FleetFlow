@@ -23,8 +23,8 @@ const VehiclesList = () => {
                     <h1>Vehicles</h1>
                     <p>Total found: {data.total}</p>
                 </div>
-                <NavLink className="create-link" to="/vehicles/create">
-                    + Create vehicle
+                <NavLink className="create-link entity-action--create" to="/vehicles/create">
+                    Create vehicle
                 </NavLink>
             </div>
 

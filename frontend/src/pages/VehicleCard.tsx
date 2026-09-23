@@ -124,19 +124,25 @@ export const VehicleCard = () => {
 
             <div>
                 <h2>Actions</h2>
-                <button
-                    disabled={isPending}
-                    hidden={isSuccess}
-                    onClick={() => setIsDeleteConfirmOpen(true)}
-                >
-                    {isPending ? "DELETING..." : "DELETE"}
-                </button>
-                <button
-                    hidden={isSuccess}
-                    onClick={() => navigate(`/vehicles/${vehicleId}/edit`)}
-                >
-                    Edit
-                </button>
+                <div className="entity-actions">
+                    <button
+                        className="entity-action entity-action--vehicle entity-action--edit"
+                        type="button"
+                        hidden={isSuccess}
+                        onClick={() => navigate(`/vehicles/${vehicleId}/edit`)}
+                    >
+                        Edit
+                    </button>
+                    <button
+                        className="entity-action entity-action--vehicle entity-action--delete"
+                        type="button"
+                        disabled={isPending}
+                        hidden={isSuccess}
+                        onClick={() => setIsDeleteConfirmOpen(true)}
+                    >
+                        {isPending ? "Deleting..." : "Delete"}
+                    </button>
+                </div>
                 <ConfirmModal
                     isOpen={isDeleteConfirmOpen}
                     title="Delete vehicle?"

@@ -49,8 +49,8 @@ export const DriversList = () => {
                     <h1>Drivers</h1>
                     <p>Total drivers: {response?.total ?? drivers.length}</p>
                 </div>
-                <NavLink className="create-link" to="/drivers/create">
-                    + Create driver
+                <NavLink className="create-link entity-action--create" to="/drivers/create">
+                    Create driver
                 </NavLink>
             </div>
             <div className="drivers-status-actions">
@@ -93,7 +93,7 @@ export const DriversList = () => {
                                 </dl>
 
                                 <button
-                                    className="driver-card__button"
+                                    className="entity-action entity-action--driver entity-action--details driver-card__button"
                                     type="button"
                                     onClick={() =>
                                         navigate(`/drivers/${driver.id}`)

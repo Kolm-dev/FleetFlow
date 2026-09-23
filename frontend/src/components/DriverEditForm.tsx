@@ -80,7 +80,7 @@ export const DriverEditForm = ({
                 />
             </label>
 
-            <button type="submit" disabled={isPending}>
+            <button className="entity-action entity-action--update" type="submit" disabled={isPending}>
                 {isPending ? "Saving..." : "Save"}
             </button>
         </form>

@@ -93,7 +93,7 @@ export const VehicleEditForm = (props: PropsEditForm) => {
             </div>
 
             <div>
-                <button type="submit" disabled={isPending}>
+                <button className="entity-action entity-action--update" type="submit" disabled={isPending}>
                     {isPending ? "Saving..." : "Save vehicle"}
                 </button>
             </div>

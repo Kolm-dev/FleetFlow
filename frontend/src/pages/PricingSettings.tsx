@@ -49,7 +49,7 @@ export const PricingSettings = () => {
                     <p>Current trip tariff values</p>
                 </div>
                 <button
-                    className="pricing-settings-edit-button"
+                    className="pricing-settings-edit-button entity-action--edit"
                     onClick={() => setShowForm(!showForm)}
                     type="button"
                 >

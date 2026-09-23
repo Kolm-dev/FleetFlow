@@ -142,7 +142,7 @@ const TripCreateForm = ({
                 </select>
             </label>
 
-            <button disabled={isSubmitDisabled} type="submit">
+            <button className="entity-action entity-action--create" disabled={isSubmitDisabled} type="submit">
                 {isCreating ? "Creating..." : "Create"}
             </button>
         </form>

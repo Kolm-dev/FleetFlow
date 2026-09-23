@@ -197,6 +197,7 @@ export const TripEditForm = ({
                     <p>No vehicles for this driver</p>
                 )}
                 <button
+                    className="entity-action entity-action--update"
                     type="submit"
                     disabled={
                         isPending ||

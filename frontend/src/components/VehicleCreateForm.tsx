@@ -90,7 +90,7 @@ export const VehicleCreateForm = ({
                 </select>
             </label>
 
-            <button type="submit" disabled={isPending}>
+            <button className="entity-action entity-action--create" type="submit" disabled={isPending}>
                 {isPending ? "Creating..." : "Create!"}
             </button>
         </form>
