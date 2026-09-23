@@ -17,6 +17,8 @@ export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: T
     const navigate = useNavigate();
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const isActiveTrip = trip.status === "pending";
+    const canStart = trip.status === "planned";
+    const canClose = trip.status === "pending";
 
     const handleConfirmDelete = () => {
         onDelete(trip.id);
@@ -34,42 +36,54 @@ export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: T
             </p>
 
             <div className="trip-card__actions">
-                <button
-                    className="button-control"
-                    onClick={() => navigate(`/trips/${trip.id}/edit`)}
-                >
-                    Edit
-                </button>
-                {trip.status === "planned" && (
-                    <button
-                        className="button-control"
-                        onClick={() => onStart(trip.id)}
-                    >
-                        Start
-                    </button>
+                {(canStart || canClose) && (
+                    <div className="trip-card__action-group trip-card__action-group--controls">
+                        {canStart && (
+                            <button
+                                className="entity-action entity-action--trip entity-action--start"
+                                type="button"
+                                onClick={() => onStart(trip.id)}
+                            >
+                                Start
+                            </button>
+                        )}
+                        {canClose && (
+                            <button
+                                className="entity-action entity-action--trip entity-action--close"
+                                type="button"
+                                onClick={() => onClose(trip.id)}
+                            >
+                                Close
+                            </button>
+                        )}
+                    </div>
                 )}
-                {trip.status !== "closed" && (
+
+                <div className="trip-card__action-group trip-card__action-group--crud">
                     <button
-                        className="button-control"
-                        onClick={() => onClose(trip.id)}
+                        className="entity-action entity-action--trip entity-action--details"
+                        type="button"
+                        onClick={onDetailsClick}
                     >
-                        Close
+                        Details
                     </button>
-                )}
-                <button
-                    className="button-control"
-                    onClick={onDetailsClick}
-                >
-                    Details
-                </button>
-                <button
-                    className="button-control"
-                    disabled={isActiveTrip}
-                    title={isActiveTrip ? "Active trips cannot be deleted." : "Delete trip"}
-                    onClick={() => setIsDeleteConfirmOpen(true)}
-                >
-                    Delete
-                </button>
+                    <button
+                        className="entity-action entity-action--trip entity-action--edit"
+                        type="button"
+                        onClick={() => navigate(`/trips/${trip.id}/edit`)}
+                    >
+                        Edit
+                    </button>
+                    <button
+                        className="entity-action entity-action--trip entity-action--delete"
+                        type="button"
+                        disabled={isActiveTrip}
+                        title={isActiveTrip ? "Active trips cannot be deleted." : "Delete trip"}
+                        onClick={() => setIsDeleteConfirmOpen(true)}
+                    >
+                        Delete
+                    </button>
+                </div>
             </div>
 
             <ConfirmModal

@@ -916,14 +916,18 @@ select:disabled {
 }
 
 .trip-card__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    align-items: center;
     margin-top: 24px;
 }
 
-.trip-card__actions button + button {
-    margin-left: 0;
+.trip-card__action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.trip-card__action-group--crud {
+    margin-left: auto;
 }
 
 .trip-details-overlay {
@@ -1523,6 +1527,15 @@ select:disabled {
 @media (max-width: 600px) {
     .trip-edit-form {
         grid-template-columns: 1fr;
+    }
+
+    .trip-card__actions {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .trip-card__action-group--crud {
+        margin-left: 0;
     }
 
     .page-header {
