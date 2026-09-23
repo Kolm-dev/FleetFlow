@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\DriverStatus;
+use App\Enums\TripStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
@@ -34,8 +35,23 @@ class DriverController extends Controller
 
     public function show(Driver $driver)
     {
+
+        $closedTripsBuilder = $driver->trips()->where('status', TripStatus::Closed);
+
+        $closedTripsCount = $closedTripsBuilder->count();
+        $totalEarnings = $closedTripsBuilder->sum('price');
+        $totalDistance = $closedTripsBuilder->sum('distance');
+        $allClosedTrips = $closedTripsBuilder->orderByDesc('created_at')->paginate(5);
+
         return response()->json([
             'driver' => $driver->load('vehicles'),
+            'statistics' => [
+                'closed_trips_count' => $closedTripsCount,
+                'total_earnings' => $totalEarnings,
+                'total_distance' => $totalDistance,
+            ],
+            'closed_trips' => $allClosedTrips,
+
         ]);
     }
 

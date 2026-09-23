@@ -27,6 +27,7 @@ class Trip extends Model
     protected function casts(): array
     {
         return [
+            'price' => 'float',
             'status' => TripStatus::class,
         ];
     }

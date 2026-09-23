@@ -1,16 +1,34 @@
-import { deleteDriver, getDriver } from "@/api/drivers";
+import { deleteDriver, getDriverDetails } from "@/api/drivers";
 import { ConfirmModal } from "@/components/ConfirmModal";
+import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+
+const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
+
+const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
+
+const formatMoney = (value: number) =>
+    new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+    }).format(value);
+
+const formatTripValue = (value: number | null, suffix = "") =>
+    value === null ? "Not specified" : `${formatNumber(value)}${suffix}`;
 
 export const DriverCard = () => {
     const { driverId } = useParams();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const queryClient = useQueryClient();
     const [redirectCountdown, setRedirectCountdown] = useState(5);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const pageParam = Number(searchParams.get("page"));
+    const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
     const { mutate, isError, error, isPending, isSuccess } = useMutation({
         mutationFn: (id: number) => deleteDriver(id),
         onSuccess: () => {
@@ -20,11 +38,28 @@ export const DriverCard = () => {
         },
     });
 
-    const { isLoading, data: driver } = useQuery({
+    const {
+        isLoading,
+        isFetching,
+        data,
+        error: driverError,
+    } = useQuery({
         enabled: !!driverId,
-        queryKey: [driverId, "driver"],
-        queryFn: () => getDriver(parseInt(driverId as string)),
+        queryKey: ["driver", driverId, { page }],
+        queryFn: () => getDriverDetails(parseInt(driverId as string), { page }),
+        placeholderData: keepPreviousData,
     });
+    const driver = data?.driver;
+    const statistics = data?.statistics;
+    const closedTrips = data?.closed_trips;
+
+    const goToPage = (nextPage: number) => {
+        setSearchParams((currentParams) => {
+            const nextParams = new URLSearchParams(currentParams);
+            nextParams.set("page", nextPage.toString());
+            return nextParams;
+        });
+    };
 
     useEffect(() => {
         if (!isSuccess) return;
@@ -74,101 +109,188 @@ export const DriverCard = () => {
         <div>
             {isError && <div>{error.message}</div>}
 
+            {driverError && (
+                <p className="error-message">{driverError.message}</p>
+            )}
+
             {isLoading && <Spinner />}
 
-            {!isLoading && !driver && (
+            {!isLoading && !driver && !driverError && (
                 <p className="error-message">Driver not found</p>
             )}
 
-            {driver && (
+            {driver && statistics && closedTrips && (
                 <>
-                    <div>
+                    <div className="page-header">
                         <h1>{driver.name}</h1>
-                        <p>Phone: {driver.phone_number}</p>
-                        <p>Status: {driver.status}</p>
                     </div>
 
-                    <div>
-                        <h2>Driver details</h2>
-                        <p>
-                            <span>ID: </span>
-                            <span>{driver.id}</span>
-                        </p>
-                        <p>
-                            <span>Name: </span>
-                            <span>{driver.name}</span>
-                        </p>
-                        <p>
-                            <span>Phone number: </span>
-                            <span>{driver.phone_number}</span>
-                        </p>
-                        <p>
-                            <span>Status: </span>
-                            <span>{driver.status}</span>
-                        </p>
-                        <p>
-                            <span>Photo URL: </span>
-                            <span>{driver.photo ?? "Not specified"}</span>
-                        </p>
-                        {driver.photo && (
-                            <div>
-                                <img src={driver.photo} alt={driver.name} />
-                            </div>
+                    <div className="driver-profile">
+                        <div className="driver-profile__content">
+                            <h2>Driver details</h2>
+                            <dl className="driver-profile__details">
+                                <div>
+                                    <dt>ID</dt>
+                                    <dd>{driver.id}</dd>
+                                </div>
+                                <div>
+                                    <dt>Phone number</dt>
+                                    <dd>{driver.phone_number}</dd>
+                                </div>
+                                <div>
+                                    <dt>Status</dt>
+                                    <dd>
+                                        {driver.status === "on_trip"
+                                            ? "on trip"
+                                            : driver.status}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <img
+                            className="driver-profile__photo"
+                            src={driver.photo ?? DRIVER_PHOTO_PLACEHOLDER}
+                            alt={driver.photo ? driver.name : "No driver photo"}
+                        />
+                    </div>
+
+                    <div className="driver-vehicles">
+                        <h2>Assigned vehicles - {driver.vehicles.length}</h2>
+                        {driver.vehicles.length > 0 ? (
+                            <ul className="driver-vehicles__list">
+                                {driver.vehicles.map((vehicle) => (
+                                    <li
+                                        className="driver-vehicles__item"
+                                        key={vehicle.id}
+                                    >
+                                        <Link
+                                            className="driver-vehicles__link"
+                                            to={`/vehicles/${vehicle.id}`}
+                                        >
+                                            {vehicle.brand} {vehicle.model}
+                                        </Link>
+                                        <span className="driver-vehicles__meta">
+                                            <span>{vehicle.license_plate}</span>
+                                            <span>
+                                                {vehicle.year ??
+                                                    "Year not specified"}
+                                            </span>
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="empty-state">No assigned vehicles</p>
                         )}
                     </div>
 
                     <div>
-                        <h2>Assigned vehicles - {driver.vehicles.length}</h2>
-                        {driver.vehicles.length > 0 ? (
-                            <div>
-                                {driver.vehicles.map((vehicle) => (
-                                    <div key={vehicle.id}>
+                        <h2>Statistics</h2>
+                        <div className="driver-statistics">
+                            <div className="driver-statistics__item">
+                                <span>Completed trips</span>
+                                <strong>
+                                    {formatNumber(
+                                        statistics.closed_trips_count,
+                                    )}
+                                </strong>
+                            </div>
+                            <div className="driver-statistics__item">
+                                <span>Total distance</span>
+                                <strong>
+                                    {formatNumber(statistics.total_distance)} km
+                                </strong>
+                            </div>
+                            <div className="driver-statistics__item">
+                                <span>Total earnings</span>
+                                <strong>
+                                    {formatMoney(statistics.total_earnings)}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2>Closed trips - {closedTrips.total}</h2>
+                        {isFetching && !isLoading && (
+                            <p className="trips-updating">Updating trips...</p>
+                        )}
+                        {closedTrips.data.length > 0 ? (
+                            <div className="driver-closed-trips">
+                                {closedTrips.data.map((trip) => (
+                                    <div
+                                        className="driver-closed-trip"
+                                        key={trip.id}
+                                    >
                                         <p>
-                                            <span>
-                                                {vehicle.brand} {vehicle.model}
-                                            </span>
+                                            <strong>{trip.title}</strong>
                                         </p>
                                         <p>
-                                            <span>License plate: </span>
-                                            <span>{vehicle.license_plate}</span>
+                                            Distance:{" "}
+                                            {formatTripValue(
+                                                trip.distance,
+                                                " km",
+                                            )}{" "}
+                                            | Earnings:{" "}
+                                            {trip.price === null
+                                                ? "Not specified"
+                                                : formatMoney(trip.price)}
                                         </p>
-                                        <p>
-                                            <span>Year: </span>
-                                            <span>
-                                                {vehicle.year ??
-                                                    "Not specified"}
-                                            </span>
-                                        </p>
-                                        <hr />
+                                        {trip.vehicle && (
+                                            <p>
+                                                Vehicle: {trip.vehicle.brand}{" "}
+                                                {trip.vehicle.model} (
+                                                {trip.vehicle.license_plate})
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <p>No assigned vehicles</p>
+                            <p className="empty-state">
+                                No closed trips found
+                            </p>
                         )}
+                        <Pagination
+                            page={closedTrips.current_page}
+                            lastPage={closedTrips.last_page}
+                            isFetching={isFetching}
+                            onPreviousPage={() =>
+                                goToPage(closedTrips.current_page - 1)
+                            }
+                            onNextPage={() =>
+                                goToPage(closedTrips.current_page + 1)
+                            }
+                        />
                     </div>
 
                     <div>
                         <h2>Actions</h2>
-                        <button
-                            disabled={isPending}
-                            hidden={isSuccess}
-                            onClick={() => setIsDeleteConfirmOpen(true)}
-                        >
-                            {isPending ? (
-                                <Spinner text="DELETING..." />
-                            ) : (
-                                "DELETE"
-                            )}
-                        </button>
-                        <button
-                            hidden={isSuccess}
-                            onClick={() =>
-                                navigate(`/drivers/${driverId}/edit`)
-                            }
-                        >
-                            Edit
-                        </button>
+                        <div className="entity-actions">
+                            <button
+                                className="entity-action entity-action--driver entity-action--edit"
+                                type="button"
+                                hidden={isSuccess}
+                                onClick={() =>
+                                    navigate(`/drivers/${driverId}/edit`)
+                                }
+                            >
+                                Edit
+                            </button>
+                            <button
+                                className="entity-action entity-action--driver entity-action--delete"
+                                type="button"
+                                disabled={isPending}
+                                hidden={isSuccess}
+                                onClick={() => setIsDeleteConfirmOpen(true)}
+                            >
+                                {isPending ? (
+                                    <Spinner text="DELETING..." />
+                                ) : (
+                                    "Delete"
+                                )}
+                            </button>
+                        </div>
                         <ConfirmModal
                             isOpen={isDeleteConfirmOpen}
                             title="Delete driver?"

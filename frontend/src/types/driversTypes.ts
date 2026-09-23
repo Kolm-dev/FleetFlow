@@ -1,3 +1,5 @@
+import type { DriverStatistics } from "@/types/statsTypes";
+import type { PaginatedTrips } from "@/types/tripsTypes";
 import type { Vehicle } from "@/types/vehiclesTypes";
 
 export type DriverStatus = "available" | "on_trip" | "unavailable";
@@ -22,6 +24,10 @@ export type DriversFilters = {
     status?: DriverStatus;
 };
 
+export type DriverDetailsFilters = {
+    page?: number;
+};
+
 export type DriversResponse = {
     total: number;
     drivers: Driver[];
@@ -37,3 +43,9 @@ export type DriverActionResponse = {
 };
 
 export type UpdateDriverData = Partial<CreateDriverData>;
+
+export type DriverDetailsResponse = {
+    driver: Driver;
+    statistics: DriverStatistics;
+    closed_trips: PaginatedTrips;
+};

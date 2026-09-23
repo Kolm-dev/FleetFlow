@@ -2,6 +2,8 @@ import { apiClient } from "@/api/client";
 import type {
     CreateDriverData,
     DriverActionResponse,
+    DriverDetailsFilters,
+    DriverDetailsResponse,
     DriverResponse,
     DriversFilters,
     DriversResponse,
@@ -23,6 +25,20 @@ export function getDrivers(filters?: DriversFilters) {
 export async function getDriver(id: number) {
     const response = await apiClient<DriverResponse>(`/drivers/${id}`);
     return response.driver;
+}
+
+export function getDriverDetails(id: number, filters?: DriverDetailsFilters) {
+    const params = new URLSearchParams();
+
+    if (filters?.page) {
+        params.set("page", filters.page.toString());
+    }
+
+    const query = params.toString();
+
+    return apiClient<DriverDetailsResponse>(
+        `/drivers/${id}${query ? `?${query}` : ""}`,
+    );
 }
 
 export function createDriver(data: CreateDriverData) {

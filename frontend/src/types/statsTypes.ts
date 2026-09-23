@@ -16,3 +16,10 @@ export type Stats = {
         cancelled: number;
     };
 };
+
+
+export type DriverStatistics = {
+    closed_trips_count: number;
+    total_earnings: number;
+    total_distance: number;
+};
