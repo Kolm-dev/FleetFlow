@@ -1030,6 +1030,124 @@ select:disabled {
     outline: none;
 }
 
+.driver-profile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    align-items: start;
+    gap: 32px;
+}
+
+.driver-profile__content {
+    min-width: 0;
+}
+
+.driver-profile__details {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+}
+
+.driver-profile__details div {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 12px;
+}
+
+.driver-profile__details dt {
+    color: var(--color-muted);
+}
+
+.driver-profile__details dd {
+    margin: 0;
+    color: var(--color-text);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.driver-profile__photo {
+    width: 240px;
+    height: 240px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-subtle);
+    object-fit: contain;
+}
+
+.driver-vehicles__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.driver-vehicles__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 42px;
+    padding: 8px 0;
+}
+
+.driver-vehicles__link {
+    color: var(--color-text);
+    font-weight: 700;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+.driver-vehicles__link:hover,
+.driver-vehicles__link:focus-visible {
+    color: var(--color-muted);
+}
+
+.driver-vehicles__meta {
+    display: flex;
+    flex-shrink: 0;
+    gap: 16px;
+    color: var(--color-muted);
+    font-size: 14px;
+}
+
+.driver-statistics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.driver-statistics__item {
+    display: grid;
+    gap: 6px;
+    border: 1px solid var(--color-border);
+    padding: 12px;
+    background: var(--color-bg-subtle);
+}
+
+.driver-statistics__item span {
+    color: var(--color-muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.driver-statistics__item strong {
+    color: var(--color-text);
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.driver-closed-trips {
+    display: grid;
+    gap: 12px;
+}
+
+.driver-closed-trip {
+    border: 1px solid var(--color-border);
+    padding: 12px;
+    background: var(--color-bg-subtle);
+}
+
+.driver-closed-trip p:last-child {
+    margin-bottom: 0;
+}
+
 /* =======Vehicles======= */
 .vehicles-list {
     display: grid;
@@ -1315,6 +1433,32 @@ select:disabled {
     }
 
     .driver-card__button {
+        width: 100%;
+    }
+
+    .driver-profile {
+        grid-template-columns: 1fr;
+    }
+
+    .driver-profile__photo {
+        width: min(100%, 240px);
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    .driver-profile__details div {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .driver-vehicles__item {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .driver-vehicles__meta {
+        justify-content: space-between;
         width: 100%;
     }
 
