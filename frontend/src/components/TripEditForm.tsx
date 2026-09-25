@@ -1,4 +1,4 @@
-import { calculateTripPrice } from "@/api/pricing";
+import { TripPriceCalculator } from "@/components/TripPriceCalculator";
 import type { Driver } from "@/types/driversTypes";
 import type { Trip, TripStatus, UpdateTripData } from "@/types/tripsTypes";
 import type React from "react";
@@ -32,8 +32,6 @@ const getDriversForSelect = (drivers: Driver[], currentDriverId: number) =>
 const getVehiclesByDriverId = (drivers: Driver[], driverId?: number) =>
     drivers.find((driver) => driver.id === driverId)?.vehicles ?? [];
 
-type PriceCalculationStatus = "idle" | "loading" | "success" | "error";
-
 export const TripEditForm = ({
     trip,
     onSubmit,
@@ -43,12 +41,6 @@ export const TripEditForm = ({
     const [title, setTitle] = useState(trip.title);
     const [distance, setDistance] = useState(trip.distance?.toString() ?? "");
     const [price, setPrice] = useState(trip.price?.toString() ?? "");
-    const [recommendedPrice, setRecommendedPrice] = useState<number | null>(
-        null,
-    );
-    const [priceCalculationStatus, setPriceCalculationStatus] =
-        useState<PriceCalculationStatus>("idle");
-    const [isManualPrice, setIsManualPrice] = useState(false);
     const [status, setStatus] = useState<TripStatus>(trip.status);
     const [driverId, setDriverId] = useState<number | undefined>(
         trip.driver_id,
@@ -73,46 +65,6 @@ export const TripEditForm = ({
         const firstVehicle = driver?.vehicles[0];
 
         setVehicleId(firstVehicle?.id);
-    };
-
-    const handlePriceChange = (value: string) => {
-        setPrice(value);
-
-        if (recommendedPrice === null) return;
-
-        setIsManualPrice(toNullableNumber(value) !== recommendedPrice);
-    };
-
-    const handleRecalculatePrice = async () => {
-        const distanceValue = toNullableNumber(distance);
-
-        if (distanceValue === null || distanceValue <= 0) {
-            setRecommendedPrice(null);
-            setPriceCalculationStatus("error");
-            return;
-        }
-
-        setPriceCalculationStatus("loading");
-        setIsManualPrice(false);
-
-        try {
-            const response = await calculateTripPrice(distanceValue);
-            const nextRecommendedPrice = response.recommended_price;
-
-            setRecommendedPrice(nextRecommendedPrice);
-            setPriceCalculationStatus("success");
-            setIsManualPrice(toNullableNumber(price) !== nextRecommendedPrice);
-        } catch {
-            setRecommendedPrice(null);
-            setPriceCalculationStatus("error");
-        }
-    };
-
-    const handleUseRecommendedPrice = () => {
-        if (recommendedPrice === null) return;
-
-        setPrice(recommendedPrice.toString());
-        setIsManualPrice(false);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -208,81 +160,11 @@ export const TripEditForm = ({
                     {isPending ? "Saving..." : "Save"}
                 </button>
             </div>
-            <aside className="trip-price-tools">
-                <h2>Price recommendation</h2>
-                <p className="trip-price-tools__distance">
-                    Distance: <strong>{distance || "not specified"} km</strong>
-                </p>
-                <label>
-                    Price
-                    <input
-                        type="number"
-                        value={price}
-                        onChange={(e) =>
-                            handlePriceChange(e.currentTarget.value)
-                        }
-                    />
-                </label>
-
-                <button
-                    type="button"
-                    onClick={handleRecalculatePrice}
-                    disabled={priceCalculationStatus === "loading"}
-                >
-                    {priceCalculationStatus === "loading"
-                        ? "Recalculating..."
-                        : "Recalculate"}
-                </button>
-
-                <div className="trip-price-tools__status">
-                    {priceCalculationStatus === "idle" && (
-                        <p>
-                            Recommended price has not been calculated yet. You
-                            can keep your own price.
-                        </p>
-                    )}
-
-                    {priceCalculationStatus === "loading" && (
-                        <p>Calculating recommended price...</p>
-                    )}
-
-                    {priceCalculationStatus === "success" &&
-                        recommendedPrice !== null && (
-                            <>
-                                <p>
-                                    Recommended price:{" "}
-                                    <strong>{recommendedPrice} ₴</strong>
-                                </p>
-                                <p>
-                                    Price to save:{" "}
-                                    <strong>{price || "not specified"}</strong>
-                                </p>
-                                {isManualPrice && (
-                                    <p className="trip-price-tools__manual">
-                                        You changed the calculated price
-                                        manually.
-                                    </p>
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={handleUseRecommendedPrice}
-                                    disabled={
-                                        toNullableNumber(price) ===
-                                        recommendedPrice
-                                    }
-                                >
-                                    Use recommended
-                                </button>
-                            </>
-                        )}
-
-                    {priceCalculationStatus === "error" && (
-                        <p className="error-message">
-                            Cannot calculate price. Enter trip distance first.
-                        </p>
-                    )}
-                </div>
-            </aside>
+            <TripPriceCalculator
+                distance={distance}
+                price={price}
+                onPriceChange={setPrice}
+            />
         </form>
     );
 };
