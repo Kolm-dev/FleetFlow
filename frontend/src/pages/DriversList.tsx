@@ -1,10 +1,18 @@
 import { getDrivers } from "@/api/drivers";
+import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { DriverStatus } from "@/types/driversTypes";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
+
+const getValidPage = (value: string | null) => {
+    const page = Number(value);
+    return Number.isInteger(page) && page > 0 ? page : 1;
+};
 
 const handlerStatus = (status: DriverStatus) => {
     if (status == "on_trip") {
@@ -17,30 +25,95 @@ export const DriversList = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const status = searchParams.get("status") as DriverStatus;
-    const changeStatus = (status?: DriverStatus) => {
-        if (!status) {
-            setSearchParams({});
-            return;
-        }
+    const urlSearch = searchParams.get("search")?.trim() ?? "";
+    const page = getValidPage(searchParams.get("page"));
+    const [searchInput, setSearchInput] = useState(urlSearch);
+    const [lastUrlSearch, setLastUrlSearch] = useState(urlSearch);
+    const debouncedSearch = useDebounce(searchInput.trim(), 500);
 
-        setSearchParams({ status });
+    if (urlSearch !== lastUrlSearch) {
+        setLastUrlSearch(urlSearch);
+        setSearchInput(urlSearch);
+    }
+
+    useEffect(() => {
+        if (debouncedSearch === urlSearch) return;
+
+        setSearchParams(
+            (currentParams) => {
+                const nextParams = new URLSearchParams(currentParams);
+
+                if (debouncedSearch) {
+                    nextParams.set("search", debouncedSearch);
+                } else {
+                    nextParams.delete("search");
+                }
+
+                nextParams.delete("page");
+                return nextParams;
+            },
+            { replace: true },
+        );
+    }, [debouncedSearch, setSearchParams, urlSearch]);
+
+    const changeStatus = (status?: DriverStatus) => {
+        setSearchParams(
+            (currentParams) => {
+                const nextParams = new URLSearchParams(currentParams);
+
+                if (status) {
+                    nextParams.set("status", status);
+                } else {
+                    nextParams.delete("status");
+                }
+
+                nextParams.delete("page");
+                return nextParams;
+            },
+            { replace: true },
+        );
+    };
+
+    const goToPage = (nextPage: number) => {
+        setSearchParams(
+            (currentParams) => {
+                const nextParams = new URLSearchParams(currentParams);
+
+                if (nextPage > 1) {
+                    nextParams.set("page", nextPage.toString());
+                } else {
+                    nextParams.delete("page");
+                }
+
+                return nextParams;
+            },
+            { replace: true },
+        );
     };
     const {
         isError,
         isLoading,
+        isFetching,
         error,
         data: response,
     } = useQuery({
-        queryKey: ["drivers", status],
-        queryFn: () => (status ? getDrivers({ status }) : getDrivers()),
+        queryKey: ["drivers", { status, search: urlSearch, page }],
+        queryFn: () =>
+            getDrivers({
+                status: status || undefined,
+                search: urlSearch || undefined,
+                page,
+            }),
+        placeholderData: keepPreviousData,
     });
 
     if (isLoading) return <Spinner />;
     if (isError) {
         return <div>{error.message}</div>;
     }
+    if (!response) return <p className="empty-state">No drivers data.</p>;
 
-    const drivers = response?.drivers ?? [];
+    const drivers = response.drivers;
 
     return (
         <div className="drivers-status-container">
@@ -53,6 +126,20 @@ export const DriversList = () => {
                     Create driver
                 </NavLink>
             </header>
+
+            <div className="entity-search">
+                <label>
+                    Search drivers
+                    <input
+                        type="search"
+                        value={searchInput}
+                        placeholder="Name, phone number or ID"
+                        onChange={(event) => setSearchInput(event.currentTarget.value)}
+                    />
+                </label>
+                {isFetching && !isLoading && <span>Searching...</span>}
+            </div>
+
             <div className="drivers-status-actions">
                 <button onClick={() => changeStatus()}>All</button>
                 <button onClick={() => changeStatus("available")}>
@@ -76,7 +163,7 @@ export const DriversList = () => {
                             <div className="driver-card__content">
                                 <div className="driver-card__header">
                                     <span className="driver-card__number">
-                                        #{index + 1}
+                                    #{(response.current_page - 1) * response.per_page + index + 1}
                                     </span>
                                     <h2>{driver.name}</h2>
                                 </div>
@@ -108,6 +195,16 @@ export const DriversList = () => {
                     <p className="empty-state">No drivers found</p>
                 )}
             </div>
+
+            {response && (
+                <Pagination
+                    page={response.current_page}
+                    lastPage={response.last_page}
+                    isFetching={isFetching}
+                    onPreviousPage={() => goToPage(response.current_page - 1)}
+                    onNextPage={() => goToPage(response.current_page + 1)}
+                />
+            )}
         </div>
     );
 };

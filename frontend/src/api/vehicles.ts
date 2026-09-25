@@ -19,6 +19,14 @@ export function getVehicles(filters?: VehiclesFilters) {
         params.set("license_plate", filters.license_plate);
     }
 
+    if (filters?.search?.trim()) {
+        params.set("search", filters.search.trim());
+    }
+
+    if (filters?.page) {
+        params.set("page", filters.page.toString());
+    }
+
     const query = params.toString();
 
     return apiClient<VehiclesResponse>(`/vehicles${query ? `?${query}` : ""}`);

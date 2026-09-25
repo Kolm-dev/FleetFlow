@@ -21,11 +21,16 @@ export type CreateVehicleData = {
 export type VehiclesFilters = {
     driver_id?: number;
     license_plate?: string;
+    search?: string;
+    page?: number;
 };
 
 export type VehiclesResponse = {
     total: number;
     vehicles: Vehicle[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
 };
 
 export type VehicleResponse = {

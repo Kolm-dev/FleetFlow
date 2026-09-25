@@ -22,6 +22,8 @@ export type CreateDriverData = {
 
 export type DriversFilters = {
     status?: DriverStatus;
+    search?: string;
+    page?: number;
 };
 
 export type DriverDetailsFilters = {
@@ -31,6 +33,9 @@ export type DriverDetailsFilters = {
 export type DriversResponse = {
     total: number;
     drivers: Driver[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
 };
 
 export type DriverResponse = {

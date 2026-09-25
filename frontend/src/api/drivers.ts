@@ -17,6 +17,14 @@ export function getDrivers(filters?: DriversFilters) {
         params.set("status", filters.status);
     }
 
+    if (filters?.search?.trim()) {
+        params.set("search", filters.search.trim());
+    }
+
+    if (filters?.page) {
+        params.set("page", filters.page.toString());
+    }
+
     const query = params.toString();
 
     return apiClient<DriversResponse>(`/drivers${query ? `?${query}` : ""}`);
