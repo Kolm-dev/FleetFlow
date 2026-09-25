@@ -19,7 +19,7 @@ export const Home = () => {
         <div className="home-dashboard">
             <header className="home-dashboard__header">
                 <p>Operations</p>
-                <h1>Fleet overview</h1>
+                <h2>Fleet overview</h2>
                 <span>Current vehicles, drivers and trip activity</span>
             </header>
 

@@ -43,19 +43,19 @@ export const PricingSettings = () => {
     }
     return (
         <div className="pricing-settings-page">
-            <div className="page-header">
+            <header className="page-header entity-list-header">
                 <div>
-                    <h1>Pricing settings</h1>
+                    <h2>Pricing settings</h2>
                     <p>Current trip tariff values</p>
                 </div>
                 <button
-                    className="pricing-settings-edit-button entity-action--edit"
+                    className="entity-action pricing-settings-edit-button entity-action--edit"
                     onClick={() => setShowForm(!showForm)}
                     type="button"
                 >
                     Edit pricing
                 </button>
-            </div>
+            </header>
 
             <section className="pricing-settings-summary">
                 <dl>

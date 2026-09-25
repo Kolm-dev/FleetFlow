@@ -44,15 +44,15 @@ export const DriversList = () => {
 
     return (
         <div className="drivers-status-container">
-            <div className="page-header">
+            <header className="page-header entity-list-header">
                 <div>
-                    <h1>Drivers</h1>
+                    <h2>Drivers</h2>
                     <p>Total drivers: {response?.total ?? drivers.length}</p>
                 </div>
                 <NavLink className="create-link entity-action--create" to="/drivers/create">
                     Create driver
                 </NavLink>
-            </div>
+            </header>
             <div className="drivers-status-actions">
                 <button onClick={() => changeStatus()}>All</button>
                 <button onClick={() => changeStatus("available")}>

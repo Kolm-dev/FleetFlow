@@ -7,9 +7,9 @@ type TripsHeaderProps = {
 };
 
 export const TripsHeader = ({ currentPage, lastPage, total }: TripsHeaderProps) => (
-    <div className="page-header">
+    <header className="page-header entity-list-header">
         <div>
-            <h1>Trips</h1>
+            <h2>Trips</h2>
             <p>
                 Page {currentPage} of {lastPage}. Total trips: {total}
             </p>
@@ -20,5 +20,5 @@ export const TripsHeader = ({ currentPage, lastPage, total }: TripsHeaderProps) 
         >
             Create trip
         </NavLink>
-    </div>
+    </header>
 );

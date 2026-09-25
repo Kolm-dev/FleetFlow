@@ -18,15 +18,15 @@ const VehiclesList = () => {
 
     return (
         <div>
-            <div className="page-header">
+            <header className="page-header entity-list-header">
                 <div>
-                    <h1>Vehicles</h1>
+                    <h2>Vehicles</h2>
                     <p>Total found: {data.total}</p>
                 </div>
                 <NavLink className="create-link entity-action--create" to="/vehicles/create">
                     Create vehicle
                 </NavLink>
-            </div>
+            </header>
 
             <div className="vehicles-list">
                 {vehicles.length > 0 ? (
