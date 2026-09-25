@@ -3,12 +3,13 @@ import { useState } from "react";
 
 type PropsEditForm = {
     onSubmit: (data: UpdateVehicleData) => void;
+    onCancel: () => void;
     vehicle: Vehicle;
     isPending?: boolean;
 };
 
 export const VehicleEditForm = (props: PropsEditForm) => {
-    const { vehicle, isPending = false, onSubmit } = props;
+    const { vehicle, isPending = false, onSubmit, onCancel } = props;
     const [brand, setBrand] = useState(vehicle.brand);
     const [model, setModel] = useState(vehicle.model);
     const [licensePlate, setLicensePlate] = useState(vehicle.license_plate);
@@ -34,51 +35,51 @@ export const VehicleEditForm = (props: PropsEditForm) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
+        <form className="vehicle-edit-form" onSubmit={handleSubmit}>
+            <header className="vehicle-edit-form__header">
+                <p>Edit vehicle</p>
                 <h1>
-                    Edit {vehicle.brand} {vehicle.model}
+                    {vehicle.brand} {vehicle.model}
                 </h1>
-                <p>License plate: {vehicle.license_plate}</p>
-            </div>
+                <span>{vehicle.license_plate}</span>
+            </header>
 
-            <div>
+            <section className="vehicle-edit-form__fields">
                 <label>
                     Brand
                     <input
+                        required
+                        autoComplete="organization"
                         name="brand"
                         type="text"
                         value={brand}
                         onChange={(e) => setBrand(e.currentTarget.value)}
                     />
                 </label>
-            </div>
 
-            <div>
                 <label>
                     Model
                     <input
+                        required
                         name="model"
                         type="text"
                         value={model}
                         onChange={(e) => setModel(e.currentTarget.value)}
                     />
                 </label>
-            </div>
 
-            <div>
                 <label>
                     License plate
                     <input
+                        required
+                        autoCapitalize="characters"
                         name="licensePlate"
                         type="text"
                         value={licensePlate}
                         onChange={(e) => setLicensePlate(e.currentTarget.value)}
                     />
                 </label>
-            </div>
 
-            <div>
                 <label>
                     Year
                     <input
@@ -90,13 +91,25 @@ export const VehicleEditForm = (props: PropsEditForm) => {
                         onChange={(e) => setYear(e.currentTarget.value)}
                     />
                 </label>
-            </div>
+            </section>
 
-            <div>
-                <button className="entity-action entity-action--update" type="submit" disabled={isPending}>
+            <footer className="vehicle-edit-form__actions">
+                <button
+                    className="entity-action entity-action--update"
+                    type="submit"
+                    disabled={isPending}
+                >
                     {isPending ? "Saving..." : "Save vehicle"}
                 </button>
-            </div>
+                <button
+                    className="vehicle-edit-form__cancel"
+                    type="button"
+                    disabled={isPending}
+                    onClick={onCancel}
+                >
+                    Cancel
+                </button>
+            </footer>
         </form>
     );
 };

@@ -1,4 +1,5 @@
 import { getVehicle, updateVehicle } from "@/api/vehicles";
+import { Spinner } from "@/components/Spinner";
 import { VehicleEditForm } from "@/components/VehicleEditForm";
 import type { UpdateVehicleData } from "@/types/vehiclesTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -10,7 +11,8 @@ export const VehicleEdit = () => {
     const { id: vehicleId } = useParams();
     const {
         data: vehicle,
-        // isSuccess
+        isLoading,
+        error: vehicleError,
     } = useQuery({
         queryKey: ["vehicle", vehicleId],
         queryFn: () => getVehicle(parseInt(vehicleId as string)),
@@ -19,7 +21,7 @@ export const VehicleEdit = () => {
     const {
         mutate,
         isPending,
-        // isSuccess: isUpdated,
+        error: updateError,
     } = useMutation({
         mutationFn: (data: UpdateVehicleData) =>
             updateVehicle(data, parseInt(vehicleId as string)),
@@ -33,12 +35,21 @@ export const VehicleEdit = () => {
             navigate(`/vehicles/${vehicleId}`);
         },
     });
-    if (!vehicle) return;
+
+    if (isLoading) return <Spinner />;
+    if (vehicleError) {
+        return <p className="error-message">{vehicleError.message}</p>;
+    }
+    if (!vehicle) return <p className="error-message">Vehicle not found</p>;
 
     return (
-        <div>
+        <div className="vehicle-edit-page">
+            {updateError && (
+                <p className="error-message">{updateError.message}</p>
+            )}
             <VehicleEditForm
                 onSubmit={(data) => mutate(data)}
+                onCancel={() => navigate(`/vehicles/${vehicleId}`)}
                 isPending={isPending}
                 vehicle={vehicle}
             />

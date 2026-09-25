@@ -1337,6 +1337,89 @@ select:disabled {
     margin: 0;
 }
 
+.vehicle-edit-page {
+    display: grid;
+    gap: 16px;
+}
+
+.vehicle-edit-form {
+    display: grid;
+    width: min(100%, 760px);
+    gap: 0;
+}
+
+.vehicle-edit-form__header {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 24px;
+}
+
+.vehicle-edit-form__header p {
+    margin-bottom: 5px;
+    color: var(--color-muted);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.vehicle-edit-form__header h1 {
+    margin-bottom: 6px;
+}
+
+.vehicle-edit-form__header span {
+    color: var(--color-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.vehicle-edit-form__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+    border-bottom: 1px solid var(--color-border);
+    padding: 24px 0;
+}
+
+.vehicle-edit-form__fields label {
+    min-width: 0;
+    margin: 0;
+}
+
+.vehicle-edit-form__fields input {
+    width: 100%;
+    max-width: none;
+    margin-top: 6px;
+}
+
+.vehicle-edit-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 20px;
+}
+
+.vehicle-edit-form__actions button {
+    width: auto;
+    min-width: 148px;
+    min-height: 40px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.vehicle-edit-form__cancel {
+    border-color: var(--color-border-strong);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.vehicle-edit-form__cancel:hover:not(:disabled),
+.vehicle-edit-form__cancel:focus-visible:not(:disabled) {
+    border-color: var(--color-text);
+    background: var(--color-bg-hover);
+    outline: none;
+}
+
 .vehicle-details-page {
     display: grid;
     gap: 0;
@@ -1894,6 +1977,19 @@ select:disabled {
 
 /* =======Responsive======= */
 @media (max-width: 600px) {
+    .vehicle-edit-form__fields {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .vehicle-edit-form__actions {
+        flex-direction: column;
+    }
+
+    .vehicle-edit-form__actions button {
+        width: 100%;
+    }
+
     .vehicle-details-header {
         align-items: stretch;
     }
