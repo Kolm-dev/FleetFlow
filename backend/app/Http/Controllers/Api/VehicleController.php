@@ -27,25 +27,36 @@ class VehicleController extends Controller
             [
                 'driver_id' => 'sometimes|integer|exists:drivers,id',
                 'license_plate' => 'sometimes|string|max:8',
+                'search' => 'sometimes|string|max:50',
+                'page' => 'sometimes|integer|min:1',
+
             ]
         );
 
         $query = Vehicle::with('driver');
 
-        if ($request->has('license_plate')) {
-            $query->where('license_plate', strtoupper($request->query('license_plate')));
-        }
+        if ($request->filled('search')) {
+            $search = $request->input('search');
 
-        if ($request->has('driver_id')) {
-            $query->where('driver_id', $request->query('driver_id'));
-        }
+            $query->where(function ($q) use ($search) {
+                $q->where('license_plate', 'ILIKE', "%{$search}%")
+                    ->orWhere('brand', 'ILIKE', "%{$search}%")
+                    ->orWhere('model', 'ILIKE', "%{$search}%");
 
-        $vehicles = $query->get();
+                if (ctype_digit($search)) {
+                    $q->orWhere('id', (int) $search);
+                }
+            });
+        }
+        $vehicles = $query->orderBy('id')->paginate(15);
 
         return response()->json(
             [
-                'total' => $vehicles->count(),
-                'vehicles' => $vehicles,
+                'total' => $vehicles->total(),
+                'vehicles' => $vehicles->items(),
+                'current_page' => $vehicles->currentPage(),
+                'last_page' => $vehicles->lastPage(),
+                'per_page' => $vehicles->perPage(),
             ],
             200
         );

@@ -17,6 +17,8 @@ class DriverController extends Controller
     {
         $request->validate([
             'status' => ['sometimes', Rule::enum(DriverStatus::class)],
+            'search' => ['sometimes', 'string'],
+            'page' => ['sometimes', 'integer', 'min:1'],
         ]);
 
         $query = Driver::with('vehicles');
@@ -25,11 +27,27 @@ class DriverController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        $drivers = $query->get();
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('phone_number', 'ILIKE', "%{$search}%");
+
+                if (ctype_digit($search)) {
+                    $q->orWhere('id', (int) $search);
+                }
+            });
+        }
+
+        $drivers = $query->orderBy('id')->paginate(15);
 
         return response()->json([
-            'total' => $drivers->count(),
-            'drivers' => $drivers,
+            'total' => $drivers->total(),
+            'drivers' => $drivers->items(),
+            'current_page' => $drivers->currentPage(),
+            'last_page' => $drivers->lastPage(),
+            'per_page' => $drivers->perPage(),
         ]);
     }
 

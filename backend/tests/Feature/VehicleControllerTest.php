@@ -53,6 +53,20 @@ class VehicleControllerTest extends TestCase
         $response->assertJsonValidationErrors('driver_id');
     }
 
+    public function test_vehicles_are_paginated_by_fifteen(): void
+    {
+        Vehicle::factory()->count(16)->create();
+
+        $response = $this->getJson('/api/vehicles');
+
+        $response->assertOk();
+        $response->assertJsonCount(15, 'vehicles');
+        $response->assertJsonPath('total', 16);
+        $response->assertJsonPath('current_page', 1);
+        $response->assertJsonPath('last_page', 2);
+        $response->assertJsonPath('per_page', 15);
+    }
+
     public function test_one_driver_can_have_multiple_vehicles()
     {
         $driver = Driver::factory()->create();

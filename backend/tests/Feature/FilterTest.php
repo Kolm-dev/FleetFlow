@@ -57,6 +57,20 @@ class FilterTest extends TestCase
         $response->assertJsonValidationErrors('status');
     }
 
+    public function test_drivers_are_paginated_by_fifteen(): void
+    {
+        Driver::factory()->count(16)->create();
+
+        $response = $this->getJson('/api/drivers');
+
+        $response->assertOk();
+        $response->assertJsonCount(15, 'drivers');
+        $response->assertJsonPath('total', 16);
+        $response->assertJsonPath('current_page', 1);
+        $response->assertJsonPath('last_page', 2);
+        $response->assertJsonPath('per_page', 15);
+    }
+
     public function test_trips_can_be_filtered_by_status(): void
     {
         $driver = Driver::factory()->create();
