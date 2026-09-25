@@ -1,6 +1,7 @@
 import { deleteVehicle, getVehicle } from "@/api/vehicles";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner";
+import { VehicleServicesSection } from "@/components/VehicleServicesSection";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -121,6 +122,8 @@ export const VehicleCard = () => {
                     <p>No assigned driver</p>
                 )}
             </div>
+
+            <VehicleServicesSection vehicleId={Number(vehicleId)} />
 
             <div>
                 <h2>Actions</h2>

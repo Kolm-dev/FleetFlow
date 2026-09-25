@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\PricingSettingController;
 use App\Http\Controllers\Api\StatsController;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\VehicleController;
+use App\Http\Controllers\Api\VehicleServiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -12,7 +13,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('stats', [StatsController::class, 'index']);
     Route::get('pricing-settings', [PricingSettingController::class, 'show']);
@@ -25,5 +26,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('drivers', DriverController::class);
 
-    Route::apiResource('vehicles', VehicleController::class);
-});
+    Route::apiResources(
+        [
+            'vehicles' => VehicleController::class,
+            'vehicles.services' => VehicleServiceController::class,
+        ]
+    );
+// });

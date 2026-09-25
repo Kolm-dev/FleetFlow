@@ -18,7 +18,8 @@ class PriceSeeder extends Seeder
                 'price_per_km' => 12,
                 'base_price' => 300,
                 'minimum_price' => 500,
-            ]
+                
+                ]
         );
     }
 }

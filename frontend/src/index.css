@@ -1337,6 +1337,240 @@ select:disabled {
     margin: 0;
 }
 
+.vehicle-services {
+    display: grid;
+    gap: 16px;
+    margin-top: 32px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 24px;
+}
+
+.vehicle-services__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.vehicle-services__header h2,
+.vehicle-services__header p {
+    margin-bottom: 4px;
+}
+
+.vehicle-services__header p,
+.vehicle-services__updating {
+    color: var(--color-muted);
+    font-size: 14px;
+}
+
+.vehicle-services__editor,
+.vehicle-service__edit-form {
+    border-left: 3px solid var(--color-border-strong);
+    padding: 16px;
+    background: var(--color-bg-subtle);
+}
+
+.vehicle-services__editor h3 {
+    margin: 0 0 14px;
+    font-size: 17px;
+}
+
+.vehicle-service-form {
+    display: grid;
+    gap: 14px;
+}
+
+.vehicle-service-form__fields {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.vehicle-service-form label {
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.vehicle-service-form input,
+.vehicle-service-form select,
+.vehicle-service-form textarea {
+    width: 100%;
+    max-width: none;
+    margin-top: 6px;
+}
+
+.vehicle-service-form textarea {
+    resize: vertical;
+    border: 1px solid var(--color-border-muted);
+    background: var(--color-bg-control);
+    padding: 8px 10px;
+    color: var(--color-text);
+    font: inherit;
+}
+
+.vehicle-service-form textarea:focus {
+    border-color: var(--color-text);
+    background: var(--color-bg);
+    box-shadow: var(--focus-ring);
+    outline: none;
+}
+
+.vehicle-service-form__actions,
+.vehicle-service__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.vehicle-service-form__actions button,
+.vehicle-service__actions button {
+    margin-left: 0;
+}
+
+.vehicle-services__toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 20px;
+    border: 1px solid var(--color-border);
+    padding: 14px;
+    background: var(--color-bg-subtle);
+}
+
+.vehicle-services__types {
+    min-width: 0;
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+
+.vehicle-services__types legend {
+    margin-bottom: 8px;
+    padding: 0;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.vehicle-services__type-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.vehicle-services__type-options label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    margin: 0;
+    border: 1px solid var(--color-border);
+    padding: 5px 8px;
+    background: var(--color-bg);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.vehicle-services__type-options label:has(input:checked) {
+    border-color: var(--color-text);
+    background: var(--color-bg-hover);
+    color: var(--color-text);
+}
+
+.vehicle-services__type-options input {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+}
+
+.vehicle-services__sort label {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.vehicle-services__sort select {
+    width: 100%;
+    margin-top: 6px;
+}
+
+.vehicle-services__direction {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+
+.vehicle-services__direction button {
+    min-width: 0;
+    min-height: 36px;
+    margin: 0;
+    border-color: var(--color-border-strong);
+    background: var(--color-bg);
+    padding: 6px 8px;
+    color: var(--color-text);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.vehicle-services__direction button.is-active {
+    border-color: var(--color-text);
+    background: var(--color-text);
+    color: var(--color-bg);
+}
+
+.vehicle-services__updating {
+    margin: 0;
+}
+
+.vehicle-services__list {
+    display: grid;
+    gap: 10px;
+}
+
+.vehicle-service {
+    border: 1px solid var(--color-border);
+    padding: 14px;
+    background: var(--color-bg);
+}
+
+.vehicle-service__summary {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.5fr) repeat(2, minmax(120px, 1fr));
+    gap: 16px;
+}
+
+.vehicle-service__summary > div {
+    display: grid;
+    align-content: start;
+    gap: 4px;
+    min-width: 0;
+}
+
+.vehicle-service__summary span {
+    color: var(--color-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.vehicle-service__summary strong {
+    overflow-wrap: anywhere;
+}
+
+.vehicle-service__summary .vehicle-service__type {
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.vehicle-service__notes {
+    margin: 12px 0;
+    color: var(--color-muted);
+    white-space: pre-wrap;
+}
+
+.vehicle-service__edit-form {
+    margin-top: 14px;
+}
+
 /* =======Trip edit price calculator======= */
 .trip-edit-form {
     display: grid;
@@ -1525,6 +1759,35 @@ select:disabled {
 
 /* =======Responsive======= */
 @media (max-width: 600px) {
+    .vehicle-services__header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .vehicle-services__header .entity-action {
+        width: 100%;
+    }
+
+    .vehicle-services__toolbar,
+    .vehicle-service-form__fields,
+    .vehicle-service__summary {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-services__direction {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .vehicle-service-form__actions,
+    .vehicle-service__actions {
+        flex-direction: column;
+    }
+
+    .vehicle-service-form__actions button,
+    .vehicle-service__actions .entity-action {
+        width: 100%;
+    }
+
     .trip-edit-form {
         grid-template-columns: 1fr;
     }
