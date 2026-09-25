@@ -1337,23 +1337,27 @@ select:disabled {
     margin: 0;
 }
 
-.vehicle-edit-page {
+.vehicle-edit-page,
+.driver-edit-page {
     display: grid;
     gap: 16px;
 }
 
-.vehicle-edit-form {
+.vehicle-edit-form,
+.driver-edit-form {
     display: grid;
     width: min(100%, 760px);
     gap: 0;
 }
 
-.vehicle-edit-form__header {
+.vehicle-edit-form__header,
+.driver-edit-form__header {
     border-bottom: 1px solid var(--color-border);
     padding-bottom: 24px;
 }
 
-.vehicle-edit-form__header p {
+.vehicle-edit-form__header p,
+.driver-edit-form__header p {
     margin-bottom: 5px;
     color: var(--color-muted);
     font-size: 13px;
@@ -1361,11 +1365,13 @@ select:disabled {
     text-transform: uppercase;
 }
 
-.vehicle-edit-form__header h1 {
+.vehicle-edit-form__header h1,
+.driver-edit-form__header h1 {
     margin-bottom: 6px;
 }
 
-.vehicle-edit-form__header span {
+.vehicle-edit-form__header span,
+.driver-edit-form__header span {
     color: var(--color-muted);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 15px;
@@ -1391,14 +1397,16 @@ select:disabled {
     margin-top: 6px;
 }
 
-.vehicle-edit-form__actions {
+.vehicle-edit-form__actions,
+.driver-edit-form__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     padding-top: 20px;
 }
 
-.vehicle-edit-form__actions button {
+.vehicle-edit-form__actions button,
+.driver-edit-form__actions button {
     width: auto;
     min-width: 148px;
     min-height: 40px;
@@ -1406,7 +1414,8 @@ select:disabled {
     white-space: nowrap;
 }
 
-.vehicle-edit-form__cancel {
+.vehicle-edit-form__cancel,
+.driver-edit-form__cancel {
     border-color: var(--color-border-strong);
     background: var(--color-bg);
     color: var(--color-text);
@@ -1414,10 +1423,63 @@ select:disabled {
 }
 
 .vehicle-edit-form__cancel:hover:not(:disabled),
-.vehicle-edit-form__cancel:focus-visible:not(:disabled) {
+.vehicle-edit-form__cancel:focus-visible:not(:disabled),
+.driver-edit-form__cancel:hover:not(:disabled),
+.driver-edit-form__cancel:focus-visible:not(:disabled) {
     border-color: var(--color-text);
     background: var(--color-bg-hover);
     outline: none;
+}
+
+.driver-edit-form__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 200px;
+    align-items: start;
+    gap: 24px;
+    border-bottom: 1px solid var(--color-border);
+    padding: 24px 0;
+}
+
+.driver-edit-form__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
+}
+
+.driver-edit-form__fields label {
+    min-width: 0;
+    margin: 0;
+}
+
+.driver-edit-form__fields input,
+.driver-edit-form__fields select {
+    width: 100%;
+    max-width: none;
+    margin-top: 6px;
+}
+
+.driver-edit-form__photo-url {
+    grid-column: 1 / -1;
+}
+
+.driver-photo-preview {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+}
+
+.driver-photo-preview img {
+    width: 200px;
+    height: 200px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-subtle);
+    object-fit: cover;
+}
+
+.driver-photo-preview figcaption {
+    color: var(--color-muted);
+    font-size: 12px;
+    text-align: center;
 }
 
 .vehicle-details-page {
@@ -1977,16 +2039,37 @@ select:disabled {
 
 /* =======Responsive======= */
 @media (max-width: 600px) {
-    .vehicle-edit-form__fields {
+    .vehicle-edit-form__fields,
+    .driver-edit-form__fields {
         grid-template-columns: 1fr;
         gap: 14px;
     }
 
-    .vehicle-edit-form__actions {
+    .driver-edit-form__photo-url {
+        grid-column: auto;
+    }
+
+    .driver-edit-form__body {
+        grid-template-columns: 1fr;
+    }
+
+    .driver-photo-preview img {
+        width: min(100%, 200px);
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    .driver-photo-preview figcaption {
+        width: min(100%, 200px);
+    }
+
+    .vehicle-edit-form__actions,
+    .driver-edit-form__actions {
         flex-direction: column;
     }
 
-    .vehicle-edit-form__actions button {
+    .vehicle-edit-form__actions button,
+    .driver-edit-form__actions button {
         width: 100%;
     }
 
