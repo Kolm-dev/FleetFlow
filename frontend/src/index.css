@@ -665,27 +665,54 @@ select:disabled {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 32px;
     width: min(100% - var(--space-page-x), var(--container-width));
     margin: 0 auto;
     border-bottom: 1px solid var(--color-border);
-    padding: 6px 0;
+    padding: 12px 0;
 }
 
 .navbar {
     display: flex;
     align-items: center;
-    gap: 6px;
-    border: 1px solid var(--color-border);
-    padding: 5px;
-    background: var(--color-bg-subtle);
-    box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
+    min-width: 0;
+    gap: 28px;
+}
+
+.navbar__brand {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 10px;
+    color: var(--color-text);
+    font-size: 19px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.navbar__brand-icon {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    object-fit: contain;
+}
+
+.navbar__brand:hover,
+.navbar__brand:focus-visible {
+    color: var(--color-success);
+    outline: none;
+}
+
+.navbar__links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
 }
 
 .navbar__link,
 .settings-link {
     border: 1px solid transparent;
-    padding: 8px 12px;
+    padding: 9px 12px;
     color: #333333;
     font-size: 14px;
     font-weight: 600;
@@ -699,13 +726,18 @@ select:disabled {
         transform var(--transition-fast);
 }
 
+.navbar__link {
+    flex-shrink: 0;
+    min-height: 36px;
+    border-width: 0 0 2px;
+    text-transform: uppercase;
+}
+
 .navbar__link:hover,
 .navbar__link:focus-visible,
 .settings-link:hover,
 .settings-link:focus-visible {
-    border-color: var(--color-border-muted);
-    background: var(--color-bg);
-    box-shadow: var(--shadow-sm);
+    background: var(--color-bg-hover);
     color: var(--color-text);
     outline: none;
     text-decoration: none;
@@ -718,7 +750,13 @@ select:disabled {
     transform: translateY(-1px);
 }
 
-.navbar__link.active,
+.navbar__link.active {
+    border-color: var(--color-success);
+    background: var(--color-bg-subtle);
+    box-shadow: none;
+    color: var(--color-text);
+}
+
 .settings-link.active {
     border-color: var(--color-text);
     background: var(--color-text);
@@ -730,12 +768,12 @@ select:disabled {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-strong);
     min-height: 32px;
     margin: 0;
     padding: 8px 12px;
     background: var(--color-bg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-xs);
     color: #333333;
     cursor: pointer;
     font-size: 14px;
@@ -758,7 +796,8 @@ select:disabled {
 .header__user:focus-visible,
 .header__user[aria-expanded="true"] {
     border-color: var(--color-text);
-    box-shadow: var(--shadow-md);
+    background: var(--color-bg-hover);
+    box-shadow: var(--shadow-sm);
     color: var(--color-text);
     outline: none;
 }
@@ -2041,9 +2080,33 @@ select:disabled {
     border-top: 1px solid var(--color-border);
 }
 
-.footer__text {
-    margin-bottom: 0;
+.footer__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.footer__brand img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.footer__brand strong {
+    font-size: 15px;
+}
+
+.footer__brand small {
     color: var(--color-muted);
+    font-size: 12px;
+}
+
+.footer__brand:hover,
+.footer__brand:focus-visible {
+    color: var(--color-success);
+    outline: none;
 }
 
 .footer__link {
@@ -2057,6 +2120,27 @@ select:disabled {
 }
 
 /* =======Responsive======= */
+@media (max-width: 760px) {
+    .header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .navbar {
+        width: 100%;
+    }
+
+    .navbar__links {
+        min-width: 0;
+        overflow-x: auto;
+    }
+
+    .header__actions {
+        align-self: flex-end;
+    }
+}
+
 @media (max-width: 600px) {
     .vehicle-edit-form__fields,
     .driver-edit-form__fields {
