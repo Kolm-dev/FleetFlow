@@ -4,7 +4,7 @@ import { Spinner } from "@/components/Spinner";
 import { VehicleServicesSection } from "@/components/VehicleServicesSection";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 
 export const VehicleCard = () => {
     const { vehicleId } = useParams();
@@ -77,64 +77,26 @@ export const VehicleCard = () => {
     if (!vehicle) return <p>Vehicle not found</p>;
 
     return (
-        <div>
-            <div>
-                <h1>
-                    {vehicle.brand} {vehicle.model}
-                </h1>
-                <p>License plate: {vehicle.license_plate}</p>
-            </div>
+        <div className="vehicle-details-page">
+            <header className="page-header vehicle-details-header">
+                <div>
+                    <p className="vehicle-details-header__label">Vehicle</p>
+                    <h1>
+                        {vehicle.brand} {vehicle.model}
+                    </h1>
+                    <p className="vehicle-details-header__plate">
+                        {vehicle.license_plate}
+                    </p>
+                </div>
 
-            <div>
-                <h2>Vehicle details</h2>
-                <p>
-                    <span>Brand: </span>
-                    <span>{vehicle.brand}</span>
-                </p>
-                <p>
-                    <span>Model: </span>
-                    <span>{vehicle.model}</span>
-                </p>
-                <p>
-                    <span>Year: </span>
-                    <span>{vehicle.year ?? "Not specified"}</span>
-                </p>
-                <p>
-                    <span>License plate: </span>
-                    <span>{vehicle.license_plate}</span>
-                </p>
-            </div>
-
-            <div>
-                <h2>Assigned driver</h2>
-                {vehicle.driver ? (
-                    <div>
-                        <p>
-                            <span>Name: </span>
-                            <span>{vehicle.driver.name}</span>
-                        </p>
-                        <p>
-                            <span>Status: </span>
-                            <span>{vehicle.driver.status}</span>
-                        </p>
-                    </div>
-                ) : (
-                    <p>No assigned driver</p>
-                )}
-            </div>
-
-            <VehicleServicesSection vehicleId={Number(vehicleId)} />
-
-            <div>
-                <h2>Actions</h2>
-                <div className="entity-actions">
+                <div className="entity-actions vehicle-details-header__actions">
                     <button
                         className="entity-action entity-action--vehicle entity-action--edit"
                         type="button"
                         hidden={isSuccess}
                         onClick={() => navigate(`/vehicles/${vehicleId}/edit`)}
                     >
-                        Edit
+                        Edit vehicle
                     </button>
                     <button
                         className="entity-action entity-action--vehicle entity-action--delete"
@@ -143,19 +105,72 @@ export const VehicleCard = () => {
                         hidden={isSuccess}
                         onClick={() => setIsDeleteConfirmOpen(true)}
                     >
-                        {isPending ? "Deleting..." : "Delete"}
+                        {isPending ? "Deleting..." : "Delete vehicle"}
                     </button>
                 </div>
-                <ConfirmModal
-                    isOpen={isDeleteConfirmOpen}
-                    title="Delete vehicle?"
-                    message={`Vehicle "${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}" will be permanently deleted.`}
-                    confirmText="Delete vehicle"
-                    isConfirming={isPending}
-                    onConfirm={handleConfirmDelete}
-                    onCancel={() => setIsDeleteConfirmOpen(false)}
-                />
-            </div>
+            </header>
+
+            <section className="vehicle-overview">
+                <div className="vehicle-overview__section">
+                    <h2>Vehicle details</h2>
+                    <dl className="vehicle-overview__details">
+                        <div>
+                            <dt>Brand</dt>
+                            <dd>{vehicle.brand}</dd>
+                        </div>
+                        <div>
+                            <dt>Model</dt>
+                            <dd>{vehicle.model}</dd>
+                        </div>
+                        <div>
+                            <dt>Year</dt>
+                            <dd>{vehicle.year ?? "Not specified"}</dd>
+                        </div>
+                        <div>
+                            <dt>License plate</dt>
+                            <dd>{vehicle.license_plate}</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div className="vehicle-overview__section vehicle-overview__driver">
+                    <h2>Assigned driver</h2>
+                    {vehicle.driver ? (
+                        <dl className="vehicle-overview__details">
+                            <div>
+                                <dt>Name</dt>
+                                <dd>
+                                    <Link to={`/drivers/${vehicle.driver.id}`}>
+                                        {vehicle.driver.name}
+                                    </Link>
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>Status</dt>
+                                <dd>
+                                    {vehicle.driver.status === "on_trip"
+                                        ? "On trip"
+                                        : vehicle.driver.status}
+                                </dd>
+                            </div>
+                        </dl>
+                    ) : (
+                        <p className="vehicle-overview__empty">No assigned driver</p>
+                    )}
+                </div>
+            </section>
+
+            <VehicleServicesSection vehicleId={Number(vehicleId)} />
+
+            <ConfirmModal
+                isOpen={isDeleteConfirmOpen}
+                title="Delete vehicle?"
+                message={`Vehicle "${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}" will be permanently deleted.`}
+                confirmText="Delete vehicle"
+                isConfirming={isPending}
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setIsDeleteConfirmOpen(false)}
+            />
         </div>
     );
 };

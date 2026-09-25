@@ -120,7 +120,12 @@ export const VehicleServiceForm = ({
                 >
                     {isPending ? "Saving..." : submitText}
                 </button>
-                <button disabled={isPending} type="button" onClick={onCancel}>
+                <button
+                    className="vehicle-service-form__cancel"
+                    disabled={isPending}
+                    type="button"
+                    onClick={onCancel}
+                >
                     Cancel
                 </button>
             </div>
