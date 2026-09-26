@@ -1,6 +1,7 @@
 import type { Trip } from "@/types/tripsTypes";
 import { useNavigate } from "react-router";
 import { ConfirmModal } from "@/components/ConfirmModal";
+import { formatCurrency } from "@/libs/formatCurrency";
 import { useState } from "react";
 
 type TripCardProps = {
@@ -32,7 +33,7 @@ export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: T
             </p>
             <p>
                 Distance: {formatValue(trip.distance)}km | Price:
-                {formatValue(trip.price)}
+                {formatCurrency(trip.price)}
             </p>
 
             <div className="trip-card__actions">

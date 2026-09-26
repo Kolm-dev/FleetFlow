@@ -8,6 +8,7 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
 import { VehicleServiceForm } from "@/components/VehicleServiceForm";
+import { formatCurrency } from "@/libs/formatCurrency";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
 import type {
     CreateVehicleServiceData,
@@ -36,12 +37,6 @@ const formatDate = (value: string) =>
     }).format(new Date(`${value.slice(0, 10)}T00:00:00`));
 
 const formatMileage = (value: number) => `${new Intl.NumberFormat("en-US").format(value)} km`;
-
-const formatCost = (value: number) =>
-    new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-    }).format(value);
 
 const serviceTypeLabel = (type: VehicleServiceType) =>
     VEHICLE_SERVICE_TYPES.find(option => option.value === type)?.label ?? type;
@@ -157,13 +152,13 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                     </div>
                     <div>
                         <dt>Total cost</dt>
-                        <dd>{formatCost(statistics.total_service_cost)}</dd>
+                        <dd>{formatCurrency(statistics.total_service_cost)}</dd>
                     </div>
                     <div>
                         <dt>Average cost</dt>
                         <dd>
                             {statistics.average_service_cost !== null
-                                ? formatCost(statistics.average_service_cost)
+                                ? formatCurrency(statistics.average_service_cost)
                                 : "Not available"}
                         </dd>
                     </div>
@@ -175,7 +170,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                                 : "Not available"}
                         </dd>
                         {statistics.last_service_cost !== null && (
-                            <span>{formatCost(statistics.last_service_cost)}</span>
+                            <span>{formatCurrency(statistics.last_service_cost)}</span>
                         )}
                         {statistics.last_service_mileage !== null && (
                             <span>{formatMileage(statistics.last_service_mileage)}</span>
@@ -280,7 +275,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                                 </div>
                                 <div>
                                     <span>Cost</span>
-                                    <strong>{formatCost(service.cost)}</strong>
+                                    <strong>{formatCurrency(service.cost)}</strong>
                                 </div>
                             </div>
 

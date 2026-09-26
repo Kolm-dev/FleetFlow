@@ -29,7 +29,7 @@ export const PricingSettingsForm = ({
     return (
         <form onSubmit={onSubmit} className="pricing-settings-form">
             <label>
-                Base price
+                Base price (USD)
                 <input
                     type="number"
                     value={basePrice}
@@ -42,7 +42,7 @@ export const PricingSettingsForm = ({
             </label>
 
             <label>
-                Price per km
+                Price per km (USD)
                 <input
                     type="number"
                     value={pricePerKm}
@@ -53,7 +53,7 @@ export const PricingSettingsForm = ({
             </label>
 
             <label>
-                Minimum price
+                Minimum price (USD)
                 <input
                     type="number"
                     value={minimumPrice}

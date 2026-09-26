@@ -1,4 +1,5 @@
 import { ConfirmModal } from "@/components/ConfirmModal";
+import { formatCurrency } from "@/libs/formatCurrency";
 import type { Trip } from "@/types/tripsTypes";
 import { useState } from "react";
 
@@ -73,7 +74,7 @@ const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
                         </div>
                         <div>
                             <dt>Price</dt>
-                            <dd>{formatValue(trip.price)}</dd>
+                            <dd>{formatCurrency(trip.price)}</dd>
                         </div>
                         <div>
                             <dt>Created</dt>

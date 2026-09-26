@@ -1,6 +1,7 @@
 import { getPricingSettings, updatePricingSettings } from "@/api/pricing";
 import { PricingSettingsForm } from "@/components/PricingSettingsForm";
 import { Spinner } from "@/components/Spinner";
+import { formatCurrency } from "@/libs/formatCurrency";
 import type { UpdatePricingType } from "@/types/pricingTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -61,15 +62,15 @@ export const PricingSettings = () => {
                 <dl>
                     <div>
                         <dt>Base price</dt>
-                        <dd>{pricing?.base_price}</dd>
+                        <dd>{formatCurrency(pricing?.base_price)}</dd>
                     </div>
                     <div>
                         <dt>Price per km</dt>
-                        <dd>{pricing?.price_per_km}</dd>
+                        <dd>{formatCurrency(pricing?.price_per_km)}</dd>
                     </div>
                     <div>
                         <dt>Minimum price</dt>
-                        <dd>{pricing?.minimum_price}</dd>
+                        <dd>{formatCurrency(pricing?.minimum_price)}</dd>
                     </div>
                     <div>
                         <dt>Updated at</dt>

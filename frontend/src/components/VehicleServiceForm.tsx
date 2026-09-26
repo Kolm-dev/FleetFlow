@@ -89,7 +89,7 @@ export const VehicleServiceForm = ({
                 </label>
 
                 <label>
-                    Cost
+                    Cost (USD)
                     <input
                         required
                         min="0"

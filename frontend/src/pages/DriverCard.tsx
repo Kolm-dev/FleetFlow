@@ -2,6 +2,7 @@ import { deleteDriver, getDriverDetails } from "@/api/drivers";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
+import { formatCurrency } from "@/libs/formatCurrency";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
@@ -9,13 +10,6 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
 
 const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
-
-const formatMoney = (value: number) =>
-    new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0,
-    }).format(value);
 
 const formatTripValue = (value: number | null, suffix = "") =>
     value === null ? "Not specified" : `${formatNumber(value)}${suffix}`;
@@ -204,7 +198,7 @@ export const DriverCard = () => {
                             <div className="driver-statistics__item">
                                 <span>Total earnings</span>
                                 <strong>
-                                    {formatMoney(statistics.total_earnings)}
+                                    {formatCurrency(statistics.total_earnings)}
                                 </strong>
                             </div>
                         </div>
@@ -234,7 +228,7 @@ export const DriverCard = () => {
                                             | Earnings:{" "}
                                             {trip.price === null
                                                 ? "Not specified"
-                                                : formatMoney(trip.price)}
+                                                : formatCurrency(trip.price)}
                                         </p>
                                         {trip.vehicle && (
                                             <p>

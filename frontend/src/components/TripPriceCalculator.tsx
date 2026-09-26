@@ -1,4 +1,5 @@
 import { calculateTripPrice } from "@/api/pricing";
+import { formatCurrency } from "@/libs/formatCurrency";
 import { useState } from "react";
 
 type TripPriceCalculatorProps = {
@@ -74,7 +75,7 @@ export const TripPriceCalculator = ({
                 Distance: <strong>{distance || "not specified"} km</strong>
             </p>
             <label>
-                Price
+                Price (USD)
                 <input
                     type="number"
                     value={price}
@@ -108,10 +109,14 @@ export const TripPriceCalculator = ({
                     recommendedPrice !== null && (
                         <>
                             <p>
-                                Recommended price: <strong>{recommendedPrice} ₴</strong>
+                                Recommended price:{" "}
+                                <strong>{formatCurrency(recommendedPrice)}</strong>
                             </p>
                             <p>
-                                Price to save: <strong>{price || "not specified"}</strong>
+                                Price to save:{" "}
+                                <strong>
+                                    {formatCurrency(price, "not specified")}
+                                </strong>
                             </p>
                             {isManualPrice && (
                                 <p className="trip-price-tools__manual">
