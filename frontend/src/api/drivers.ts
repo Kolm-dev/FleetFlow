@@ -38,6 +38,14 @@ export async function getDriver(id: number) {
 export function getDriverDetails(id: number, filters?: DriverDetailsFilters) {
     const params = new URLSearchParams();
 
+    if (filters?.from) {
+        params.set("from", filters.from);
+    }
+
+    if (filters?.to) {
+        params.set("to", filters.to);
+    }
+
     if (filters?.page) {
         params.set("page", filters.page.toString());
     }

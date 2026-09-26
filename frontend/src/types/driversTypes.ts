@@ -27,6 +27,8 @@ export type DriversFilters = {
 };
 
 export type DriverDetailsFilters = {
+    from?: string;
+    to?: string;
     page?: number;
 };
 

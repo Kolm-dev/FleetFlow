@@ -22,6 +22,8 @@ export const DriverCard = () => {
     const [redirectCountdown, setRedirectCountdown] = useState(5);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const page = getValidPage(searchParams.get("page"));
+    const from = searchParams.get("from") ?? "";
+    const to = searchParams.get("to") ?? "";
     const { mutate, isError, error, isPending, isSuccess } = useMutation({
         mutationFn: (id: number) => deleteDriver(id),
         onSuccess: () => {
@@ -38,8 +40,13 @@ export const DriverCard = () => {
         error: driverError,
     } = useQuery({
         enabled: !!driverId,
-        queryKey: ["driver", driverId, { page }],
-        queryFn: () => getDriverDetails(parseInt(driverId as string), { page }),
+        queryKey: ["driver", driverId, { page, from, to }],
+        queryFn: () =>
+            getDriverDetails(parseInt(driverId as string), {
+                page,
+                from: from || undefined,
+                to: to || undefined,
+            }),
         placeholderData: keepPreviousData,
     });
     const driver = data?.driver;
@@ -50,6 +57,21 @@ export const DriverCard = () => {
         setSearchParams((currentParams) => {
             const nextParams = new URLSearchParams(currentParams);
             nextParams.set("page", nextPage.toString());
+            return nextParams;
+        });
+    };
+
+    const changeDateFilter = (name: "from" | "to", value: string) => {
+        setSearchParams((currentParams) => {
+            const nextParams = new URLSearchParams(currentParams);
+
+            if (value) {
+                nextParams.set(name, value);
+            } else {
+                nextParams.delete(name);
+            }
+
+            nextParams.delete("page");
             return nextParams;
         });
     };
@@ -175,6 +197,31 @@ export const DriverCard = () => {
                         ) : (
                             <p className="empty-state">No assigned vehicles</p>
                         )}
+                    </div>
+
+                    <div className="entity-search">
+                        <label>
+                            From
+                            <input
+                                max={to || undefined}
+                                type="date"
+                                value={from}
+                                onChange={(event) =>
+                                    changeDateFilter("from", event.currentTarget.value)
+                                }
+                            />
+                        </label>
+                        <label>
+                            To
+                            <input
+                                min={from || undefined}
+                                type="date"
+                                value={to}
+                                onChange={(event) =>
+                                    changeDateFilter("to", event.currentTarget.value)
+                                }
+                            />
+                        </label>
                     </div>
 
                     <div>
