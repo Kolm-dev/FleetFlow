@@ -1,6 +1,6 @@
 import { getDrivers } from "@/api/drivers";
 import { Pagination } from "@/components/Pagination";
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "@/components/Spinner/Spinner";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getValidPage } from "@/libs/utils";
 import type { DriverStatus } from "@/types/driversTypes";

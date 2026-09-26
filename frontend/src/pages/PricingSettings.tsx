@@ -1,6 +1,6 @@
 import { getPricingSettings, updatePricingSettings } from "@/api/pricing";
 import { PricingSettingsForm } from "@/components/PricingSettingsForm";
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "@/components/Spinner/Spinner";
 import { formatCurrency, formatDateTime } from "@/libs/utils";
 import type { UpdatePricingType } from "@/types/pricingTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

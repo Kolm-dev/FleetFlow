@@ -1,23 +1,23 @@
 import { Home } from "@/pages/Home";
-import { DriversList } from "@/pages/DriversList";
-import VehiclesList from "@/pages/VehiclesList";
-import { DriverCard } from "@/pages/DriverCard";
+import { DriversList } from "@/pages/Drivers/DriversList";
+import VehiclesList from "@/pages/Vehicles/VehiclesList";
+import { DriverCard } from "@/pages/Drivers/DriverCard";
 import { MainLayout } from "@/layouts/MainLayout";
 import { NotFound } from "@/layouts/NotFound";
 
 import { Route, Routes } from "react-router";
-import TripsList from "@/pages/TripsList";
-import { DriverEdit } from "@/pages/DriverEdit";
-import { DriverCreate } from "@/pages/DriverCreate";
-import { VehicleCard } from "@/pages/VehicleCard";
-import { VehicleEdit } from "@/pages/VehicleEdit";
-import VehicleCreate from "@/pages/VehicleCreate";
-import TripEdit from "@/pages/TripEdit";
-import { TripCreate } from "@/pages/TripCreate";
+import TripsList from "@/pages/Trips/TripsList";
+import { DriverEdit } from "@/pages/Drivers/DriverEdit";
+import { DriverCreate } from "@/pages/Drivers/DriverCreate";
+import { VehicleCard } from "@/pages/Vehicles/VehicleCard";
+import { VehicleEdit } from "@/pages/Vehicles/VehicleEdit";
+import VehicleCreate from "@/pages/Vehicles/VehicleCreate";
+import TripEdit from "@/pages/Trips/TripEdit";
+import { TripCreate } from "@/pages/Trips/TripCreate";
 import Authorization from "@/pages/Authorization";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import PublicOnlyRoute from "@/components/PublicOnlyRoute";
-import { Register } from "@/components/Register";
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
+import PublicOnlyRoute from "@/components/Auth/PublicOnlyRoute";
+import { Register } from "@/components/Auth/Register";
 import { PricingSettings } from "@/pages/PricingSettings";
 
 export const App = () => {

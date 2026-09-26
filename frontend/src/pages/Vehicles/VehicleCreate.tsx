@@ -1,6 +1,6 @@
 import { getDrivers } from "@/api/drivers";
 import { createVehicle } from "@/api/vehicles";
-import { VehicleCreateForm } from "@/components/VehicleCreateForm";
+import { VehicleCreateForm } from "@/components/Vehicles/VehicleCreateForm";
 import type { CreateVehicleData } from "@/types/vehiclesTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";

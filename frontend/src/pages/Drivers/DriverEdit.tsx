@@ -1,6 +1,6 @@
 import { getDriver, updateDriver } from "@/api/drivers";
-import { DriverEditForm } from "@/components/DriverEditForm";
-import { Spinner } from "@/components/Spinner";
+import { DriverEditForm } from "@/components/Drivers/DriverEditForm";
+import { Spinner } from "@/components/Spinner/Spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UpdateDriverData } from "@/types/driversTypes";
 import { useNavigate, useParams } from "react-router";

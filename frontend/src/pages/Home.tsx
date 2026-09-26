@@ -1,5 +1,5 @@
 import { getStats } from "@/api/stats";
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "@/components/Spinner/Spinner";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
 

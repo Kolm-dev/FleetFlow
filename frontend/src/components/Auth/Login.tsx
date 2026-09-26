@@ -1,5 +1,5 @@
 import { login, type LoginErrorResponse } from "@/api/auth";
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "@/components/Spinner/Spinner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState, type FormEvent } from "react";

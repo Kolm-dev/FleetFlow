@@ -1,4 +1,4 @@
-import { TripCard } from "@/components/TripCard";
+import { TripCard } from "@/components/Trips/TripCard";
 import type { Trip } from "@/types/tripsTypes";
 
 type TripsContentProps = {

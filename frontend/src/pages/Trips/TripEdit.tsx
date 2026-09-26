@@ -1,7 +1,7 @@
 import { getDrivers } from "@/api/drivers";
 import { getTrip, updateTrip } from "@/api/trips";
-import { Spinner } from "@/components/Spinner";
-import { TripEditForm } from "@/components/TripEditForm";
+import { Spinner } from "@/components/Spinner/Spinner";
+import { TripEditForm } from "@/components/Trips/TripEditForm";
 import type { UpdateTripData } from "@/types/tripsTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";

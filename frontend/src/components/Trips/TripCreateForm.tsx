@@ -1,4 +1,4 @@
-import { TripPriceCalculator } from "@/components/TripPriceCalculator";
+import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
 import type { Driver } from "@/types/driversTypes";
 import type { CreateTripData, TripStatus } from "@/types/tripsTypes";
 import { useState, type FormEvent } from "react";

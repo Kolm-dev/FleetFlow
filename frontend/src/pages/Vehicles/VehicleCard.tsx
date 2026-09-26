@@ -1,7 +1,7 @@
 import { deleteVehicle, getVehicle } from "@/api/vehicles";
 import { ConfirmModal } from "@/components/ConfirmModal";
-import { Spinner } from "@/components/Spinner";
-import { VehicleServicesSection } from "@/components/VehicleServicesSection";
+import { Spinner } from "@/components/Spinner/Spinner";
+import { VehicleServicesSection } from "@/components/Vehicles/VehicleServicesSection";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";

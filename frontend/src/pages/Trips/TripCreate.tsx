@@ -1,6 +1,6 @@
 import { getDrivers } from "@/api/drivers";
 import { createTrip } from "@/api/trips";
-import TripCreateForm from "@/components/TripCreateForm";
+import TripCreateForm from "@/components/Trips/TripCreateForm";
 import type { CreateTripData } from "@/types/tripsTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";

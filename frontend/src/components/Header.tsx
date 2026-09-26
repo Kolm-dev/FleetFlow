@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar";
-import Logout from "@/components/Logout";
+import Logout from "@/components/Auth/Logout";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router";

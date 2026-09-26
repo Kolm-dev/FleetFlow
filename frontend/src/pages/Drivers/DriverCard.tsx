@@ -1,7 +1,7 @@
 import { deleteDriver, getDriverDetails } from "@/api/drivers";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "@/components/Spinner/Spinner";
 import {
     formatCurrency,
     formatNumber,

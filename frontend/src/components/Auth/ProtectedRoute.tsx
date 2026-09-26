@@ -1,4 +1,4 @@
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "@/components/Spinner/Spinner";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Navigate, Outlet } from "react-router";
 

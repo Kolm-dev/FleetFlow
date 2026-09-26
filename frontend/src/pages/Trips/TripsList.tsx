@@ -1,11 +1,11 @@
 import { closeTrip, cancelTrip, deleteTrip, getTrips, startTrip } from "@/api/trips";
 import { Pagination } from "@/components/Pagination";
-import { Spinner } from "@/components/Spinner";
-import TripDetailsPanel from "@/components/TripDetailsPanel";
-import { TripsContent } from "@/components/TripsContent";
-import { TripsHeader } from "@/components/TripsHeader";
-import { TripsStatusFilter } from "@/components/TripsStatusFilter";
-import { TripsToolbar } from "@/components/TripsToolbar";
+import { Spinner } from "@/components/Spinner/Spinner";
+import TripDetailsPanel from "@/components/Trips/TripDetailsPanel";
+import { TripsContent } from "@/components/Trips/TripsContent";
+import { TripsHeader } from "@/components/Trips/TripsHeader";
+import { TripsStatusFilter } from "@/components/Trips/TripsStatusFilter";
+import { TripsToolbar } from "@/components/Trips/TripsToolbar";
 import { useErrorMessageScroll } from "@/hooks/useErrorMessageScroll";
 import { useSuccessMessageScroll } from "@/hooks/useSuccessMessageScroll";
 import { useTripsFilters } from "@/hooks/useTripsFilters";

@@ -1,4 +1,4 @@
-import { TripPriceCalculator } from "@/components/TripPriceCalculator";
+import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
 import { toNullableNumber } from "@/libs/utils";
 import type { Driver } from "@/types/driversTypes";
 import type { Trip, TripStatus, UpdateTripData } from "@/types/tripsTypes";

@@ -1,6 +1,6 @@
 import { getVehicle, updateVehicle } from "@/api/vehicles";
-import { Spinner } from "@/components/Spinner";
-import { VehicleEditForm } from "@/components/VehicleEditForm";
+import { Spinner } from "@/components/Spinner/Spinner";
+import { VehicleEditForm } from "@/components/Vehicles/VehicleEditForm";
 import type { UpdateVehicleData } from "@/types/vehiclesTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";

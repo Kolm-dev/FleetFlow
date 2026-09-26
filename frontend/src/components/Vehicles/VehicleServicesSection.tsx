@@ -6,8 +6,8 @@ import {
 } from "@/api/vehicleServices";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
-import { Spinner } from "@/components/Spinner";
-import { VehicleServiceForm } from "@/components/VehicleServiceForm";
+import { Spinner } from "@/components/Spinner/Spinner";
+import { VehicleServiceForm } from "@/components/Vehicles/VehicleServiceForm";
 import { formatCurrency, formatDateOnly, formatMileage } from "@/libs/utils";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
 import type {

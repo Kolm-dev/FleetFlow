@@ -1,6 +1,6 @@
 import { getVehicles } from "@/api/vehicles";
 import { Pagination } from "@/components/Pagination";
-import { Spinner } from "@/components/Spinner";
+import { Spinner } from "@/components/Spinner/Spinner";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getValidPage } from "@/libs/utils";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
