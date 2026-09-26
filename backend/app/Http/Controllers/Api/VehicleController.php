@@ -7,6 +7,7 @@ use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class VehicleController extends Controller
 {
@@ -64,8 +65,32 @@ class VehicleController extends Controller
 
     public function show(Vehicle $vehicle)
     {
+        $serviceCount = $vehicle->vehicleServices()->count();
+        $totalCostServices = (float) $vehicle->vehicleServices()->sum('cost');
+
+        $lastService = $vehicle->vehicleServices()
+            ->orderByDesc('service_date')
+            ->first();
+
+
+        $averageServiceCost = $vehicle->vehicleServices()->avg('cost');
+
+        $averageServiceCost = $averageServiceCost !== null
+            ? round((float) $averageServiceCost, 2)
+            : null;
+
+
         return response()->json([
             'vehicle' => $vehicle->load('driver'),
+
+            'service_statistics' => [
+                'total_services' => $serviceCount,
+                'total_service_cost' => $totalCostServices,
+                'last_service_date' => $lastService?->service_date?->format('Y-m-d'),
+                'last_service_cost' => $lastService?->cost,
+                'last_service_mileage' => $lastService?->mileage,
+                'average_service_cost' => $averageServiceCost,
+            ],
         ]);
     }
 

@@ -28,13 +28,7 @@ export const VEHICLE_SERVICE_TYPES: Array<{
     { value: "other", label: "Other" },
 ];
 
-export type VehicleServiceSort =
-    | "service_date"
-    | "-service_date"
-    | "mileage"
-    | "-mileage"
-    | "cost"
-    | "-cost";
+export type VehicleServiceSort = "service_date" | "-service_date" | "mileage" | "-mileage" | "cost" | "-cost";
 
 export interface VehicleService {
     id: number;
@@ -54,6 +48,15 @@ export type PaginatedVehicleServices = {
     last_page: number;
     per_page: number;
     total: number;
+};
+
+export type VehicleServiceStatistics = {
+    total_services: number;
+    total_service_cost: number;
+    average_service_cost: number | null;
+    last_service_date: string | null;
+    last_service_cost: number | null;
+    last_service_mileage: number | null;
 };
 
 export type VehicleServicesFilters = {

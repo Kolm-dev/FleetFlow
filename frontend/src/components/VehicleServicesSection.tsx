@@ -13,19 +13,16 @@ import type {
     CreateVehicleServiceData,
     UpdateVehicleServiceData,
     VehicleService,
+    VehicleServiceStatistics,
     VehicleServiceSort,
     VehicleServiceType,
 } from "@/types/vehicleServicesTypes";
-import {
-    keepPreviousData,
-    useMutation,
-    useQuery,
-    useQueryClient,
-} from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 type VehicleServicesSectionProps = {
     vehicleId: number;
+    statistics: VehicleServiceStatistics;
 };
 
 type SortField = "service_date" | "mileage" | "cost";
@@ -38,8 +35,7 @@ const formatDate = (value: string) =>
         year: "numeric",
     }).format(new Date(`${value.slice(0, 10)}T00:00:00`));
 
-const formatMileage = (value: number) =>
-    `${new Intl.NumberFormat("en-US").format(value)} km`;
+const formatMileage = (value: number) => `${new Intl.NumberFormat("en-US").format(value)} km`;
 
 const formatCost = (value: number) =>
     new Intl.NumberFormat("en-US", {
@@ -48,11 +44,9 @@ const formatCost = (value: number) =>
     }).format(value);
 
 const serviceTypeLabel = (type: VehicleServiceType) =>
-    VEHICLE_SERVICE_TYPES.find((option) => option.value === type)?.label ?? type;
+    VEHICLE_SERVICE_TYPES.find(option => option.value === type)?.label ?? type;
 
-export const VehicleServicesSection = ({
-    vehicleId,
-}: VehicleServicesSectionProps) => {
+export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleServicesSectionProps) => {
     const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
     const [selectedTypes, setSelectedTypes] = useState<VehicleServiceType[]>([]);
@@ -63,18 +57,9 @@ export const VehicleServicesSection = ({
     const [deletingService, setDeletingService] = useState<VehicleService | null>(null);
 
     const sort = `${sortDirection === "desc" ? "-" : ""}${sortField}` as VehicleServiceSort;
-    const servicesQueryKey = [
-        "vehicle-services",
-        vehicleId,
-        { page, types: selectedTypes, sort },
-    ];
+    const servicesQueryKey = ["vehicle-services", vehicleId, { page, types: selectedTypes, sort }];
 
-    const {
-        data,
-        error,
-        isLoading,
-        isFetching,
-    } = useQuery({
+    const { data, error, isLoading, isFetching } = useQuery({
         queryKey: servicesQueryKey,
         queryFn: () =>
             getVehicleServices(vehicleId, {
@@ -86,13 +71,17 @@ export const VehicleServicesSection = ({
     });
 
     const invalidateServices = () =>
-        queryClient.invalidateQueries({
-            queryKey: ["vehicle-services", vehicleId],
-        });
+        Promise.all([
+            queryClient.invalidateQueries({
+                queryKey: ["vehicle-services", vehicleId],
+            }),
+            queryClient.invalidateQueries({
+                queryKey: ["vehicles"],
+            }),
+        ]);
 
     const createMutation = useMutation({
-        mutationFn: (formData: CreateVehicleServiceData) =>
-            createVehicleService(vehicleId, formData),
+        mutationFn: (formData: CreateVehicleServiceData) => createVehicleService(vehicleId, formData),
         onSuccess: () => {
             setIsCreateOpen(false);
             setPage(1);
@@ -101,13 +90,8 @@ export const VehicleServicesSection = ({
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({
-            serviceId,
-            formData,
-        }: {
-            serviceId: number;
-            formData: UpdateVehicleServiceData;
-        }) => updateVehicleService(vehicleId, serviceId, formData),
+        mutationFn: ({ serviceId, formData }: { serviceId: number; formData: UpdateVehicleServiceData }) =>
+            updateVehicleService(vehicleId, serviceId, formData),
         onSuccess: () => {
             setEditingService(null);
             invalidateServices();
@@ -115,22 +99,21 @@ export const VehicleServicesSection = ({
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (serviceId: number) =>
-            deleteVehicleService(vehicleId, serviceId),
+        mutationFn: (serviceId: number) => deleteVehicleService(vehicleId, serviceId),
         onSuccess: () => {
             setDeletingService(null);
             if (page > 1 && data?.data.length === 1) {
-                setPage((current) => current - 1);
+                setPage(current => current - 1);
             }
             invalidateServices();
         },
     });
 
     const toggleType = (type: VehicleServiceType) => {
-        setSelectedTypes((currentTypes) =>
+        setSelectedTypes(currentTypes =>
             currentTypes.includes(type)
-                ? currentTypes.filter((currentType) => currentType !== type)
-                : [...currentTypes, type],
+                ? currentTypes.filter(currentType => currentType !== type)
+                : [...currentTypes, type]
         );
         setPage(1);
     };
@@ -145,8 +128,7 @@ export const VehicleServicesSection = ({
         setPage(1);
     };
 
-    const mutationError =
-        createMutation.error ?? updateMutation.error ?? deleteMutation.error;
+    const mutationError = createMutation.error ?? updateMutation.error ?? deleteMutation.error;
 
     return (
         <section className="vehicle-services">
@@ -160,12 +142,51 @@ export const VehicleServicesSection = ({
                     type="button"
                     onClick={() => {
                         setEditingService(null);
-                        setIsCreateOpen((current) => !current);
+                        setIsCreateOpen(current => !current);
                     }}
                 >
                     {isCreateOpen ? "Close form" : "Add service"}
                 </button>
             </div>
+
+            {statistics.total_services > 0 ? (
+                <dl className="vehicle-services__statistics">
+                    <div>
+                        <dt>Total services</dt>
+                        <dd>{statistics.total_services}</dd>
+                    </div>
+                    <div>
+                        <dt>Total cost</dt>
+                        <dd>{formatCost(statistics.total_service_cost)}</dd>
+                    </div>
+                    <div>
+                        <dt>Average cost</dt>
+                        <dd>
+                            {statistics.average_service_cost !== null
+                                ? formatCost(statistics.average_service_cost)
+                                : "Not available"}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Last service</dt>
+                        <dd>
+                            {statistics.last_service_date
+                                ? formatDate(statistics.last_service_date)
+                                : "Not available"}
+                        </dd>
+                        {statistics.last_service_cost !== null && (
+                            <span>{formatCost(statistics.last_service_cost)}</span>
+                        )}
+                        {statistics.last_service_mileage !== null && (
+                            <span>{formatMileage(statistics.last_service_mileage)}</span>
+                        )}
+                    </div>
+                </dl>
+            ) : (
+                <p className="vehicle-services__no-statistics">
+                    Service statistics will appear after the first service record.
+                </p>
+            )}
 
             {isCreateOpen && (
                 <div className="vehicle-services__editor">
@@ -174,7 +195,7 @@ export const VehicleServicesSection = ({
                         isPending={createMutation.isPending}
                         submitText="Create service"
                         onCancel={() => setIsCreateOpen(false)}
-                        onSubmit={(formData) => createMutation.mutate(formData)}
+                        onSubmit={formData => createMutation.mutate(formData)}
                     />
                 </div>
             )}
@@ -183,7 +204,7 @@ export const VehicleServicesSection = ({
                 <fieldset className="vehicle-services__types">
                     <legend>Service types</legend>
                     <div className="vehicle-services__type-options">
-                        {VEHICLE_SERVICE_TYPES.map((option) => (
+                        {VEHICLE_SERVICE_TYPES.map(option => (
                             <label key={option.value}>
                                 <input
                                     checked={selectedTypes.includes(option.value)}
@@ -201,16 +222,17 @@ export const VehicleServicesSection = ({
                         Sort by
                         <select
                             value={sortField}
-                            onChange={(event) =>
-                                handleSortFieldChange(event.currentTarget.value as SortField)
-                            }
+                            onChange={event => handleSortFieldChange(event.currentTarget.value as SortField)}
                         >
                             <option value="service_date">Service date</option>
                             <option value="mileage">Mileage</option>
                             <option value="cost">Cost</option>
                         </select>
                     </label>
-                    <div className="vehicle-services__direction" aria-label="Sort direction">
+                    <div
+                        className="vehicle-services__direction"
+                        aria-label="Sort direction"
+                    >
                         <button
                             aria-pressed={sortDirection === "asc"}
                             className={sortDirection === "asc" ? "is-active" : ""}
@@ -232,13 +254,9 @@ export const VehicleServicesSection = ({
             </div>
 
             {error && <p className="error-message">{error.message}</p>}
-            {mutationError && (
-                <p className="error-message">{mutationError.message}</p>
-            )}
+            {mutationError && <p className="error-message">{mutationError.message}</p>}
             {isLoading && <Spinner />}
-            {isFetching && !isLoading && (
-                <p className="vehicle-services__updating">Updating service history...</p>
-            )}
+            {isFetching && !isLoading && <p className="vehicle-services__updating">Updating service history...</p>}
 
             {!isLoading && !error && data?.data.length === 0 && (
                 <p className="empty-state">No service records match these filters.</p>
@@ -246,13 +264,14 @@ export const VehicleServicesSection = ({
 
             {data && data.data.length > 0 && (
                 <div className="vehicle-services__list">
-                    {data.data.map((service) => (
-                        <article className="vehicle-service" key={service.id}>
+                    {data.data.map(service => (
+                        <article
+                            className="vehicle-service"
+                            key={service.id}
+                        >
                             <div className="vehicle-service__summary">
                                 <div>
-                                    <span className="vehicle-service__type">
-                                        {serviceTypeLabel(service.type)}
-                                    </span>
+                                    <span className="vehicle-service__type">{serviceTypeLabel(service.type)}</span>
                                     <strong>{formatDate(service.service_date)}</strong>
                                 </div>
                                 <div>
@@ -265,9 +284,7 @@ export const VehicleServicesSection = ({
                                 </div>
                             </div>
 
-                            <p className="vehicle-service__notes">
-                                {service.notes || "No notes"}
-                            </p>
+                            <p className="vehicle-service__notes">{service.notes || "No notes"}</p>
 
                             <div className="vehicle-service__actions">
                                 <button
@@ -275,9 +292,7 @@ export const VehicleServicesSection = ({
                                     type="button"
                                     onClick={() => {
                                         setIsCreateOpen(false);
-                                        setEditingService(
-                                            editingService?.id === service.id ? null : service,
-                                        );
+                                        setEditingService(editingService?.id === service.id ? null : service);
                                     }}
                                 >
                                     {editingService?.id === service.id ? "Close edit" : "Edit"}
@@ -299,7 +314,7 @@ export const VehicleServicesSection = ({
                                         isPending={updateMutation.isPending}
                                         submitText="Save changes"
                                         onCancel={() => setEditingService(null)}
-                                        onSubmit={(formData) =>
+                                        onSubmit={formData =>
                                             updateMutation.mutate({
                                                 serviceId: service.id,
                                                 formData,
@@ -318,10 +333,8 @@ export const VehicleServicesSection = ({
                     page={data.current_page}
                     lastPage={data.last_page}
                     isFetching={isFetching}
-                    onPreviousPage={() => setPage((current) => Math.max(1, current - 1))}
-                    onNextPage={() =>
-                        setPage((current) => Math.min(data.last_page, current + 1))
-                    }
+                    onPreviousPage={() => setPage(current => Math.max(1, current - 1))}
+                    onNextPage={() => setPage(current => Math.min(data.last_page, current + 1))}
                 />
             )}
 

@@ -1,4 +1,5 @@
 import type { Driver } from "@/types/driversTypes";
+import type { VehicleServiceStatistics } from "@/types/vehicleServicesTypes";
 
 export interface Vehicle {
     id: number;
@@ -9,6 +10,8 @@ export interface Vehicle {
     driver_id: number;
     driver: Driver;
 }
+
+
 
 export type CreateVehicleData = {
     brand: string;
@@ -35,6 +38,7 @@ export type VehiclesResponse = {
 
 export type VehicleResponse = {
     vehicle: Vehicle;
+    service_statistics: VehicleServiceStatistics;
 };
 
 export type VehicleActionResponse = {

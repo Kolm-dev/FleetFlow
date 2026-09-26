@@ -22,20 +22,19 @@ export const VehicleCard = () => {
         },
     });
 
-    const { isLoading, data: vehicle } = useQuery({
+    const { isLoading, data } = useQuery({
         enabled: !!vehicleId,
         queryKey: ["vehicles", vehicleId],
         queryFn: () => getVehicle(parseInt(vehicleId as string)),
     });
+    const vehicle = data?.vehicle;
 
     useEffect(() => {
         if (!isSuccess) return;
 
         const intervalId = window.setInterval(() => {
-            setRedirectCountdown((currentCountdown) => {
-                const nextCountdown = Number(
-                    (currentCountdown - 0.1).toFixed(1),
-                );
+            setRedirectCountdown(currentCountdown => {
+                const nextCountdown = Number((currentCountdown - 0.1).toFixed(1));
 
                 return Math.max(nextCountdown, 0);
             });
@@ -53,9 +52,7 @@ export const VehicleCard = () => {
     const handleConfirmDelete = () => {
         if (!vehicleId || !vehicle) return;
 
-        setDeletedVehicleLabel(
-            `${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`,
-        );
+        setDeletedVehicleLabel(`${vehicle.brand} ${vehicle.model} - ${vehicle.license_plate}`);
         setIsDeleteConfirmOpen(false);
         mutate(parseInt(vehicleId));
     };
@@ -64,10 +61,7 @@ export const VehicleCard = () => {
         return (
             <div className="success-message">
                 <p>{deletedVehicleLabel} was successfully deleted!</p>
-                <p>
-                    Redirecting to vehicles list in{" "}
-                    {redirectCountdown.toFixed(1)}s
-                </p>
+                <p>Redirecting to vehicles list in {redirectCountdown.toFixed(1)}s</p>
             </div>
         );
     }
@@ -84,9 +78,7 @@ export const VehicleCard = () => {
                     <h1>
                         {vehicle.brand} {vehicle.model}
                     </h1>
-                    <p className="vehicle-details-header__plate">
-                        {vehicle.license_plate}
-                    </p>
+                    <p className="vehicle-details-header__plate">{vehicle.license_plate}</p>
                 </div>
 
                 <div className="entity-actions vehicle-details-header__actions">
@@ -140,18 +132,12 @@ export const VehicleCard = () => {
                             <div>
                                 <dt>Name</dt>
                                 <dd>
-                                    <Link to={`/drivers/${vehicle.driver.id}`}>
-                                        {vehicle.driver.name}
-                                    </Link>
+                                    <Link to={`/drivers/${vehicle.driver.id}`}>{vehicle.driver.name}</Link>
                                 </dd>
                             </div>
                             <div>
                                 <dt>Status</dt>
-                                <dd>
-                                    {vehicle.driver.status === "on_trip"
-                                        ? "On trip"
-                                        : vehicle.driver.status}
-                                </dd>
+                                <dd>{vehicle.driver.status === "on_trip" ? "On trip" : vehicle.driver.status}</dd>
                             </div>
                         </dl>
                     ) : (
@@ -160,7 +146,10 @@ export const VehicleCard = () => {
                 </div>
             </section>
 
-            <VehicleServicesSection vehicleId={Number(vehicleId)} />
+            <VehicleServicesSection
+                vehicleId={Number(vehicleId)}
+                statistics={data.service_statistics}
+            />
 
             <ConfirmModal
                 isOpen={isDeleteConfirmOpen}

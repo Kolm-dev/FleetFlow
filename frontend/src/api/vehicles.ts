@@ -33,8 +33,7 @@ export function getVehicles(filters?: VehiclesFilters) {
 }
 
 export async function getVehicle(id: number) {
-    const response = await apiClient<VehicleResponse>(`/vehicles/${id}`);
-    return response.vehicle;
+    return await apiClient<VehicleResponse>(`/vehicles/${id}`);
 }
 
 export function createVehicle(data: CreateVehicleData) {

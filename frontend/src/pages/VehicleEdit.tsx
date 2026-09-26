@@ -10,7 +10,7 @@ export const VehicleEdit = () => {
     const navigate = useNavigate();
     const { id: vehicleId } = useParams();
     const {
-        data: vehicle,
+        data,
         isLoading,
         error: vehicleError,
     } = useQuery({
@@ -18,13 +18,13 @@ export const VehicleEdit = () => {
         queryFn: () => getVehicle(parseInt(vehicleId as string)),
         enabled: !!vehicleId,
     });
+    const vehicle = data?.vehicle;
     const {
         mutate,
         isPending,
         error: updateError,
     } = useMutation({
-        mutationFn: (data: UpdateVehicleData) =>
-            updateVehicle(data, parseInt(vehicleId as string)),
+        mutationFn: (data: UpdateVehicleData) => updateVehicle(data, parseInt(vehicleId as string)),
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ["vehicles"],
@@ -44,11 +44,9 @@ export const VehicleEdit = () => {
 
     return (
         <div className="vehicle-edit-page">
-            {updateError && (
-                <p className="error-message">{updateError.message}</p>
-            )}
+            {updateError && <p className="error-message">{updateError.message}</p>}
             <VehicleEditForm
-                onSubmit={(data) => mutate(data)}
+                onSubmit={data => mutate(data)}
                 onCancel={() => navigate(`/vehicles/${vehicleId}`)}
                 isPending={isPending}
                 vehicle={vehicle}
