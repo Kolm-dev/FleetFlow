@@ -17,6 +17,7 @@ class Trip extends Model
         'status',
         'driver_id',
         'vehicle_id',
+        'completed_at',
     ];
 
     public function driver()
