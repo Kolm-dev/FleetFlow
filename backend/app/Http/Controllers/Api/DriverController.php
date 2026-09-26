@@ -51,15 +51,28 @@ class DriverController extends Controller
         ]);
     }
 
-    public function show(Driver $driver)
+    public function show(Driver $driver, Request $request)
     {
-
+        $validated = $request->validate([
+            'from' => ['sometimes', 'date'],
+            'to' => ['sometimes', 'date', 'after_or_equal:from'],
+        ]);
         $closedTripsBuilder = $driver->trips()->where('status', TripStatus::Closed);
+
+        if (isset($validated['from'])) {
+            $closedTripsBuilder->whereDate('completed_at', '>=', $validated['from']);
+        }
+
+        if (isset($validated['to'])) {
+            $closedTripsBuilder->whereDate('completed_at', '<=', $validated['to']);
+        }
 
         $closedTripsCount = $closedTripsBuilder->count();
         $totalEarnings = $closedTripsBuilder->sum('price');
         $totalDistance = $closedTripsBuilder->sum('distance');
-        $allClosedTrips = $closedTripsBuilder->orderByDesc('created_at')->paginate(5);
+        $allClosedTrips = $closedTripsBuilder
+            ->orderByDesc('completed_at')
+            ->paginate(5);
 
         return response()->json([
             'driver' => $driver->load('vehicles'),

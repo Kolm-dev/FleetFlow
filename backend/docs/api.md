@@ -30,7 +30,8 @@ Trip and vehicle service lists use the standard Laravel pagination shape. The
 records are in `data`; pagination fields include `current_page`, `last_page`,
 `per_page`, and `total`.
 
-Show routes return one named object:
+Most show routes return one named object. Driver and vehicle details also
+include their related statistics.
 
 ```json
 {
@@ -74,12 +75,12 @@ Register fields: `name`, `password`, `password_confirmation`.
 | Method | Endpoint        | Response              |
 | ------ | --------------- | --------------------- |
 | GET    | `/drivers`      | `{ total, drivers }`  |
-| GET    | `/drivers/{id}` | `{ driver }`          |
+| GET    | `/drivers/{id}` | `{ driver, statistics, closed_trips }` |
 | POST   | `/drivers`      | `{ message, driver }` |
 | PATCH  | `/drivers/{id}` | `{ message, driver }` |
 | DELETE | `/drivers/{id}` | `204 No Content`      |
 
-Query parameters:
+List query parameters:
 
 - `status`: `available`, `on_trip`, or `unavailable`.
 - `search`: case-insensitive partial match by name or phone number; a numeric
@@ -100,12 +101,16 @@ Update fields: `name`, `phone_number`, `status`, `photo`; all are optional and
 
 Driver object includes assigned `vehicles`.
 
+Driver details accept `from`, `to`, and `page`. Dates use `YYYY-MM-DD`, `to`
+must not be earlier than `from`, and both statistics and closed trips are
+filtered by trip `completed_at`. Closed trips are paginated by 5 records.
+
 ## Vehicles
 
 | Method | Endpoint         | Response               |
 | ------ | ---------------- | ---------------------- |
 | GET    | `/vehicles`      | `{ total, vehicles }`  |
-| GET    | `/vehicles/{id}` | `{ vehicle }`          |
+| GET    | `/vehicles/{id}` | `{ vehicle, service_statistics }` |
 | POST   | `/vehicles`      | `{ message, vehicle }` |
 | PATCH  | `/vehicles/{id}` | `{ message, vehicle }` |
 | DELETE | `/vehicles/{id}` | `204 No Content`       |
@@ -129,6 +134,8 @@ Update fields: same fields, all optional.
 
 Vehicle object includes assigned `driver`.
 `license_plate` is converted to uppercase automatically.
+Vehicle details include service count, total and average cost, and the latest
+service date, cost, and mileage. Latest-service values may be `null`.
 
 ## Trips
 
@@ -166,6 +173,7 @@ Create fields: `title`, `driver_id`, `vehicle_id`, `distance`, `price`, `status`
 Update fields: same fields, all optional.
 
 Trip object includes `driver` and `vehicle`.
+Closing a trip sets its `completed_at` timestamp.
 
 Trips are paginated by 5 records.
 
@@ -244,7 +252,8 @@ All pricing fields are optional on update and must be non-negative numbers.
 
 Request field: `distance` is required and must be a number greater than `0`.
 The recommended price is calculated from the current pricing settings:
-`max(minimum_price, base_price + distance * price_per_km)`.
+`max(minimum_price, base_price + distance * price_per_km)`. The result is
+rounded to two decimal places.
 
 Example request:
 

@@ -29,6 +29,7 @@ class Trip extends Model
         return [
             'price' => 'float',
             'status' => TripStatus::class,
+            'completed_at' => 'datetime',
         ];
     }
 

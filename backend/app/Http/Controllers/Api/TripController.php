@@ -74,9 +74,9 @@ class TripController extends Controller
         $trip = DB::transaction(function () use ($tripRequest) {
             $trip = Trip::create($tripRequest->validated());
 
-//            $trip->driver->update([
-//                'status' => DriverStatus::OnTrip,
-//            ]);
+            //            $trip->driver->update([
+            //                'status' => DriverStatus::OnTrip,
+            //            ]);
 
             return $trip;
         });
@@ -157,34 +157,34 @@ class TripController extends Controller
             $reasons[] = 'driver is not available';
         }
 
-        if ($reasons ) {
+        if ($reasons) {
             return response()->json([
                 'message' => 'Trip cannot be started because ' . implode(' and ', $reasons) . '.',
                 'trip' => $trip,
             ]);
         }
 
-            DB::transaction(function () use ($trip) {
-                $trip->update([
-                    'status' => TripStatus::Pending,
-                ]);
+        DB::transaction(function () use ($trip) {
+            $trip->update([
+                'status' => TripStatus::Pending,
+            ]);
 
-                $trip->driver->update([
-                    'status' => DriverStatus::OnTrip,
-                ]);
-            });
+            $trip->driver->update([
+                'status' => DriverStatus::OnTrip,
+            ]);
+        });
 
         return response()->json([
             'message' => 'Trip was started successfully.',
             'trip' => $trip,
 
         ]);
-
     }
     public function close(Trip $trip)
     {
         $trip->update([
             'status' => TripStatus::Closed,
+            'completed_at' => now(),
         ]);
 
         $trip->driver->update([
@@ -201,15 +201,19 @@ class TripController extends Controller
     {
         if (in_array($trip->status, [TripStatus::Cancelled, TripStatus::Closed], true)) {
             return response()->json([
-                'message' => 'Trip cannot be updated because it is already cancelled or closed.',
+                'message' => 'Trip cannot be cancelled because it is already cancelled or closed.',
             ], 422);
         }
+
         DB::transaction(function () use ($trip) {
-            $trip->update(['status' => TripStatus::Cancelled]);
-            $trip->driver->update(['status' => DriverStatus::Available]);
+            $trip->update([
+                'status' => TripStatus::Cancelled,
+            ]);
 
+            $trip->driver->update([
+                'status' => DriverStatus::Available,
+            ]);
         });
-
         return response()->json([
             'message' => 'Trip cancelled successfully.',
             'trip' => $trip->fresh(['driver', 'vehicle']),
@@ -240,6 +244,5 @@ class TripController extends Controller
         return response()->json([
             'recommended_price' => $calculator->calculate($data['distance']),
         ]);
-
     }
 }
