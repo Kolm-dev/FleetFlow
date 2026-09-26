@@ -1,7 +1,7 @@
 import { getPricingSettings, updatePricingSettings } from "@/api/pricing";
 import { PricingSettingsForm } from "@/components/PricingSettingsForm";
 import { Spinner } from "@/components/Spinner";
-import { formatCurrency } from "@/libs/formatCurrency";
+import { formatCurrency, formatDateTime } from "@/libs/utils";
 import type { UpdatePricingType } from "@/types/pricingTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -28,17 +28,6 @@ export const PricingSettings = () => {
         },
     });
 
-    const formatDateTime = (val?: string | null) => {
-        if (!val) return "Not updated yet";
-
-        return new Date(val).toLocaleString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    };
     if (isLoading) {
         return <Spinner />;
     }
@@ -74,7 +63,11 @@ export const PricingSettings = () => {
                     </div>
                     <div>
                         <dt>Updated at</dt>
-                        <dd>{formatDateTime(pricing?.updated_at)}</dd>
+                        <dd>
+                            {formatDateTime(pricing?.updated_at, {
+                                fallback: "Not updated yet",
+                            })}
+                        </dd>
                     </div>
                 </dl>
             </section>

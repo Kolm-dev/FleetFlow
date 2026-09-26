@@ -3,19 +3,11 @@ import type {
     DriverStatus,
     UpdateDriverData,
 } from "@/types/driversTypes";
+import { isHttpUrl } from "@/libs/utils";
 import type { FormEvent } from "react";
 import { useState } from "react";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
-
-const isPreviewableUrl = (value: string) => {
-    try {
-        const url = new URL(value);
-        return url.protocol === "http:" || url.protocol === "https:";
-    } catch {
-        return false;
-    }
-};
 
 type DriverEditFormProps = {
     driver: Driver;
@@ -37,7 +29,7 @@ export const DriverEditForm = ({
     );
     const [photo, setPhoto] = useState(driver.photo ?? "");
     const [isPreviewError, setIsPreviewError] = useState(false);
-    const canPreviewPhoto = isPreviewableUrl(photo) && !isPreviewError;
+    const canPreviewPhoto = isHttpUrl(photo) && !isPreviewError;
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();

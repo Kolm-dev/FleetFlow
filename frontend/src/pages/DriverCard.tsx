@@ -2,17 +2,17 @@ import { deleteDriver, getDriverDetails } from "@/api/drivers";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
-import { formatCurrency } from "@/libs/formatCurrency";
+import {
+    formatCurrency,
+    formatNumber,
+    formatNumberWithSuffix,
+    getValidPage,
+} from "@/libs/utils";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
-
-const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
-
-const formatTripValue = (value: number | null, suffix = "") =>
-    value === null ? "Not specified" : `${formatNumber(value)}${suffix}`;
 
 export const DriverCard = () => {
     const { driverId } = useParams();
@@ -21,8 +21,7 @@ export const DriverCard = () => {
     const queryClient = useQueryClient();
     const [redirectCountdown, setRedirectCountdown] = useState(5);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-    const pageParam = Number(searchParams.get("page"));
-    const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+    const page = getValidPage(searchParams.get("page"));
     const { mutate, isError, error, isPending, isSuccess } = useMutation({
         mutationFn: (id: number) => deleteDriver(id),
         onSuccess: () => {
@@ -221,7 +220,7 @@ export const DriverCard = () => {
                                         </p>
                                         <p>
                                             Distance:{" "}
-                                            {formatTripValue(
+                                            {formatNumberWithSuffix(
                                                 trip.distance,
                                                 " km",
                                             )}{" "}

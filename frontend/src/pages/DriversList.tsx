@@ -2,17 +2,13 @@ import { getDrivers } from "@/api/drivers";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
 import { useDebounce } from "@/hooks/useDebounce";
+import { getValidPage } from "@/libs/utils";
 import type { DriverStatus } from "@/types/driversTypes";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useSearchParams } from "react-router";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
-
-const getValidPage = (value: string | null) => {
-    const page = Number(value);
-    return Number.isInteger(page) && page > 0 ? page : 1;
-};
 
 const handlerStatus = (status: DriverStatus) => {
     if (status == "on_trip") {

@@ -1,7 +1,7 @@
 import type { Trip } from "@/types/tripsTypes";
 import { useNavigate } from "react-router";
 import { ConfirmModal } from "@/components/ConfirmModal";
-import { formatCurrency } from "@/libs/formatCurrency";
+import { formatCurrency, formatNullableValue } from "@/libs/utils";
 import { useState } from "react";
 
 type TripCardProps = {
@@ -11,8 +11,6 @@ type TripCardProps = {
     onDelete: (id: number) => void;
     onDetailsClick: () => void;
 };
-
-const formatValue = (value: number | null) => value ?? "-";
 
 export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: TripCardProps) => {
     const navigate = useNavigate();
@@ -32,7 +30,7 @@ export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: T
                 {trip.title} - {trip.status}
             </p>
             <p>
-                Distance: {formatValue(trip.distance)}km | Price:
+                Distance: {formatNullableValue(trip.distance)}km | Price:
                 {formatCurrency(trip.price)}
             </p>
 

@@ -1,5 +1,9 @@
 import { ConfirmModal } from "@/components/ConfirmModal";
-import { formatCurrency } from "@/libs/formatCurrency";
+import {
+    formatCurrency,
+    formatDateTime,
+    formatNullableValue,
+} from "@/libs/utils";
 import type { Trip } from "@/types/tripsTypes";
 import { useState } from "react";
 
@@ -7,22 +11,6 @@ export type TripDetailsType = {
     onClose: () => void;
     onCancelled: () => void;
     trip: Trip;
-};
-
-const formatValue = (value: number | string | null | undefined) => value ?? "-";
-
-const formatDate = (value?: string) => {
-    if (!value) return "-";
-
-    return new Intl.DateTimeFormat("en-GB", {
-        year: "numeric",
-        timeZone: "Europe/Kiev",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-    }).format(new Date(value));
 };
 
 const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
@@ -70,7 +58,7 @@ const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
                         </div>
                         <div>
                             <dt>Distance</dt>
-                            <dd>{formatValue(trip.distance)}</dd>
+                            <dd>{formatNullableValue(trip.distance)}</dd>
                         </div>
                         <div>
                             <dt>Price</dt>
@@ -78,7 +66,13 @@ const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
                         </div>
                         <div>
                             <dt>Created</dt>
-                            <dd>{formatDate(trip.created_at)}</dd>
+                            <dd>
+                                {formatDateTime(trip.created_at, {
+                                    hour12: false,
+                                    locale: "en-GB",
+                                    timeZone: "Europe/Kiev",
+                                })}
+                            </dd>
                         </div>
                         <div>
                             <dt>Driver ID</dt>
@@ -131,7 +125,7 @@ const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
                             </div>
                             <div>
                                 <dt>Year</dt>
-                                <dd>{formatValue(trip.vehicle.year)}</dd>
+                                <dd>{formatNullableValue(trip.vehicle.year)}</dd>
                             </div>
                         </dl>
                     ) : (

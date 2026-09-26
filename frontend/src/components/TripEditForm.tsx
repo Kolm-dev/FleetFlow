@@ -1,4 +1,5 @@
 import { TripPriceCalculator } from "@/components/TripPriceCalculator";
+import { toNullableNumber } from "@/libs/utils";
 import type { Driver } from "@/types/driversTypes";
 import type { Trip, TripStatus, UpdateTripData } from "@/types/tripsTypes";
 import type React from "react";
@@ -9,18 +10,6 @@ type TripFormEditProps = {
     availableDrivers: Driver[];
     isPending: boolean;
     onSubmit: (data: UpdateTripData) => void;
-};
-
-const toNullableNumber = (str: string) => {
-    const trimmedValue = str.trim();
-
-    if (trimmedValue === "") {
-        return null;
-    }
-
-    const numberValue = Number(trimmedValue);
-
-    return Number.isFinite(numberValue) ? numberValue : null;
 };
 
 const getDriversForSelect = (drivers: Driver[], currentDriverId: number) =>

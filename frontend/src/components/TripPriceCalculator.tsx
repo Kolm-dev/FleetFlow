@@ -1,5 +1,5 @@
 import { calculateTripPrice } from "@/api/pricing";
-import { formatCurrency } from "@/libs/formatCurrency";
+import { formatCurrency, toNullableNumber } from "@/libs/utils";
 import { useState } from "react";
 
 type TripPriceCalculatorProps = {
@@ -9,15 +9,6 @@ type TripPriceCalculatorProps = {
 };
 
 type PriceCalculationStatus = "idle" | "loading" | "success" | "error";
-
-const toNullableNumber = (value: string) => {
-    const trimmedValue = value.trim();
-
-    if (trimmedValue === "") return null;
-
-    const numberValue = Number(trimmedValue);
-    return Number.isFinite(numberValue) ? numberValue : null;
-};
 
 export const TripPriceCalculator = ({
     distance,

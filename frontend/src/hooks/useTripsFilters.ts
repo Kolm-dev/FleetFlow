@@ -1,16 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "@/hooks/useDebounce.ts";
+import { getValidPage } from "@/libs/utils";
 import type { TripSort, TripStatus } from "@/types/tripsTypes";
 import { useSearchParams } from "react-router";
 
 const TRIP_STATUSES: TripStatus[] = ["closed", "pending", "planned", "cancelled"];
 const TRIP_SORTS: TripSort[] = ["price", "-price", "created_at", "-created_at"];
-
-const getValidPage = (page: string | null) => {
-    const parsedPage = Number(page);
-
-    return Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-};
 
 const isValidStatus = (status: string): status is TripStatus => {
     return TRIP_STATUSES.includes(status as TripStatus);

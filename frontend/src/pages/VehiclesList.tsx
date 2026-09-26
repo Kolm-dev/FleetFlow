@@ -2,14 +2,10 @@ import { getVehicles } from "@/api/vehicles";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
 import { useDebounce } from "@/hooks/useDebounce";
+import { getValidPage } from "@/libs/utils";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { NavLink, useSearchParams } from "react-router";
-
-const getValidPage = (value: string | null) => {
-    const page = Number(value);
-    return Number.isInteger(page) && page > 0 ? page : 1;
-};
 
 const VehiclesList = () => {
     const [searchParams, setSearchParams] = useSearchParams();

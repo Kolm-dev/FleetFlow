@@ -4,6 +4,7 @@ import type {
     VehicleServiceType,
 } from "@/types/vehicleServicesTypes";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
+import { toDateInputValue } from "@/libs/utils";
 import { useState, type FormEvent } from "react";
 
 type VehicleServiceFormProps = {
@@ -13,8 +14,6 @@ type VehicleServiceFormProps = {
     onSubmit: (data: CreateVehicleServiceData) => void;
     onCancel: () => void;
 };
-
-const toDateInputValue = (value?: string) => value?.slice(0, 10) ?? "";
 
 export const VehicleServiceForm = ({
     service,

@@ -8,7 +8,7 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner";
 import { VehicleServiceForm } from "@/components/VehicleServiceForm";
-import { formatCurrency } from "@/libs/formatCurrency";
+import { formatCurrency, formatDateOnly, formatMileage } from "@/libs/utils";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
 import type {
     CreateVehicleServiceData,
@@ -28,15 +28,6 @@ type VehicleServicesSectionProps = {
 
 type SortField = "service_date" | "mileage" | "cost";
 type SortDirection = "asc" | "desc";
-
-const formatDate = (value: string) =>
-    new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    }).format(new Date(`${value.slice(0, 10)}T00:00:00`));
-
-const formatMileage = (value: number) => `${new Intl.NumberFormat("en-US").format(value)} km`;
 
 const serviceTypeLabel = (type: VehicleServiceType) =>
     VEHICLE_SERVICE_TYPES.find(option => option.value === type)?.label ?? type;
@@ -172,7 +163,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                         <dt>Last service</dt>
                         <dd>
                             {statistics.last_service_date
-                                ? formatDate(statistics.last_service_date)
+                                ? formatDateOnly(statistics.last_service_date)
                                 : "Not available"}
                         </dd>
                         {statistics.last_service_cost !== null && (
@@ -273,7 +264,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                             <div className="vehicle-service__summary">
                                 <div>
                                     <span className="vehicle-service__type">{serviceTypeLabel(service.type)}</span>
-                                    <strong>{formatDate(service.service_date)}</strong>
+                                    <strong>{formatDateOnly(service.service_date)}</strong>
                                 </div>
                                 <div>
                                     <span>Mileage</span>
@@ -344,7 +335,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                 title="Delete service record?"
                 message={
                     deletingService
-                        ? `${serviceTypeLabel(deletingService.type)} from ${formatDate(deletingService.service_date)} will be permanently deleted.`
+                        ? `${serviceTypeLabel(deletingService.type)} from ${formatDateOnly(deletingService.service_date)} will be permanently deleted.`
                         : undefined
                 }
                 confirmText="Delete service"
