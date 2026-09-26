@@ -8,6 +8,7 @@ import { Link, useNavigate, useParams } from "react-router";
 
 export const VehicleCard = () => {
     const { vehicleId } = useParams();
+    const numericVehicleId = Number(vehicleId);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const [redirectCountdown, setRedirectCountdown] = useState(5);
@@ -23,9 +24,9 @@ export const VehicleCard = () => {
     });
 
     const { isLoading, data } = useQuery({
-        enabled: !!vehicleId,
-        queryKey: ["vehicles", vehicleId],
-        queryFn: () => getVehicle(parseInt(vehicleId as string)),
+        enabled: Number.isInteger(numericVehicleId),
+        queryKey: ["vehicles", numericVehicleId],
+        queryFn: () => getVehicle(numericVehicleId),
     });
     const vehicle = data?.vehicle;
 
@@ -147,7 +148,7 @@ export const VehicleCard = () => {
             </section>
 
             <VehicleServicesSection
-                vehicleId={Number(vehicleId)}
+                vehicleId={numericVehicleId}
                 statistics={data.service_statistics}
             />
 

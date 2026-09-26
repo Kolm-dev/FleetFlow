@@ -65,13 +65,14 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
         placeholderData: keepPreviousData,
     });
 
-    const invalidateServices = () =>
+    const invalidateServices = (refetchServices = true) =>
         Promise.all([
             queryClient.invalidateQueries({
                 queryKey: ["vehicle-services", vehicleId],
+                refetchType: refetchServices ? "active" : "none",
             }),
             queryClient.invalidateQueries({
-                queryKey: ["vehicles"],
+                queryKey: ["vehicles", vehicleId],
             }),
         ]);
 
@@ -79,8 +80,10 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
         mutationFn: (formData: CreateVehicleServiceData) => createVehicleService(vehicleId, formData),
         onSuccess: () => {
             setIsCreateOpen(false);
+            const isChangingPage = page !== 1;
             setPage(1);
-            invalidateServices();
+
+            return invalidateServices(!isChangingPage);
         },
     });
 
@@ -89,7 +92,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
             updateVehicleService(vehicleId, serviceId, formData),
         onSuccess: () => {
             setEditingService(null);
-            invalidateServices();
+            return invalidateServices();
         },
     });
 
@@ -97,10 +100,13 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
         mutationFn: (serviceId: number) => deleteVehicleService(vehicleId, serviceId),
         onSuccess: () => {
             setDeletingService(null);
-            if (page > 1 && data?.data.length === 1) {
+            const isChangingPage = page > 1 && data?.data.length === 1;
+
+            if (isChangingPage) {
                 setPage(current => current - 1);
             }
-            invalidateServices();
+
+            return invalidateServices(!isChangingPage);
         },
     });
 
