@@ -1,5 +1,22 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap");
+@font-face {
+    font-family: "Source Sans 3";
+    src: url("./assets/fonts/source-sans-3-cyrillic-wght-normal.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 200 900;
+    font-display: swap;
+    unicode-range: U+0400-052F, U+2DE0-2DFF, U+A640-A69F;
+}
 
+@font-face {
+    font-family: "Source Sans 3";
+    src: url("./assets/fonts/source-sans-3-latin-wght-normal.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 200 900;
+    font-display: swap;
+    unicode-range:
+        U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+        U+20AC, U+2122, U+2190-2195, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 /*
 Contents:
 1. Tokens
@@ -28,7 +45,7 @@ Rule:
 
 /* =======Tokens======= */
 :root {
-    --font-main: Manrope, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-main: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
 
     --color-text: #111111;
     --color-text-soft: #222222;
@@ -127,14 +144,14 @@ a {
 
 a.active {
     color: #000000;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 label {
     display: block;
     margin-bottom: 14px;
     color: #333333;
-    font-weight: 500;
+    font-weight: 400;
 }
 
 /* =======Base buttons======= */
@@ -476,7 +493,7 @@ input[type="search"]::-webkit-search-cancel-button {
     margin-bottom: 5px;
     color: var(--color-muted);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
 }
 
@@ -522,7 +539,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .home-metrics span {
     color: var(--color-muted);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .home-metrics strong {
@@ -568,8 +585,8 @@ input[type="search"]::-webkit-search-cancel-button {
 .home-breakdown__header > a {
     flex-shrink: 0;
     color: var(--color-text);
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
     text-decoration-color: var(--color-border-strong);
     text-underline-offset: 3px;
     transition:
@@ -608,7 +625,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .home-breakdown dd {
     margin: 0;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 /* =======Shared feedback======= */
@@ -731,7 +748,7 @@ input[type="search"]::-webkit-search-cancel-button {
     border-color: var(--color-danger);
     background: var(--color-danger);
     color: var(--color-bg);
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .confirm-modal__confirm:hover,
@@ -771,7 +788,7 @@ input[type="search"]::-webkit-search-cancel-button {
     width: min(100%, 420px);
     margin: 0;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .entity-search input {
@@ -801,7 +818,7 @@ input[type="search"]::-webkit-search-cancel-button {
         var(--shadow-filter),
         inset 0 1px 0 rgb(255 255 255 / 80%);
     color: var(--color-text);
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .drivers-status-actions button:hover,
@@ -848,7 +865,7 @@ input[type="search"]::-webkit-search-cancel-button {
         inset 0 1px 0 rgb(255 255 255 / 80%);
     color: var(--color-text);
     cursor: pointer;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .status-filter-checkbox:hover,
@@ -895,7 +912,7 @@ input[type="search"]::-webkit-search-cancel-button {
     gap: 10px;
     color: var(--color-text);
     font-size: 19px;
-    font-weight: 700;
+    font-weight: 600;
     text-decoration: none;
 }
 
@@ -1071,7 +1088,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .login__form button {
     width: 100%;
     min-height: 42px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .login__switch {
@@ -1082,7 +1099,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .login__switch a {
     color: var(--color-text);
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .logout-button {
@@ -1304,7 +1321,7 @@ input[type="search"]::-webkit-search-cancel-button {
     box-shadow: var(--shadow-xs);
     color: var(--color-danger);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.2;
 }
 
@@ -1414,6 +1431,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .driver-card__header h2 {
     margin-bottom: 0;
     overflow-wrap: anywhere;
+    font-weight: 600;
 }
 
 .driver-card__number,
@@ -1423,7 +1441,7 @@ input[type="search"]::-webkit-search-cancel-button {
     padding: 4px 8px;
     color: var(--color-muted);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .driver-card__details {
@@ -1450,7 +1468,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .vehicle-card__details dd {
     margin: 0;
     color: var(--color-text);
-    font-weight: 700;
+    font-weight: 500;
 }
 
 .driver-card__details dd {
@@ -1464,7 +1482,7 @@ input[type="search"]::-webkit-search-cancel-button {
     background: var(--color-bg);
     box-shadow: var(--shadow-sm);
     color: var(--color-text);
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .driver-card__button::after {
@@ -1540,7 +1558,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .driver-vehicles__link {
     color: var(--color-text);
-    font-weight: 700;
+    font-weight: 500;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
 }
@@ -1643,10 +1661,12 @@ input[type="search"]::-webkit-search-cancel-button {
     min-width: 0;
     overflow: hidden;
     margin: 0;
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1.25;
     -webkit-box-orient: vertical;
+    font-weight: 600;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .vehicle-card__details {
@@ -1680,7 +1700,7 @@ input[type="search"]::-webkit-search-cancel-button {
     margin-bottom: 5px;
     color: var(--color-muted);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
 }
 
@@ -1816,7 +1836,7 @@ input[type="search"]::-webkit-search-cancel-button {
     margin-bottom: 5px;
     color: var(--color-muted);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
 }
 
@@ -1885,7 +1905,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .vehicle-overview__details dd {
     margin: 0;
     color: var(--color-text);
-    font-weight: 700;
+    font-weight: 600;
     overflow-wrap: anywhere;
 }
 
@@ -1961,7 +1981,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .vehicle-services__statistics dd {
     margin: 0;
-    font-weight: 700;
+    font-weight: 600;
     overflow-wrap: anywhere;
 }
 
@@ -2091,7 +2111,7 @@ input[type="search"]::-webkit-search-cancel-button {
     padding: 0;
     color: var(--color-text);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .vehicle-services__type-options {
@@ -2128,7 +2148,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .vehicle-services__sort label {
     margin-bottom: 8px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .vehicle-services__sort select {
@@ -2201,7 +2221,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .vehicle-service__summary .vehicle-service__type {
     color: var(--color-text);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .vehicle-service__notes {
@@ -2309,7 +2329,7 @@ input[type="search"]::-webkit-search-cancel-button {
     margin: 0;
     color: var(--color-text);
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 600;
     overflow-wrap: anywhere;
 }
 
@@ -2385,7 +2405,7 @@ input[type="search"]::-webkit-search-cancel-button {
 .footer__brand {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
     color: var(--color-text);
     text-decoration: none;
 }
@@ -2412,7 +2432,7 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 .footer__link {
-    font-weight: 700;
+    font-weight: 600;
     text-decoration: none;
 }
 
@@ -2600,6 +2620,10 @@ input[type="search"]::-webkit-search-cancel-button {
         min-height: var(--mobile-control-height);
         padding: var(--mobile-control-padding);
         font-size: var(--mobile-control-font-size);
+        font-weight: 400;
+    }
+    .entity-search input::placeholder {
+        font-weight: 500;
     }
 
     .entity-search span {
