@@ -161,7 +161,7 @@ class TripController extends Controller
             return response()->json([
                 'message' => 'Trip cannot be started because ' . implode(' and ', $reasons) . '.',
                 'trip' => $trip,
-            ]);
+            ], 422);
         }
 
         DB::transaction(function () use ($trip) {
