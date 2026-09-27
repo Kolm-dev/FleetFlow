@@ -19,6 +19,7 @@ import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
 import PublicOnlyRoute from "@/components/Auth/PublicOnlyRoute";
 import { Register } from "@/components/Auth/Register";
 import { PricingSettings } from "@/pages/PricingSettings";
+import { TripCard } from "@/pages/Trips/TripCard";
 
 export const App = () => {
     return (
@@ -61,6 +62,7 @@ export const App = () => {
                         />
 
                         <Route path="trips" element={<TripsList />} />
+                        <Route path="trips/:tripId" element={<TripCard />} />
                         <Route
                             path="trips/:tripsId/edit"
                             element={<TripEdit />}

@@ -1,27 +1,16 @@
-import { ConfirmModal } from "@/components/ConfirmModal";
 import {
     formatCurrency,
     formatDateTime,
     formatNullableValue,
 } from "@/libs/utils";
 import type { Trip } from "@/types/tripsTypes";
-import { useState } from "react";
 
 export type TripDetailsType = {
     onClose: () => void;
-    onCancelled: () => void;
     trip: Trip;
 };
 
-const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
-    const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
-    const canCancel = trip.status !== "closed" && trip.status !== "cancelled";
-
-    const handleConfirmCancel = () => {
-        setIsCancelConfirmOpen(false);
-        onCancelled();
-    };
-
+const TripDetailsPanel = ({ onClose, trip }: TripDetailsType) => {
     return (
         <div className="trip-details-overlay">
             <div className="trip-details-modal">
@@ -31,17 +20,6 @@ const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
 
                         <div className="trip-details-title-row">
                             <h2>{trip.title}</h2>
-                            {canCancel && (
-                                <button
-                                    type="button"
-                                    className="trip-details-cancel"
-                                    onClick={() =>
-                                        setIsCancelConfirmOpen(true)
-                                    }
-                                >
-                                    Cancel trip
-                                </button>
-                            )}
                         </div>
                     </div>
                     <button className="trip-details-close" onClick={onClose}>
@@ -132,15 +110,6 @@ const TripDetailsPanel = ({ onClose, onCancelled, trip }: TripDetailsType) => {
                         <p className="trip-details-empty">No vehicle data.</p>
                     )}
                 </div>
-
-                <ConfirmModal
-                    isOpen={isCancelConfirmOpen}
-                    title="Cancel trip?"
-                    message={`Trip "${trip.title}" will be cancelled and the driver will become available.`}
-                    confirmText="Cancel trip"
-                    onConfirm={handleConfirmCancel}
-                    onCancel={() => setIsCancelConfirmOpen(false)}
-                />
             </div>
         </div>
     );

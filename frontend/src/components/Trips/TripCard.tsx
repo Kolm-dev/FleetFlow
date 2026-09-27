@@ -1,5 +1,5 @@
 import type { Trip } from "@/types/tripsTypes";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { formatCurrency, formatNullableValue } from "@/libs/utils";
 import { useState } from "react";
@@ -27,7 +27,10 @@ export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: T
     return (
         <div>
             <p>
-                {trip.title} - {trip.status}
+                <Link className="trip-card__link" to={`/trips/${trip.id}`}>
+                    {trip.title}
+                </Link>{" "}
+                - {trip.status}
             </p>
             <p>
                 Distance: {formatNullableValue(trip.distance)}km | Price:

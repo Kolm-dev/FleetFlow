@@ -151,6 +151,11 @@ service date, cost, and mileage. Latest-service values may be `null`.
 | DELETE | `/trips/{id}`            | `204 No Content`        |
 | POST   | `/trips/calculate-price` | `{ recommended_price }` |
 
+Frontend route `/trips/:tripId` displays a separate trip details page. It is
+a client-side route, not an API endpoint, and loads its data through
+`GET /api/trips/{id}`. Cancelling a trip from this page uses
+`PATCH /api/trips/{id}/cancel`.
+
 Query parameters: `status[]`, `page`, `sort`, `search`.
 
 Sort values: `price`, `-price`, `created_at`, `-created_at`.

@@ -1,4 +1,4 @@
-import { closeTrip, cancelTrip, deleteTrip, getTrips, startTrip } from "@/api/trips";
+import { closeTrip, deleteTrip, getTrips, startTrip } from "@/api/trips";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
 import TripDetailsPanel from "@/components/Trips/TripDetailsPanel";
@@ -86,21 +86,6 @@ const TripsList = () => {
         },
     });
 
-    const { mutate: cancelTripMutation } = useMutation({
-        mutationFn: (id: number) => cancelTrip(id),
-        onSuccess: ({ message }) => {
-            scrollReturnPositionRef.current = window.scrollY;
-
-            queryClient.invalidateQueries({
-                queryKey: ["trips"],
-            });
-
-            setSelectedCard(null);
-            setErrorMessage(null);
-            setSuccessMessage(message);
-        },
-    });
-
     const { mutate: deleteTripMutation } = useMutation({
         mutationFn: (id: number) => deleteTrip(id),
         onSuccess: () => {
@@ -179,7 +164,6 @@ const TripsList = () => {
                 <TripDetailsPanel
                     trip={selectedTrip}
                     onClose={() => setSelectedCard(null)}
-                    onCancelled={() => cancelTripMutation(selectedTrip.id)}
                 />
             )}
 
