@@ -32,6 +32,7 @@ desktop.ini
 
 # VS Code local settings
 .vscode/
+TODO.md 
 
 # Zed local settings
 .zed/
@@ -215,3 +216,5 @@ coverage-report/
 # Local backups
 backup/
 backups/
+
+
