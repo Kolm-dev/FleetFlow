@@ -137,12 +137,32 @@ export const DriversList = () => {
             </div>
 
             <div className="drivers-status-actions">
-                <button onClick={() => changeStatus()}>All</button>
-                <button onClick={() => changeStatus("available")}>
+                <button
+                    className={!status ? "is-active" : undefined}
+                    aria-pressed={!status}
+                    onClick={() => changeStatus()}
+                >
+                    All
+                </button>
+                <button
+                    className={status === "available" ? "is-active" : undefined}
+                    aria-pressed={status === "available"}
+                    onClick={() => changeStatus("available")}
+                >
                     Available
                 </button>
-                <button onClick={() => changeStatus("on_trip")}>On trip</button>
-                <button onClick={() => changeStatus("unavailable")}>
+                <button
+                    className={status === "on_trip" ? "is-active" : undefined}
+                    aria-pressed={status === "on_trip"}
+                    onClick={() => changeStatus("on_trip")}
+                >
+                    On trip
+                </button>
+                <button
+                    className={status === "unavailable" ? "is-active" : undefined}
+                    aria-pressed={status === "unavailable"}
+                    onClick={() => changeStatus("unavailable")}
+                >
                     Unavailable
                 </button>
             </div>
