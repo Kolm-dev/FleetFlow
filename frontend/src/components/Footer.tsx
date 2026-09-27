@@ -8,8 +8,7 @@ export const Footer = () => {
                 to="/"
                 aria-label="FleetFlow home"
             >
-                {/* <img src="/favicon.svg" alt="" aria-hidden="true" /> */}
-                <strong>FleetFlow</strong>
+                <small>FleetFlow</small>
                 <small>2026</small>
             </NavLink>
             <a
