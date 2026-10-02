@@ -13,6 +13,7 @@ use App\Services\TripPriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class TripController extends Controller
@@ -229,7 +230,10 @@ class TripController extends Controller
             ], 422);
         }
 
-
+        $attachments = $trip->attachments()->get();
+        foreach ($attachments as $attachment) {
+            Storage::disk($attachment->disk)->delete($attachment->path);
+        }
         $trip->delete();
 
         return response()->noContent(); //

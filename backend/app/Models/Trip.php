@@ -38,4 +38,9 @@ class Trip extends Model
     {
         return $this->belongsTo(Vehicle::class, 'vehicle_id');
     }
+
+    public function attachments()
+    {
+        return $this->hasMany(TripAttachment::class);
+    }
 }

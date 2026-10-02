@@ -1,6 +1,7 @@
 import { cancelTrip, getTrip } from "@/api/trips";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { TripAttachmentsSection } from "@/components/Trips/TripAttachmentsSection";
 import { formatCurrency, formatDateTime, formatNullableValue } from "@/libs/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -164,7 +165,9 @@ export const TripCard = () => {
                     <p className="trip-details-empty">No vehicle data.</p>
                 )}
             </section>
-
+            <section className="trip-page__section">
+                <TripAttachmentsSection tripId={trip.id} />
+            </section>
             <ConfirmModal
                 isOpen={isCancelConfirmOpen}
                 title="Cancel trip?"

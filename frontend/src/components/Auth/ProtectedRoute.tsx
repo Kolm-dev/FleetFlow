@@ -10,7 +10,13 @@ export const ProtectedRoute = () => {
                 <Spinner />
             </div>
         );
-    if (isError || !user) return <Navigate to="/authorization" replace />;
+    if (isError || !user)
+        return (
+            <Navigate
+                to="/authorization"
+                replace
+            />
+        );
 
     return <Outlet />;
 };

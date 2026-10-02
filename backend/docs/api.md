@@ -72,13 +72,13 @@ Register fields: `name`, `password`, `password_confirmation`.
 
 ## Drivers
 
-| Method | Endpoint        | Response              |
-| ------ | --------------- | --------------------- |
-| GET    | `/drivers`      | `{ total, drivers }`  |
+| Method | Endpoint        | Response                               |
+| ------ | --------------- | -------------------------------------- |
+| GET    | `/drivers`      | `{ total, drivers }`                   |
 | GET    | `/drivers/{id}` | `{ driver, statistics, closed_trips }` |
-| POST   | `/drivers`      | `{ message, driver }` |
-| PATCH  | `/drivers/{id}` | `{ message, driver }` |
-| DELETE | `/drivers/{id}` | `204 No Content`      |
+| POST   | `/drivers`      | `{ message, driver }`                  |
+| PATCH  | `/drivers/{id}` | `{ message, driver }`                  |
+| DELETE | `/drivers/{id}` | `204 No Content`                       |
 
 List query parameters:
 
@@ -107,13 +107,13 @@ filtered by trip `completed_at`. Closed trips are paginated by 5 records.
 
 ## Vehicles
 
-| Method | Endpoint         | Response               |
-| ------ | ---------------- | ---------------------- |
-| GET    | `/vehicles`      | `{ total, vehicles }`  |
+| Method | Endpoint         | Response                          |
+| ------ | ---------------- | --------------------------------- |
+| GET    | `/vehicles`      | `{ total, vehicles }`             |
 | GET    | `/vehicles/{id}` | `{ vehicle, service_statistics }` |
-| POST   | `/vehicles`      | `{ message, vehicle }` |
-| PATCH  | `/vehicles/{id}` | `{ message, vehicle }` |
-| DELETE | `/vehicles/{id}` | `204 No Content`       |
+| POST   | `/vehicles`      | `{ message, vehicle }`            |
+| PATCH  | `/vehicles/{id}` | `{ message, vehicle }`            |
+| DELETE | `/vehicles/{id}` | `204 No Content`                  |
 
 Query parameters:
 
@@ -195,13 +195,13 @@ Business rules:
 Vehicle services are nested under a vehicle. A service requested through a
 vehicle URL must belong to that vehicle.
 
-| Method | Endpoint                                      | Response               |
-| ------ | --------------------------------------------- | ---------------------- |
-| GET    | `/vehicles/{vehicle}/services`                | paginated services     |
-| GET    | `/vehicles/{vehicle}/services/{service}`      | service object         |
-| POST   | `/vehicles/{vehicle}/services`                | service object         |
-| PATCH  | `/vehicles/{vehicle}/services/{service}`      | `{ message, service }` |
-| DELETE | `/vehicles/{vehicle}/services/{service}`      | `204 No Content`       |
+| Method | Endpoint                                 | Response               |
+| ------ | ---------------------------------------- | ---------------------- |
+| GET    | `/vehicles/{vehicle}/services`           | paginated services     |
+| GET    | `/vehicles/{vehicle}/services/{service}` | service object         |
+| POST   | `/vehicles/{vehicle}/services`           | service object         |
+| PATCH  | `/vehicles/{vehicle}/services/{service}` | `{ message, service }` |
+| DELETE | `/vehicles/{vehicle}/services/{service}` | `204 No Content`       |
 
 Query parameters:
 
@@ -265,6 +265,50 @@ Example request:
 ```json
 {
     "distance": 25.5
+}
+```
+
+## Upload Documents/Images for Trip
+
+```text
+GET    /api/trips/{trip}/attachments
+POST   /api/trips/{trip}/attachments
+GET    /api/trips/{trip}/attachments/{attachment}/content
+GET    /api/trips/{trip}/attachments/{attachment}/download
+DELETE /api/trips/{trip}/attachments/{attachment}
+```
+
+- `GET .../attachments` — retrieve attachment metadata, without file contents.
+- `POST .../attachments` — upload `multipart/form-data` with a `files[]` field.
+- `GET .../content` — open a file safe for inline preview: image, PDF, or `text/plain`.
+- `GET .../download` — download the file with its original name.
+- `DELETE` — delete the database record and the physical file.
+
+Response object of attachments metadata (collection):
+
+```json
+{
+    "data": [
+        {
+            "id": 12,
+            "trip_id": 36,
+            "original_name": "document.pdf",
+            "mime_type": "application/pdf",
+            "size": 248120,
+            "kind": "document",
+            "can_preview": true,
+            "created_at": "2024-06-05T12:00:00.000000Z"
+        }
+    ]
+}
+```
+
+For uploading files, response includes a message and the list of created attachments:
+
+```json
+{
+    "message": "Attachments uploaded successfully.",
+    "data": [{ "id": 12, "original_name": "document.pdf", "...": "..." }]
 }
 ```
 

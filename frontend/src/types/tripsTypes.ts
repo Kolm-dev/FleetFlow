@@ -50,6 +50,8 @@ export type CreateTripData = {
     status?: TripStatus;
 };
 
+
+
 export type UpdateTripData = Partial<{
     title: string;
     driver_id: number;
@@ -58,3 +60,31 @@ export type UpdateTripData = Partial<{
     price: number | null;
     status: TripStatus;
 }>;
+
+export type TripAttachmentKind = "image" | "document" | "text";
+
+export type TripAttachment = {
+    id: number;
+    trip_id: number;
+    original_name: string;
+    mime_type: string;
+    size: number;
+    kind: TripAttachmentKind;
+    can_preview: boolean;
+    created_at: string;
+    display_name: string;
+};
+
+export type TripAttachmentsResponse = {
+    data: TripAttachment[];
+};
+
+export type UploadTripAttachmentsResponse = {
+    message: string;
+    data: TripAttachment[];
+};
+
+export type TripAttachmentsCreateResponse = {
+    message: string;
+    data: TripAttachment[];
+};
