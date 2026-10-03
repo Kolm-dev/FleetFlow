@@ -174,8 +174,12 @@ GET /api/trips?search=Kyiv&status[]=planned&sort=-price&page=2
 
 Frontend keeps these filters in the URL, so the Trips page can be refreshed or shared without losing the current search, status, sort, or page.
 
-Create fields: `title`, `driver_id`, `vehicle_id`, `distance`, `price`, `status`.
-Update fields: same fields, all optional.
+Create fields: `title`, `driver_id`, `vehicle_id`, `distance`, `price`.
+`status` is assigned by the backend and is prohibited in create requests.
+
+Update fields: `title`, `driver_id`, `vehicle_id`, `distance`, `price`; all are optional.
+`status` is prohibited in update requests. Use `/start`, `/close`, and `/cancel`
+to change trip lifecycle state.
 
 Trip object includes `driver` and `vehicle`.
 Closing a trip sets its `completed_at` timestamp.
@@ -186,9 +190,38 @@ Business rules:
 
 - A trip can be created only with an `available` driver.
 - The vehicle must belong to the selected driver.
-- Starting a trip requires a `planned` trip and an `available` driver; otherwise the response message explains the reason.
+- New trips are created as `planned`; the selected driver becomes `on_trip`.
+- Driver or vehicle assignment can be changed only while the trip is `planned`.
+- The new vehicle must belong to the selected driver.
+- The new driver must be `available`; the previous driver becomes `available`.
+- Starting a trip requires a `planned` trip and its assigned driver to be `on_trip`; otherwise the response message explains the reason.
 - Closing or cancelling a trip makes the driver `available`.
 - A `closed` or `cancelled` trip cannot be cancelled again.
+
+## Trip History
+
+| Method | Endpoint              | Response          |
+| ------ | --------------------- | ----------------- |
+| GET    | `/trips/{id}/events`  | `{ data: [...] }` |
+
+Events are returned oldest first: `created_at ASC`, then `id ASC`.
+`user` may be `null`.
+
+Event types include:
+
+- `trip.created`
+- `trip.updated`
+- `trip.started`
+- `trip.closed`
+- `trip.cancelled`
+- `trip.driver.changed`
+- `trip.attachment.added`
+- `trip.attachment.renamed`
+- `trip.attachment.deleted`
+
+`trip.updated` stores changed fields under `data.fields`.
+Attachment events store `attachment_id` plus display-related names, for example
+`display_name`, `old_display_name`, and `new_display_name`.
 
 ## Vehicle Services
 
@@ -273,6 +306,7 @@ Example request:
 ```text
 GET    /api/trips/{trip}/attachments
 POST   /api/trips/{trip}/attachments
+PATCH  /api/trips/{trip}/attachments/{attachment}
 GET    /api/trips/{trip}/attachments/{attachment}/content
 GET    /api/trips/{trip}/attachments/{attachment}/download
 DELETE /api/trips/{trip}/attachments/{attachment}
@@ -280,9 +314,13 @@ DELETE /api/trips/{trip}/attachments/{attachment}
 
 - `GET .../attachments` — retrieve attachment metadata, without file contents.
 - `POST .../attachments` — upload `multipart/form-data` with a `files[]` field.
+- `PATCH .../attachments/{attachment}` — update attachment `display_name`.
 - `GET .../content` — open a file safe for inline preview: image, PDF, or `text/plain`.
 - `GET .../download` — download the file with its original name.
 - `DELETE` — delete the database record and the physical file.
+
+Uploading, renaming, and deleting attachments also create trip history events.
+Saving the same `display_name` again does not create a rename event.
 
 Response object of attachments metadata (collection):
 
@@ -297,7 +335,8 @@ Response object of attachments metadata (collection):
             "size": 248120,
             "kind": "document",
             "can_preview": true,
-            "created_at": "2024-06-05T12:00:00.000000Z"
+            "created_at": "2024-06-05T12:00:00.000000Z",
+            "display_name": "document.pdf"
         }
     ]
 }

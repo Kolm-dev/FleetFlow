@@ -2,10 +2,17 @@ import { cancelTrip, getTrip } from "@/api/trips";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { TripAttachmentsSection } from "@/components/Trips/TripAttachmentsSection";
+import { TripTimeline } from "@/components/Trips/TripTimeline";
+import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import { formatCurrency, formatDateTime, formatNullableValue } from "@/libs/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+
+type TripActionErrorResponse = {
+    message?: string;
+};
 
 export const TripCard = () => {
     const { tripId } = useParams();
@@ -30,7 +37,13 @@ export const TripCard = () => {
             queryClient.invalidateQueries({
                 queryKey: ["trip", numericTripId],
             });
+            queryClient.invalidateQueries({
+                queryKey: tripEventsQueryKey(numericTripId),
+            });
             queryClient.invalidateQueries({ queryKey: ["trips"] });
+            queryClient.invalidateQueries({ queryKey: ["drivers"] });
+            queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+            queryClient.invalidateQueries({ queryKey: ["stats"] });
             setIsCancelConfirmOpen(false);
         },
     });
@@ -42,7 +55,7 @@ export const TripCard = () => {
     if (error) return <div className="error-message">{error.message}</div>;
     if (!trip) return <div className="error-message">Trip not found</div>;
 
-    const canCancel = trip.status !== "closed" && trip.status !== "cancelled";
+    const canCancel = trip.status === "planned" || trip.status === "pending";
 
     return (
         <div className="trip-page">
@@ -80,7 +93,13 @@ export const TripCard = () => {
             </header>
 
             {cancelMutation.isSuccess && <p className="success-message">{cancelMutation.data.message}</p>}
-            {cancelMutation.isError && <p className="error-message">{cancelMutation.error.message}</p>}
+            {cancelMutation.isError && (
+                <p className="error-message">
+                    {axios.isAxiosError<TripActionErrorResponse>(cancelMutation.error)
+                        ? cancelMutation.error.response?.data.message ?? cancelMutation.error.message
+                        : cancelMutation.error.message}
+                </p>
+            )}
 
             <section className="trip-page__section">
                 <h2>Trip details</h2>
@@ -168,6 +187,7 @@ export const TripCard = () => {
             <section className="trip-page__section">
                 <TripAttachmentsSection tripId={trip.id} />
             </section>
+            <TripTimeline tripId={trip.id} />
             <ConfirmModal
                 isOpen={isCancelConfirmOpen}
                 title="Cancel trip?"

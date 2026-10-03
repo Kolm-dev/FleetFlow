@@ -67,7 +67,6 @@ export const DriverCreateForm = ({
                 }
             >
                 <option value="available">Available</option>
-                <option value="on_trip">On trip</option>
                 <option value="unavailable">Unavailable</option>
             </select>
 

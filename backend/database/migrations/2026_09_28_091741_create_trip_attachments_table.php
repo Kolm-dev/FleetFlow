@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
-
 {
     /**
      * Run the migrations.
@@ -16,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->foreignId('trip_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('disk')->default('local');
             $table->string('path')->unique();
             $table->string('original_name');

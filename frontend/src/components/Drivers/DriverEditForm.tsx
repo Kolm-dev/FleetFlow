@@ -1,6 +1,5 @@
 import type {
     Driver,
-    DriverStatus,
     UpdateDriverData,
 } from "@/types/driversTypes";
 import { isHttpUrl } from "@/libs/utils";
@@ -8,6 +7,10 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
+
+const formatDriverStatus = (status: Driver["status"]) => {
+    return status === "on_trip" ? "On trip" : status;
+};
 
 type DriverEditFormProps = {
     driver: Driver;
@@ -24,9 +27,6 @@ export const DriverEditForm = ({
 }: DriverEditFormProps) => {
     const [name, setName] = useState(driver.name);
     const [phoneNumber, setPhoneNumber] = useState(driver.phone_number);
-    const [status, setStatus] = useState<DriverStatus>(
-        driver.status ?? "available",
-    );
     const [photo, setPhoto] = useState(driver.photo ?? "");
     const [isPreviewError, setIsPreviewError] = useState(false);
     const canPreviewPhoto = isHttpUrl(photo) && !isPreviewError;
@@ -37,7 +37,6 @@ export const DriverEditForm = ({
         onSubmit({
             name,
             phone_number: phoneNumber,
-            status,
             photo: photo.trim() || null,
         });
     };
@@ -80,17 +79,12 @@ export const DriverEditForm = ({
 
                     <label>
                         Status
-                        <select
+                        <input
                             name="status"
-                            value={status}
-                            onChange={(event) =>
-                                setStatus(event.currentTarget.value as DriverStatus)
-                            }
-                        >
-                            <option value="available">Available</option>
-                            <option value="on_trip">On trip</option>
-                            <option value="unavailable">Unavailable</option>
-                        </select>
+                            value={formatDriverStatus(driver.status)}
+                            aria-label={`Current status: ${formatDriverStatus(driver.status)}`}
+                            disabled
+                        />
                     </label>
 
                     <label className="driver-edit-form__photo-url">

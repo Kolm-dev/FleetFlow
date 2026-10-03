@@ -6,8 +6,8 @@ use App\Enums\DriverStatus;
 use App\Enums\TripStatus;
 use App\Models\Driver;
 use App\Models\Trip;
-use App\Models\Vehicle;
 use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Override;
 use Tests\TestCase;
@@ -23,7 +23,7 @@ class TripBusinessRulesTest extends TestCase
 
         $user = User::create([
             'name' => 'name',
-            "password" => bcrypt('password')
+            'password' => bcrypt('password'),
         ]);
 
         $this->actingAs($user);
@@ -41,7 +41,6 @@ class TripBusinessRulesTest extends TestCase
             'price' => 500,
             'driver_id' => $driver->id,
             'vehicle_id' => $vehicle->id,
-            'status' => TripStatus::Planned->value,
         ]);
 
         $response->assertCreated();
@@ -80,7 +79,7 @@ class TripBusinessRulesTest extends TestCase
         $trip = Trip::factory()->create([
             'driver_id' => $oldDriver->id,
             'vehicle_id' => $oldVehicle->id,
-            'status' => TripStatus::Pending,
+            'status' => TripStatus::Planned,
         ]);
 
         $newDriver = Driver::factory()->create(['status' => DriverStatus::Available]);
@@ -96,6 +95,44 @@ class TripBusinessRulesTest extends TestCase
             'id' => $trip->id,
             'driver_id' => $newDriver->id,
             'vehicle_id' => $newVehicle->id,
+        ]);
+    }
+
+    public function test_cannot_create_trip_with_manual_status(): void
+    {
+        $driver = Driver::factory()->create(['status' => DriverStatus::Available]);
+        $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+
+        $response = $this->postJson('/api/trips', [
+            'title' => 'Manual status trip',
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+            'status' => TripStatus::Closed->value,
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors('status');
+    }
+
+    public function test_cannot_update_trip_status_directly(): void
+    {
+        $driver = Driver::factory()->create(['status' => DriverStatus::OnTrip]);
+        $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+        $trip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+            'status' => TripStatus::Pending,
+        ]);
+
+        $response = $this->patchJson("/api/trips/{$trip->id}", [
+            'status' => TripStatus::Closed->value,
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors('status');
+        $this->assertDatabaseHas('trips', [
+            'id' => $trip->id,
+            'status' => TripStatus::Pending->value,
         ]);
     }
 

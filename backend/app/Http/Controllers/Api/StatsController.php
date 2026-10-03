@@ -13,12 +13,6 @@ class StatsController extends Controller
 {
     public function index()
     {
-        // dd([
-        //     'drivers' => $this->driversStats(),
-        //     'vehicles' => $this->vehiclesStats(),
-        //     'trips' => $this->tripsStats(),
-        // ]);
-
         return response()->json([
             'drivers' => $this->driversStats(),
             'vehicles' => $this->vehiclesStats(),

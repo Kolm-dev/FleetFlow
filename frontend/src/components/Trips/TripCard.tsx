@@ -6,18 +6,20 @@ import { useState } from "react";
 
 type TripCardProps = {
     trip: Trip;
+    onCancel: (id: number) => void;
     onStart: (id: number) => void;
     onClose: (id: number) => void;
     onDelete: (id: number) => void;
     onDetailsClick: () => void;
 };
 
-export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: TripCardProps) => {
+export const TripCard = ({ onStart, onCancel, onClose, onDelete, onDetailsClick, trip }: TripCardProps) => {
     const navigate = useNavigate();
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const isActiveTrip = trip.status === "pending";
     const canStart = trip.status === "planned";
     const canClose = trip.status === "pending";
+    const canCancel = trip.status === "planned" || trip.status === "pending";
 
     const handleConfirmDelete = () => {
         onDelete(trip.id);
@@ -38,7 +40,7 @@ export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: T
             </p>
 
             <div className="trip-card__actions">
-                {(canStart || canClose) && (
+                {(canStart || canClose || canCancel) && (
                     <div className="trip-card__action-group trip-card__action-group--controls">
                         {canStart && (
                             <button
@@ -56,6 +58,15 @@ export const TripCard = ({ onStart, onClose, onDelete, onDetailsClick, trip }: T
                                 onClick={() => onClose(trip.id)}
                             >
                                 Close
+                            </button>
+                        )}
+                        {canCancel && (
+                            <button
+                                className="entity-action entity-action--trip entity-action--cancel"
+                                type="button"
+                                onClick={() => onCancel(trip.id)}
+                            >
+                                Cancel
                             </button>
                         )}
                     </div>

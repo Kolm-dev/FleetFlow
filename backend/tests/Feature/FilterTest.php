@@ -88,7 +88,7 @@ class FilterTest extends TestCase
             'status' => TripStatus::Closed,
         ]);
 
-        $response = $this->getJson('/api/trips?status=planned');
+        $response = $this->getJson('/api/trips?status[]=planned');
 
         $response->assertOk();
         $response->assertJsonPath('total', 1);
@@ -102,10 +102,10 @@ class FilterTest extends TestCase
 
     public function test_trips_filter_rejects_invalid_status(): void
     {
-        $response = $this->getJson('/api/trips?status=wrong');
+        $response = $this->getJson('/api/trips?status[]=wrong');
 
         $response->assertUnprocessable();
-        $response->assertJsonValidationErrors('status');
+        $response->assertJsonValidationErrors('status.0');
     }
 
     public function test_trips_can_be_searched_by_title(): void

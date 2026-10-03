@@ -47,10 +47,7 @@ export type CreateTripData = {
     vehicle_id: number;
     distance?: number | null;
     price?: number | null;
-    status?: TripStatus;
 };
-
-
 
 export type UpdateTripData = Partial<{
     title: string;
@@ -58,7 +55,6 @@ export type UpdateTripData = Partial<{
     vehicle_id: number;
     distance: number | null;
     price: number | null;
-    status: TripStatus;
 }>;
 
 export type TripAttachmentKind = "image" | "document" | "text";
@@ -87,4 +83,56 @@ export type UploadTripAttachmentsResponse = {
 export type TripAttachmentsCreateResponse = {
     message: string;
     data: TripAttachment[];
+};
+
+export type TripEventType =
+    | "trip.created"
+    | "trip.updated"
+    | "trip.started"
+    | "trip.closed"
+    | "trip.cancelled"
+    | "trip.attachment.added"
+    | "trip.attachment.deleted"
+    | "trip.attachment.renamed"
+    | "trip.driver.changed"
+    | "trip.deleted";
+
+export type TripEventUser = {
+    id: number;
+    name: string;
+};
+
+export type TripEventFieldChange = {
+    old?: unknown;
+    new?: unknown;
+};
+
+export type TripEventData = {
+    status?: TripStatus;
+    old_status?: TripStatus;
+    new_status?: TripStatus;
+    driver_id?: number;
+    old_driver_id?: number;
+    new_driver_id?: number;
+    vehicle_id?: number;
+    attachment_id?: number;
+    original_name?: string;
+    display_name?: string;
+    old_display_name?: string;
+    new_display_name?: string;
+    fields?: Record<string, TripEventFieldChange>;
+    changes?: Record<string, TripEventFieldChange>;
+};
+
+export type TripEvent = {
+    id: number;
+    trip_id: number;
+    event_type: TripEventType | string;
+    data: TripEventData | null;
+    user: TripEventUser | null;
+    created_at: string;
+};
+
+export type TripEventsResponse = {
+    data: TripEvent[];
 };

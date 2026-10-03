@@ -1,7 +1,7 @@
 import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
 import { toNullableNumber } from "@/libs/utils";
 import type { Driver } from "@/types/driversTypes";
-import type { Trip, TripStatus, UpdateTripData } from "@/types/tripsTypes";
+import type { Trip, UpdateTripData } from "@/types/tripsTypes";
 import type React from "react";
 import { useState } from "react";
 
@@ -9,6 +9,7 @@ type TripFormEditProps = {
     trip: Trip;
     availableDrivers: Driver[];
     isPending: boolean;
+    errorMessages: string[];
     onSubmit: (data: UpdateTripData) => void;
 };
 
@@ -26,59 +27,69 @@ export const TripEditForm = ({
     onSubmit,
     availableDrivers,
     isPending,
+    errorMessages,
 }: TripFormEditProps) => {
     const [title, setTitle] = useState(trip.title);
     const [distance, setDistance] = useState(trip.distance?.toString() ?? "");
     const [price, setPrice] = useState(trip.price?.toString() ?? "");
-    const [status, setStatus] = useState<TripStatus>(trip.status);
     const [driverId, setDriverId] = useState<number | undefined>(
         trip.driver_id,
     );
     const [vehicleId, setVehicleId] = useState<number | undefined>(
         trip.vehicle_id,
     );
+    const canEditAssignment = trip.status === "planned";
 
-    const driversForSelect = getDriversForSelect(
+    const filteredDriversForSelect = getDriversForSelect(
         availableDrivers,
         trip.driver_id,
     );
-    const vehiclesForSelect = getVehiclesByDriverId(availableDrivers, driverId);
+    const driversForSelect =
+        trip.driver && !filteredDriversForSelect.some(driver => driver.id === trip.driver?.id)
+            ? [...filteredDriversForSelect, trip.driver]
+            : filteredDriversForSelect;
+    const driverVehicles = getVehiclesByDriverId(availableDrivers, driverId);
+    const vehiclesForSelect =
+        trip.vehicle && driverId === trip.driver_id && !driverVehicles.some(vehicle => vehicle.id === trip.vehicle?.id)
+            ? [...driverVehicles, trip.vehicle]
+            : driverVehicles;
 
     const handleDriverId = (value: string) => {
         const nextDriverId = Number(value);
         setDriverId(nextDriverId);
-
-        const driver = availableDrivers.find(
-            (driver) => driver.id === nextDriverId,
-        );
-        const firstVehicle = driver?.vehicles[0];
-
-        setVehicleId(firstVehicle?.id);
+        setVehicleId(undefined);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (driverId === undefined || vehicleId === undefined) return;
+        if (canEditAssignment && (driverId === undefined || vehicleId === undefined)) return;
 
-        onSubmit({
+        const data: UpdateTripData = {
             distance: toNullableNumber(distance),
             price: toNullableNumber(price),
             title,
-            status,
-            driver_id: driverId,
-            vehicle_id: vehicleId,
-        });
+        };
+
+        if (canEditAssignment) {
+            data.driver_id = driverId;
+            data.vehicle_id = vehicleId;
+        }
+
+        onSubmit(data);
     };
     return (
-        <form className="trip-edit-form" onSubmit={handleSubmit}>
+        <form
+            className="trip-edit-form"
+            onSubmit={handleSubmit}
+        >
             <div className="trip-edit-form__fields">
                 <label>
                     Title
                     <input
                         type="text"
                         value={title}
-                        onChange={(e) => setTitle(e.currentTarget.value)}
+                        onChange={e => setTitle(e.currentTarget.value)}
                     />
                 </label>
                 <label>
@@ -86,32 +97,22 @@ export const TripEditForm = ({
                     <input
                         type="text"
                         value={distance}
-                        onChange={(e) => setDistance(e.currentTarget.value)}
+                        onChange={e => setDistance(e.currentTarget.value)}
                     />
                 </label>
-                <label>
-                    Status
-                    <select
-                        value={status}
-                        onChange={(event) =>
-                            setStatus(event.currentTarget.value as TripStatus)
-                        }
-                    >
-                        <option value="planned">Planned</option>
-                        <option value="pending">Pending</option>
-                        <option value="closed">Closed</option>
-                    </select>
-                </label>
+
                 <label>
                     Driver
                     <select
                         value={driverId ?? ""}
-                        onChange={(event) =>
-                            handleDriverId(event.currentTarget.value)
-                        }
+                        onChange={event => handleDriverId(event.currentTarget.value)}
+                        disabled={!canEditAssignment}
                     >
-                        {driversForSelect.map((driver) => (
-                            <option key={driver.id} value={driver.id}>
+                        {driversForSelect.map(driver => (
+                            <option
+                                key={driver.id}
+                                value={driver.id}
+                            >
                                 {driver.name}
                             </option>
                         ))}
@@ -121,30 +122,47 @@ export const TripEditForm = ({
                     Vehicle
                     <select
                         value={vehicleId ?? ""}
-                        onChange={(event) =>
-                            setVehicleId(Number(event.currentTarget.value))
-                        }
-                        disabled={vehiclesForSelect.length === 0}
+                        onChange={event => {
+                            const value = event.currentTarget.value;
+                            setVehicleId(value === "" ? undefined : Number(value));
+                        }}
+                        disabled={!canEditAssignment || vehiclesForSelect.length === 0}
                     >
-                        {vehiclesForSelect.map((vehicle) => (
-                            <option key={vehicle.id} value={vehicle.id}>
-                                {vehicle.brand} {vehicle.model} -
-                                {vehicle.license_plate}
+                        {canEditAssignment && <option value="">Select vehicle</option>}
+                        {vehiclesForSelect.map(vehicle => (
+                            <option
+                                key={vehicle.id}
+                                value={vehicle.id}
+                            >
+                                {vehicle.brand} {vehicle.model} -{vehicle.license_plate}
                             </option>
                         ))}
                     </select>
                 </label>
-                {vehiclesForSelect.length === 0 && (
-                    <p>No vehicles for this driver</p>
+                {vehiclesForSelect.length === 0 && <p>No vehicles for this driver</p>}
+                <label>
+                    Status
+                    <select
+                        value={trip.status}
+                        disabled
+                    >
+                        <option value="planned">Planned</option>
+                        <option value="pending">Pending</option>
+                        <option value="closed">Closed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </label>
+                {errorMessages.length > 0 && (
+                    <ul className="error-message">
+                        {errorMessages.map(message => (
+                            <li key={message}>{message}</li>
+                        ))}
+                    </ul>
                 )}
                 <button
                     className="entity-action entity-action--update"
                     type="submit"
-                    disabled={
-                        isPending ||
-                        driverId === undefined ||
-                        vehicleId === undefined
-                    }
+                    disabled={isPending || (canEditAssignment && (driverId === undefined || vehicleId === undefined))}
                 >
                     {isPending ? "Saving..." : "Save"}
                 </button>

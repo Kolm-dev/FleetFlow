@@ -17,6 +17,7 @@ import { Spinner } from "@/components/Spinner/Spinner";
 import { TripAttachmentsError } from "@/components/Trips/TripAttachmentsError";
 import { TripAttachmentPreviewModal } from "@/components/Trips/TripAttachmentPreviewModal";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import {
     ACCEPTED_FILE_TYPES,
     formatDateOnly,
@@ -66,6 +67,9 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
             await queryClient.invalidateQueries({
                 queryKey: ["trip-attachments", tripId],
             });
+            await queryClient.invalidateQueries({
+                queryKey: tripEventsQueryKey(tripId),
+            });
         },
     });
 
@@ -81,6 +85,9 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
             await queryClient.invalidateQueries({
                 queryKey: ["trip-attachments", tripId],
             });
+            await queryClient.invalidateQueries({
+                queryKey: tripEventsQueryKey(tripId),
+            });
         },
     });
 
@@ -92,6 +99,9 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
 
             await queryClient.invalidateQueries({
                 queryKey: ["trip-attachments", tripId],
+            });
+            await queryClient.invalidateQueries({
+                queryKey: tripEventsQueryKey(tripId),
             });
         },
     });

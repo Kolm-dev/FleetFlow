@@ -14,7 +14,6 @@ use Illuminate\Validation\Rules\Enum;
 
 class VehicleServiceController extends Controller
 {
-
     public function index(Vehicle $vehicle, Request $request)
     {
         $query = $vehicle->vehicleServices();
@@ -57,7 +56,6 @@ class VehicleServiceController extends Controller
         return response()->json($services);
     }
 
-
     public function store(StoreVehicleServiceRequest $request, Vehicle $vehicle)
     {
         $validated = $request->validated();
@@ -83,9 +81,6 @@ class VehicleServiceController extends Controller
         }
         $query->orderBy('id');
     }
-
-   // /api/vehicles/{vehicle}/services/{service}
-
 
     public function show(Vehicle $vehicle, $serviceId)
     {

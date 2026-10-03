@@ -2,13 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\DriverStatus;
-use App\Enums\TripStatus;
-use App\Models\Driver;
-use App\Models\Trip;
-use App\Models\Vehicle;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateTripRequest extends FormRequest
 {
@@ -26,43 +20,9 @@ class UpdateTripRequest extends FormRequest
             'driver_id' => 'sometimes|integer|exists:drivers,id',
             'vehicle_id' => 'sometimes|integer|exists:vehicles,id',
             'price' => 'sometimes|nullable|numeric|min:0',
-            'status' => ['sometimes', 'string', Rule::enum(TripStatus::class)],
-        ];
-    }
-
-    public function after(): array
-    {
-
-        return [
-
-            function ($validator) {
-                $trip = Trip::find($this->route('trip'));
-
-                $driverId = $this->input('driver_id', $trip->driver_id);
-                $vehicleId = $this->input('vehicle_id', $trip->vehicle_id);
-
-                $driver = Driver::find($driverId);
-                $vehicle = Vehicle::find($vehicleId);
-
-                if (! $driver || ! $vehicle) {
-                    return;
-                }
-
-                if ($this->has('driver_id') && (int) $driverId !== $trip->driver_id && $driver->status !== DriverStatus::Available) {
-                    $validator->errors()->add(
-                        'driver_id',
-                        'Driver is not available.'
-                    );
-                }
-
-                if ($vehicle->driver_id !== (int) $driverId) {
-                    $validator->errors()->add(
-                        'vehicle_id',
-                        'Vehicle does not belong to this driver.'
-                    );
-                }
-            },
+            'status' => ['prohibited']
 
         ];
     }
+
 }

@@ -1,4 +1,4 @@
-import { closeTrip, deleteTrip, getTrips, startTrip } from "@/api/trips";
+import { cancelTrip, closeTrip, deleteTrip, getTrips, startTrip } from "@/api/trips";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
 import TripDetailsPanel from "@/components/Trips/TripDetailsPanel";
@@ -8,6 +8,7 @@ import { TripsStatusFilter } from "@/components/Trips/TripsStatusFilter";
 import { TripsToolbar } from "@/components/Trips/TripsToolbar";
 import { useErrorMessageScroll } from "@/hooks/useErrorMessageScroll";
 import { useSuccessMessageScroll } from "@/hooks/useSuccessMessageScroll";
+import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import { useTripsFilters } from "@/hooks/useTripsFilters";
 import type { Trip } from "@/types/tripsTypes";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,6 +24,17 @@ const getCloseTripSuccessMessage = (trip: Trip) => {
     const vehicleName = trip.vehicle ? `${trip.vehicle.brand} ${trip.vehicle.model}` : "vehicle";
 
     return `${driverName} and ${vehicleName} are now available and will be back on the road soon.`;
+};
+
+const invalidateTripLifecycleQueries = (queryClient: ReturnType<typeof useQueryClient>, tripId?: number) => {
+    queryClient.invalidateQueries({ queryKey: ["trips"] });
+    if (tripId) {
+        queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
+        queryClient.invalidateQueries({ queryKey: tripEventsQueryKey(tripId) });
+    }
+    queryClient.invalidateQueries({ queryKey: ["drivers"] });
+    queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+    queryClient.invalidateQueries({ queryKey: ["stats"] });
 };
 
 const TripsList = () => {
@@ -53,12 +65,10 @@ const TripsList = () => {
     });
     const { mutate: startTripMutation } = useMutation({
         mutationFn: (id: number) => startTrip(id),
-        onSuccess: ({ message }) => {
+        onSuccess: ({ message }, tripId) => {
             scrollReturnPositionRef.current = window.scrollY;
 
-            queryClient.invalidateQueries({
-                queryKey: ["trips"],
-            });
+            invalidateTripLifecycleQueries(queryClient, tripId);
 
             setErrorMessage(null);
             setSuccessMessage(message);
@@ -77,21 +87,45 @@ const TripsList = () => {
         onSuccess: ({ trip }) => {
             scrollReturnPositionRef.current = window.scrollY;
 
-            queryClient.invalidateQueries({
-                queryKey: ["trips"],
-            });
+            invalidateTripLifecycleQueries(queryClient, trip.id);
 
             setErrorMessage(null);
             setSuccessMessage(getCloseTripSuccessMessage(trip));
+        },
+        onError: error => {
+            errorScrollReturnPositionRef.current = window.scrollY;
+
+            const message = axios.isAxiosError<TripActionErrorResponse>(error) ? error.response?.data.message : null;
+
+            setSuccessMessage(null);
+            setErrorMessage(message ?? "Could not close trip.");
+        },
+    });
+
+    const { mutate: cancelTripMutation } = useMutation({
+        mutationFn: (id: number) => cancelTrip(id),
+        onSuccess: ({ message }, tripId) => {
+            scrollReturnPositionRef.current = window.scrollY;
+
+            invalidateTripLifecycleQueries(queryClient, tripId);
+
+            setErrorMessage(null);
+            setSuccessMessage(message);
+        },
+        onError: error => {
+            errorScrollReturnPositionRef.current = window.scrollY;
+
+            const message = axios.isAxiosError<TripActionErrorResponse>(error) ? error.response?.data.message : null;
+
+            setSuccessMessage(null);
+            setErrorMessage(message ?? "Could not cancel trip.");
         },
     });
 
     const { mutate: deleteTripMutation } = useMutation({
         mutationFn: (id: number) => deleteTrip(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ["trips"],
-            });
+            invalidateTripLifecycleQueries(queryClient, selectedCardId ?? undefined);
 
             setSelectedCard(null);
             setErrorMessage(null);
@@ -154,6 +188,7 @@ const TripsList = () => {
 
             <TripsContent
                 onStartTrip={startTripMutation}
+                onCancelTrip={cancelTripMutation}
                 trips={trips}
                 onCloseTrip={closeTripMutation}
                 onDeleteTrip={deleteTripMutation}

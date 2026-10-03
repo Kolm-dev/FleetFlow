@@ -18,7 +18,6 @@ class StoreTripRequest extends FormRequest
 
     public function rules(): array
     {
-        $status = Rule::enum(TripStatus::class);
 
         return [
             'title' => 'required|string|max:255',
@@ -26,7 +25,7 @@ class StoreTripRequest extends FormRequest
             'price' => 'nullable|numeric|min:0',
             'driver_id' => 'required|integer|exists:drivers,id',
             'vehicle_id' => 'required|integer|exists:vehicles,id',
-            'status' => ['sometimes', $status],
+            'status' => 'prohibited',
 
         ];
     }

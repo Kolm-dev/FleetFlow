@@ -1,48 +1,34 @@
 import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
 import type { Driver } from "@/types/driversTypes";
-import type { CreateTripData, TripStatus } from "@/types/tripsTypes";
+import type { CreateTripData } from "@/types/tripsTypes";
 import { useState, type FormEvent } from "react";
 type TripCreatePropsType = {
     isCreating: boolean;
     availableDrivers: Driver[];
+    errorMessages: string[];
     onSubmit: (data: CreateTripData) => void;
 };
 
-const TripCreateForm = ({
-    isCreating,
-    availableDrivers,
-    onSubmit,
-}: TripCreatePropsType) => {
+const TripCreateForm = ({ isCreating, availableDrivers, errorMessages, onSubmit }: TripCreatePropsType) => {
     const [title, setTitle] = useState("");
     const [distance, setDistance] = useState("");
     const [price, setPrice] = useState("");
-    const [status, setStatus] = useState<TripStatus>("planned");
     const [driverId, setDriverId] = useState<number>(availableDrivers[0]?.id);
     const [vehicleId, setVehicleId] = useState<number>();
 
     const handleDriverChange = (value: string) => {
         const valueToNumber = Number(value);
         setDriverId(valueToNumber);
-        const selectedDriver = availableDrivers.find(
-            (driver) => driver.id === valueToNumber,
-        );
-        const firstVehicleDriver = selectedDriver?.vehicles[0];
-        setVehicleId(firstVehicleDriver?.id);
+        setVehicleId(undefined);
     };
     const getVehiclesByDriverId = (drivers: Driver[], driverId?: number) =>
-        drivers.find((driver) => driver.id === driverId)?.vehicles ?? [];
+        drivers.find(driver => driver.id === driverId)?.vehicles ?? [];
 
     const selectedDriverId = driverId ?? availableDrivers[0]?.id;
-    const vehiclesForDriverId = getVehiclesByDriverId(
-        availableDrivers,
-        selectedDriverId,
-    );
-    const selectedVehicleId = vehicleId ?? vehiclesForDriverId[0]?.id;
+    const vehiclesForDriverId = getVehiclesByDriverId(availableDrivers, selectedDriverId);
+    const selectedVehicleId = vehicleId;
 
-    const isSubmitDisabled =
-        title.trim() === "" ||
-        selectedDriverId === undefined ||
-        selectedVehicleId === undefined;
+    const isSubmitDisabled = title.trim() === "" || selectedDriverId === undefined || selectedVehicleId === undefined;
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -55,14 +41,16 @@ const TripCreateForm = ({
             price: Number(price),
             driver_id: selectedDriverId,
             vehicle_id: selectedVehicleId,
-            status,
         });
     };
 
     if (availableDrivers.length <= 0) return <p>No availables drivers</p>;
 
     return (
-        <form className="trip-edit-form" onSubmit={handleSubmit}>
+        <form
+            className="trip-edit-form"
+            onSubmit={handleSubmit}
+        >
             <div className="trip-edit-form__fields">
                 <label>
                     Title:
@@ -70,7 +58,7 @@ const TripCreateForm = ({
                         type="text"
                         name="title"
                         value={title}
-                        onChange={(e) => setTitle(e.currentTarget.value)}
+                        onChange={e => setTitle(e.currentTarget.value)}
                     />
                 </label>
                 <label>
@@ -79,20 +67,21 @@ const TripCreateForm = ({
                         type="text"
                         name="distance"
                         value={distance}
-                        onChange={(e) => setDistance(e.currentTarget.value)}
+                        onChange={e => setDistance(e.currentTarget.value)}
                     />
                 </label>
                 <label>
                     Choose driver:
                     <select
-                        onChange={(e) =>
-                            handleDriverChange(e.currentTarget.value)
-                        }
+                        onChange={e => handleDriverChange(e.currentTarget.value)}
                         value={selectedDriverId}
                         name="driver"
                     >
-                        {availableDrivers.map((driver) => (
-                            <option key={driver.id} value={driver.id}>
+                        {availableDrivers.map(driver => (
+                            <option
+                                key={driver.id}
+                                value={driver.id}
+                            >
                                 {driver.name} - {driver.status}
                             </option>
                         ))}
@@ -101,41 +90,36 @@ const TripCreateForm = ({
                 <label>
                     Choose vehicle:
                     <select
-                        onChange={(e) =>
-                            setVehicleId(Number(e.currentTarget.value))
-                        }
+                        onChange={e => {
+                            const value = e.currentTarget.value;
+                            setVehicleId(value === "" ? undefined : Number(value));
+                        }}
                         name="vehicle"
-                        value={selectedVehicleId}
+                        value={selectedVehicleId ?? ""}
                         disabled={vehiclesForDriverId.length === 0}
                     >
-                        {vehiclesForDriverId.map((vehicle) => (
-                            <option key={vehicle.id} value={vehicle.id}>
-                                {vehicle.brand} {vehicle.model} -
-                                {vehicle.license_plate}
+                        <option value="">Select vehicle</option>
+                        {vehiclesForDriverId.map(vehicle => (
+                            <option
+                                key={vehicle.id}
+                                value={vehicle.id}
+                            >
+                                {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
                             </option>
                         ))}
                     </select>
                     {vehiclesForDriverId.length === 0 && (
-                        <p className="trip-form__empty-message">
-                            This driver does not have cars yet
-                        </p>
+                        <p className="trip-form__empty-message">This driver does not have cars yet</p>
                     )}
                 </label>
-                <label>
-                    Status
-                    <select
-                        disabled={vehiclesForDriverId.length === 0}
-                        value={status}
-                        onChange={(e) =>
-                            setStatus(e.currentTarget.value as TripStatus)
-                        }
-                        name="vehicle"
-                    >
-                        <option value="planned">Planned</option>
-                        <option value="pending">Pending</option>
-                        <option value="closed">Closed</option>
-                    </select>
-                </label>
+
+                {errorMessages.length > 0 && (
+                    <ul className="error-message">
+                        {errorMessages.map(message => (
+                            <li key={message}>{message}</li>
+                        ))}
+                    </ul>
+                )}
 
                 <button
                     className="entity-action entity-action--create"

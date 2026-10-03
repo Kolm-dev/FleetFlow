@@ -43,4 +43,10 @@ class Trip extends Model
     {
         return $this->hasMany(TripAttachment::class);
     }
+
+    
+    public function events()
+    {
+        return $this->hasMany(TripEvent::class);
+    }
 }

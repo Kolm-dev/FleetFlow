@@ -3,18 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\DriverStatus;
+use App\Enums\TripEventEnum;
 use App\Enums\TripStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTripRequest;
 use App\Http\Requests\UpdateTripRequest;
 use App\Models\Driver;
 use App\Models\Trip;
+use App\Models\Vehicle;
 use App\Services\TripPriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+
 
 class TripController extends Controller
 {
@@ -72,15 +76,42 @@ class TripController extends Controller
 
     public function store(StoreTripRequest $tripRequest)
     {
-        $trip = DB::transaction(function () use ($tripRequest) {
-            $trip = Trip::create($tripRequest->validated());
+        $data = $tripRequest->validated();
 
-            //            $trip->driver->update([
-            //                'status' => DriverStatus::OnTrip,
-            //            ]);
+        $trip = DB::transaction(function () use ($data) {
+
+            $driver = Driver::query()->lockForUpdate()->findOrFail($data['driver_id']);
+            if ($driver->status !== DriverStatus::Available) {
+                abort(422, 'Driver is not available.');
+            }
+
+            if ($driver->vehicles()->whereKey($data['vehicle_id'])->doesntExist()) {
+                abort(422, 'Vehicle does not belong to this driver.');
+            }
+
+            $trip = Trip::create([
+                ...$data,
+                'status' => TripStatus::Planned,
+            ]);
+
+            $driver->update([
+                'status' => DriverStatus::OnTrip,
+            ]);
+
+            $trip->events()->create([
+                'type' => TripEventEnum::CREATED,
+                'user_id' => Auth::id(),
+
+                'data' => [
+                    'vehicle_id' => $trip->vehicle_id,
+                    'driver_id' => $trip->driver_id,
+                    'status' => $trip->status,
+                ],
+            ]);
 
             return $trip;
         });
+
 
         return response()->json([
             'message' => 'Trip created successfully.',
@@ -102,39 +133,113 @@ class TripController extends Controller
 
     public function update(UpdateTripRequest $request, int $id)
     {
-        $trip = Trip::findOrFail($id);
+        $newTripData = $request->validated();
 
-        $currentDriver = $trip->driver;
+        $trip = DB::transaction(function () use ($id, $newTripData) {
+            $currentTrip = Trip::query()->lockForUpdate()->findOrFail($id);
 
-        $trip = DB::transaction(function () use ($request, $trip, $currentDriver) {
-            $trip->update($request->validated());
+            $currentDriverId = $currentTrip->driver_id;
+            $currentVehicleId = $currentTrip->vehicle_id;
+            $newDriverId = (int) ($newTripData['driver_id'] ?? $currentDriverId);
+            $newVehicleId = (int) ($newTripData['vehicle_id'] ?? $currentVehicleId);
 
-            $driverWasChanged = $trip->driver_id !== $currentDriver->id;
-            $tripIsClosed = $trip->status === TripStatus::Closed;
+            $driverWasChanged = $newDriverId !== $currentDriverId;
+            $vehicleWasChanged = $newVehicleId !== $currentVehicleId;
+            $assignmentWasChanged = $driverWasChanged || $vehicleWasChanged;
+            $tripIsPlanned = $currentTrip->status === TripStatus::Planned;
 
-            //  закрыли-> освобождаем водителя
-            if ($tripIsClosed) {
-                $currentDriver->update([
-                    'status' => DriverStatus::Available,
-                ]);
+            if ($assignmentWasChanged && ! $tripIsPlanned) {
+                $errors = [];
 
-                return $trip;
+                if ($driverWasChanged) {
+                    $errors['driver_id'] = ['Driver can be changed only for planned trips.'];
+                }
+
+                if ($vehicleWasChanged) {
+                    $errors['vehicle_id'] = ['Vehicle can be changed only for planned trips.'];
+                }
+
+                throw \Illuminate\Validation\ValidationException::withMessages($errors);
             }
 
-            // меняем водителя: old -> available, new -> on trip
+            $newVehicle = Vehicle::findOrFail($newVehicleId);
+
+            if ($newVehicle->driver_id !== $newDriverId) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'vehicle_id' => ['Vehicle does not belong to this driver.'],
+                ]);
+            }
+
             if ($driverWasChanged) {
+                $lockedDrivers = Driver::query()
+                    ->whereIn('id', [$currentDriverId, $newDriverId])
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
+
+                $currentDriver = $lockedDrivers->get($currentDriverId);
+                $newDriver = $lockedDrivers->get($newDriverId);
+
+                if ($newDriver->status !== DriverStatus::Available) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'driver_id' => ['Driver is not available.'],
+                    ]);
+                }
+
+                if ($currentDriver->status !== DriverStatus::OnTrip) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'driver_id' => ['Current driver is not assigned to this trip.'],
+                    ]);
+                }
+
                 $currentDriver->update([
                     'status' => DriverStatus::Available,
                 ]);
-
-                $newDriver = Driver::findOrFail($trip->driver_id);
 
                 $newDriver->update([
                     'status' => DriverStatus::OnTrip,
                 ]);
             }
 
-            return $trip;
+            $currentTrip->fill($newTripData);
+            $updatedFields = [];
+
+            foreach (array_keys($newTripData) as $field) {
+                if ($field === 'driver_id' || !$currentTrip->isDirty($field)) {
+                    continue;
+                }
+
+                $updatedFields[$field] = [
+                    'old' => $currentTrip->getOriginal($field),
+                    'new' => $currentTrip->getAttribute($field),
+                ];
+            }
+
+            $currentTrip->save();
+
+            if ($driverWasChanged) {
+                $currentTrip->events()->create([
+                    'type' => TripEventEnum::DRIVER_CHANGED,
+                    'user_id' => Auth::id(),
+                    'data' => [
+                        'old_driver_id' => $currentDriverId,
+                        'new_driver_id' => $newDriverId,
+                    ],
+                ]);
+            }
+
+            if ($updatedFields !== []) {
+                $currentTrip->events()->create([
+                    'type' => TripEventEnum::UPDATED,
+                    'user_id' => Auth::id(),
+                    'data' => [
+                        'fields' => $updatedFields,
+                    ],
+                ]);
+            }
+
+            return $currentTrip;
         });
 
         return response()->json([
@@ -145,17 +250,18 @@ class TripController extends Controller
 
     public function start(Trip $trip)
     {
-        $driverIsAvailable = $trip->driver->status === DriverStatus::Available;
+        $driverIsAssigned = $trip->driver->status === DriverStatus::OnTrip;
         $tripIsPlanned = $trip->status === TripStatus::Planned;
         $reasons = [];
+        $oldTripStatus = $trip->status;
 
 
         if (! $tripIsPlanned) {
             $reasons[] = 'trip is not planned';
         }
 
-        if (! $driverIsAvailable) {
-            $reasons[] = 'driver is not available';
+        if (! $driverIsAssigned) {
+            $reasons[] = 'driver is not assigned';
         }
 
         if ($reasons) {
@@ -165,13 +271,19 @@ class TripController extends Controller
             ], 422);
         }
 
-        DB::transaction(function () use ($trip) {
+        DB::transaction(function () use ($trip, $oldTripStatus) {
             $trip->update([
                 'status' => TripStatus::Pending,
             ]);
 
-            $trip->driver->update([
-                'status' => DriverStatus::OnTrip,
+
+            $trip->events()->create([
+                'type' => TripEventEnum::STARTED,
+                'user_id' => Auth::id(),
+                'data' => [
+                    'old_status' => $oldTripStatus,
+                    'new_status' => TripStatus::Pending,
+                ],
             ]);
         });
 
@@ -183,14 +295,35 @@ class TripController extends Controller
     }
     public function close(Trip $trip)
     {
-        $trip->update([
-            'status' => TripStatus::Closed,
-            'completed_at' => now(),
-        ]);
+        if ($trip->status !== TripStatus::Pending) {
+            return response()->json([
+                'message' => 'Trip cannot be closed because it is not in progress.',
+            ], 422);
+        }
 
-        $trip->driver->update([
-            'status' => DriverStatus::Available,
-        ]);
+        $userID = Auth::id();
+        $currentTripStatus = $trip->status;
+
+        DB::transaction(function () use ($trip, $userID, $currentTripStatus) {
+            $trip->update([
+                'status' => TripStatus::Closed,
+                'completed_at' => now(),
+            ]);
+
+            $trip->driver->update([
+                'status' => DriverStatus::Available,
+            ]);
+
+            $trip->events()->create([
+                'type' => TripEventEnum::CLOSED,
+                'user_id' => $userID,
+                'data' => [
+                    'old_status' => $currentTripStatus,
+                    'new_status' => TripStatus::Closed,
+                ],
+
+            ]);
+        });
 
         return response()->json([
             'message' => 'Trip closed successfully.',
@@ -200,15 +333,26 @@ class TripController extends Controller
 
     public function cancel(Trip $trip)
     {
-        if (in_array($trip->status, [TripStatus::Cancelled, TripStatus::Closed], true)) {
-            return response()->json([
-                'message' => 'Trip cannot be cancelled because it is already cancelled or closed.',
-            ], 422);
+        if (!in_array($trip->status, [TripStatus::Planned, TripStatus::Pending], true)) {
+            abort(422, 'Trip cannot be cancelled from its current status.');
         }
 
-        DB::transaction(function () use ($trip) {
+        if ($trip->driver->status !== DriverStatus::OnTrip) {
+            abort(422, 'Driver is not assigned to this trip.');
+        }
+
+        $oldTripStatus = $trip->status;
+        DB::transaction(function () use ($trip, $oldTripStatus) {
             $trip->update([
                 'status' => TripStatus::Cancelled,
+            ]);
+            $trip->events()->create([
+                'type' => TripEventEnum::CANCELLED,
+                'user_id' => Auth::id(),
+                'data' => [
+                    'old_status' => $oldTripStatus,
+                    'new_status' => TripStatus::Cancelled,
+                ],
             ]);
 
             $trip->driver->update([
@@ -223,20 +367,61 @@ class TripController extends Controller
 
     public function destroy(Trip $trip)
     {
-        if ($trip->status === TripStatus::Pending) {
-            return response()->json([
-                'message' => 'Trip cannot be deleted because it is already in use.',
+        $result = DB::transaction(function () use ($trip) {
+            $actualTrip = Trip::query()->lockForUpdate()->findOrFail($trip->id);
 
-            ], 422);
+            if ($actualTrip->status === TripStatus::Pending) {
+                return [
+                    'error' => response()->json([
+                        'message' => 'Trip cannot be deleted because it is already in use.',
+                    ], 422),
+                ];
+            }
+
+            if ($actualTrip->status === TripStatus::Planned) {
+                $driver = Driver::query()->lockForUpdate()->findOrFail($actualTrip->driver_id);
+
+                if ($driver->status !== DriverStatus::OnTrip) {
+                    return [
+                        'error' => response()->json([
+                            'message' => 'Trip cannot be deleted because its driver is not assigned to this trip.',
+                        ], 422),
+                    ];
+                }
+
+                $driver->update([
+                    'status' => DriverStatus::Available,
+                ]);
+            }
+
+            $attachmentsToDelete = $actualTrip->attachments()
+                ->get(['disk', 'path'])
+                ->map(fn ($attachment) => [
+                    'disk' => $attachment->disk,
+                    'path' => $attachment->path,
+                ])
+                ->all();
+
+            $actualTrip->delete();
+
+            return [
+                'attachments' => $attachmentsToDelete,
+            ];
+        });
+
+        if (isset($result['error'])) {
+            return $result['error'];
         }
 
-        $attachments = $trip->attachments()->get();
-        foreach ($attachments as $attachment) {
-            Storage::disk($attachment->disk)->delete($attachment->path);
-        }
-        $trip->delete();
+        foreach ($result['attachments'] as $attachment) {
+            $deleted = Storage::disk($attachment['disk'])->delete($attachment['path']);
 
-        return response()->noContent(); //
+            if (! $deleted) {
+                throw new \RuntimeException("Trip was deleted, but attachment file [{$attachment['path']}] could not be deleted from disk [{$attachment['disk']}].");
+            }
+        }
+
+        return response()->noContent();
     }
 
     public function calculatePrice(Request $request, TripPriceCalculator $calculator)
