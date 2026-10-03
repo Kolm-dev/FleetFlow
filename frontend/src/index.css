@@ -1292,6 +1292,14 @@ input[type="search"]::-webkit-search-cancel-button {
     font-size: 14px;
 }
 
+.trip-timeline__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
 .trip-timeline {
     position: relative;
     display: grid;
@@ -3517,6 +3525,12 @@ input[type="search"]::-webkit-search-cancel-button {
         align-items: flex-start;
         gap: 10px;
         margin-bottom: 12px;
+    }
+
+    .trip-timeline__actions {
+        align-items: flex-end;
+        flex-direction: column;
+        gap: 6px;
     }
 
     .trip-timeline__header span,

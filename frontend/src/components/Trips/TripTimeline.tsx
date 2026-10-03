@@ -1,4 +1,5 @@
 import { Spinner } from "@/components/Spinner/Spinner";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useTripEvents } from "@/hooks/useTripEvents";
 import { formatCurrency, formatDateTime, formatNullableValue } from "@/libs/utils";
 import type { TripEvent, TripEventData, TripEventFieldChange, TripStatus } from "@/types/tripsTypes";
@@ -135,7 +136,9 @@ const getEventDetails = (event: TripEvent) => {
 
 export const TripTimeline = ({ tripId }: { tripId: number }) => {
     const { data, isLoading, isFetching, error } = useTripEvents(tripId);
+    const [isExpanded, setIsExpanded] = useLocalStorage("trip-history-expanded", true);
     const events = data?.data ?? [];
+    const contentId = `trip-history-content-${tripId}`;
 
     return (
         <section className="trip-page__section trip-timeline-section">
@@ -144,52 +147,68 @@ export const TripTimeline = ({ tripId }: { tripId: number }) => {
                     <h2>Trip history</h2>
                     <span>{isLoading ? "Loading..." : `${events.length} events`}</span>
                 </div>
-                {isFetching && !isLoading && <span className="trip-timeline__refreshing">Updating...</span>}
+                <div className="trip-timeline__actions">
+                    {isFetching && !isLoading && <span className="trip-timeline__refreshing">Updating...</span>}
+                    <button
+                        className="trip-attachments__toggle"
+                        type="button"
+                        aria-controls={contentId}
+                        aria-expanded={isExpanded}
+                        onClick={() => setIsExpanded(currentValue => !currentValue)}
+                    >
+                        <span aria-hidden="true">{isExpanded ? "▲" : "▼"}</span>
+                        {isExpanded ? "Hide history" : "Show history"}
+                    </button>
+                </div>
             </header>
 
-            {isLoading && <Spinner text="Loading trip history..." />}
+            {isExpanded && (
+                <div id={contentId}>
+                    {isLoading && <Spinner text="Loading trip history..." />}
 
-            {!isLoading && error && <p className="error-message">{error.message}</p>}
+                    {!isLoading && error && <p className="error-message">{error.message}</p>}
 
-            {!isLoading && !error && events.length === 0 && (
-                <p className="trip-details-empty">No history events yet.</p>
-            )}
+                    {!isLoading && !error && events.length === 0 && (
+                        <p className="trip-details-empty">No history events yet.</p>
+                    )}
 
-            {!isLoading && !error && events.length > 0 && (
-                <ol className="trip-timeline">
-                    {events.map(event => {
-                        const details = getEventDetails(event);
+                    {!isLoading && !error && events.length > 0 && (
+                        <ol className="trip-timeline">
+                            {events.map(event => {
+                                const details = getEventDetails(event);
 
-                        return (
-                            <li
-                                className="trip-timeline__item"
-                                key={event.id}
-                            >
-                                <div className="trip-timeline__marker" />
-                                <article className="trip-timeline__content">
-                                    <div className="trip-timeline__main">
-                                        <h3>{eventTitles[event.event_type] ?? "Trip event"}</h3>
-                                        <time dateTime={event.created_at}>
-                                            {formatDateTime(event.created_at, {
-                                                hour12: false,
-                                                locale: "en-GB",
-                                                timeZone: "Europe/Kiev",
-                                            })}
-                                        </time>
-                                    </div>
-                                    <p className="trip-timeline__actor">{event.user?.name ?? "System"}</p>
-                                    {details.length > 0 && (
-                                        <ul className="trip-timeline__details">
-                                            {details.map(detail => (
-                                                <li key={detail}>{detail}</li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </article>
-                            </li>
-                        );
-                    })}
-                </ol>
+                                return (
+                                    <li
+                                        className="trip-timeline__item"
+                                        key={event.id}
+                                    >
+                                        <div className="trip-timeline__marker" />
+                                        <article className="trip-timeline__content">
+                                            <div className="trip-timeline__main">
+                                                <h3>{eventTitles[event.event_type] ?? "Trip event"}</h3>
+                                                <time dateTime={event.created_at}>
+                                                    {formatDateTime(event.created_at, {
+                                                        hour12: false,
+                                                        locale: "en-GB",
+                                                        timeZone: "Europe/Kiev",
+                                                    })}
+                                                </time>
+                                            </div>
+                                            <p className="trip-timeline__actor">{event.user?.name ?? "System"}</p>
+                                            {details.length > 0 && (
+                                                <ul className="trip-timeline__details">
+                                                    {details.map(detail => (
+                                                        <li key={detail}>{detail}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </article>
+                                    </li>
+                                );
+                            })}
+                        </ol>
+                    )}
+                </div>
             )}
         </section>
     );
