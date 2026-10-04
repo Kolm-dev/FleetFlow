@@ -63,6 +63,8 @@ class TripController extends Controller
     private function sort(Builder $query, Request $request)
     {
         if (! $request->has('sort')) {
+            $query->orderByDesc('updated_at')->orderByDesc('id');
+
             return;
         }
 
@@ -71,7 +73,7 @@ class TripController extends Controller
         $directionSort = str_starts_with($sort, '-') ? 'desc' : 'asc';
         $whatSort = ltrim($sort, '-');
 
-        $query->orderBy($whatSort, $directionSort);
+        $query->orderBy($whatSort, $directionSort)->orderByDesc('id');
     }
 
     public function store(StoreTripRequest $tripRequest)
