@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Validation\ValidationException;
 
 class TripController extends Controller
 {
@@ -103,6 +103,9 @@ class TripController extends Controller
                 'user_id' => Auth::id(),
 
                 'data' => [
+                    'title' => $trip->title,
+                    'distance' => $trip->distance,
+                    'price' => $trip->price,
                     'vehicle_id' => $trip->vehicle_id,
                     'driver_id' => $trip->driver_id,
                     'status' => $trip->status,
@@ -111,7 +114,6 @@ class TripController extends Controller
 
             return $trip;
         });
-
 
         return response()->json([
             'message' => 'Trip created successfully.',
@@ -159,13 +161,13 @@ class TripController extends Controller
                     $errors['vehicle_id'] = ['Vehicle can be changed only for planned trips.'];
                 }
 
-                throw \Illuminate\Validation\ValidationException::withMessages($errors);
+                throw ValidationException::withMessages($errors);
             }
 
             $newVehicle = Vehicle::findOrFail($newVehicleId);
 
             if ($newVehicle->driver_id !== $newDriverId) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
+                throw ValidationException::withMessages([
                     'vehicle_id' => ['Vehicle does not belong to this driver.'],
                 ]);
             }
@@ -182,13 +184,13 @@ class TripController extends Controller
                 $newDriver = $lockedDrivers->get($newDriverId);
 
                 if ($newDriver->status !== DriverStatus::Available) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
+                    throw ValidationException::withMessages([
                         'driver_id' => ['Driver is not available.'],
                     ]);
                 }
 
                 if ($currentDriver->status !== DriverStatus::OnTrip) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
+                    throw ValidationException::withMessages([
                         'driver_id' => ['Current driver is not assigned to this trip.'],
                     ]);
                 }
@@ -206,7 +208,7 @@ class TripController extends Controller
             $updatedFields = [];
 
             foreach (array_keys($newTripData) as $field) {
-                if ($field === 'driver_id' || !$currentTrip->isDirty($field)) {
+                if ($field === 'driver_id' || ! $currentTrip->isDirty($field)) {
                     continue;
                 }
 
@@ -255,7 +257,6 @@ class TripController extends Controller
         $reasons = [];
         $oldTripStatus = $trip->status;
 
-
         if (! $tripIsPlanned) {
             $reasons[] = 'trip is not planned';
         }
@@ -266,7 +267,7 @@ class TripController extends Controller
 
         if ($reasons) {
             return response()->json([
-                'message' => 'Trip cannot be started because ' . implode(' and ', $reasons) . '.',
+                'message' => 'Trip cannot be started because '.implode(' and ', $reasons).'.',
                 'trip' => $trip,
             ], 422);
         }
@@ -275,7 +276,6 @@ class TripController extends Controller
             $trip->update([
                 'status' => TripStatus::Pending,
             ]);
-
 
             $trip->events()->create([
                 'type' => TripEventEnum::STARTED,
@@ -293,6 +293,7 @@ class TripController extends Controller
 
         ]);
     }
+
     public function close(Trip $trip)
     {
         if ($trip->status !== TripStatus::Pending) {
@@ -333,7 +334,7 @@ class TripController extends Controller
 
     public function cancel(Trip $trip)
     {
-        if (!in_array($trip->status, [TripStatus::Planned, TripStatus::Pending], true)) {
+        if (! in_array($trip->status, [TripStatus::Planned, TripStatus::Pending], true)) {
             abort(422, 'Trip cannot be cancelled from its current status.');
         }
 
@@ -359,6 +360,7 @@ class TripController extends Controller
                 'status' => DriverStatus::Available,
             ]);
         });
+
         return response()->json([
             'message' => 'Trip cancelled successfully.',
             'trip' => $trip->fresh(['driver', 'vehicle']),

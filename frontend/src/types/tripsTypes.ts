@@ -97,6 +97,8 @@ export type TripEventType =
     | "trip.driver.changed"
     | "trip.deleted";
 
+export type EventFilter = TripEventType | "all";
+
 export type TripEventUser = {
     id: number;
     name: string;
@@ -108,6 +110,9 @@ export type TripEventFieldChange = {
 };
 
 export type TripEventData = {
+    title?: string;
+    distance?: number | null;
+    price?: number | string | null;
     status?: TripStatus;
     old_status?: TripStatus;
     new_status?: TripStatus;
@@ -127,7 +132,7 @@ export type TripEventData = {
 export type TripEvent = {
     id: number;
     trip_id: number;
-    event_type: TripEventType | string;
+    event_type: TripEventType;
     data: TripEventData | null;
     user: TripEventUser | null;
     created_at: string;

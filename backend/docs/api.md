@@ -219,6 +219,8 @@ Event types include:
 - `trip.attachment.renamed`
 - `trip.attachment.deleted`
 
+`trip.created` stores the initial `title`, `distance`, `price`, `driver_id`,
+`vehicle_id`, and `status`.
 `trip.updated` stores changed fields under `data.fields`.
 Attachment events store `attachment_id` plus display-related names, for example
 `display_name`, `old_display_name`, and `new_display_name`.

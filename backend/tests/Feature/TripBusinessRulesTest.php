@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\DriverStatus;
+use App\Enums\TripEventEnum;
 use App\Enums\TripStatus;
 use App\Models\Driver;
 use App\Models\Trip;
@@ -49,6 +50,19 @@ class TripBusinessRulesTest extends TestCase
             'driver_id' => $driver->id,
             'vehicle_id' => $vehicle->id,
         ]);
+
+        $trip = Trip::query()->where('title', 'Valid create trip')->firstOrFail();
+        $event = $trip->events()->firstOrFail();
+
+        $this->assertSame(TripEventEnum::CREATED, $event->type);
+        $this->assertEquals([
+            'title' => 'Valid create trip',
+            'distance' => 120,
+            'price' => 500,
+            'vehicle_id' => $vehicle->id,
+            'driver_id' => $driver->id,
+            'status' => TripStatus::Planned->value,
+        ], $event->data);
     }
 
     public function test_can_update_trip_title_without_changing_driver_or_vehicle(): void

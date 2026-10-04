@@ -1,10 +1,19 @@
 import { Spinner } from "@/components/Spinner/Spinner";
+import EventFilters from "@/components/Trips/EventFilters";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useTripEvents } from "@/hooks/useTripEvents";
 import { formatCurrency, formatDateTime, formatNullableValue } from "@/libs/utils";
-import type { TripEvent, TripEventData, TripEventFieldChange, TripStatus } from "@/types/tripsTypes";
+import type {
+    EventFilter,
+    TripEvent,
+    TripEventData,
+    TripEventFieldChange,
+    TripEventType,
+    TripStatus,
+} from "@/types/tripsTypes";
+import { useState } from "react";
 
-const eventTitles: Record<string, string> = {
+const eventTitles: Record<TripEventType, string> = {
     "trip.created": "Trip created",
     "trip.updated": "Trip updated",
     "trip.started": "Trip started",
@@ -104,9 +113,16 @@ const getEventDetails = (event: TripEvent) => {
     if (event.event_type === "trip.created") {
         const details = [];
 
+        if (data?.title) details.push(`Title: ${data.title}`);
+        if (data?.distance !== undefined && data?.distance !== null) {
+            details.push(`Distance: ${formatEventValue("distance", data.distance)}`);
+        }
+        if (data?.price !== undefined && data?.price !== null) {
+            details.push(`Price: ${formatEventValue("price", data.price)}`);
+        }
         if (data?.status) details.push(`Status: ${formatEventValue("status", data.status)}`);
-        if (data?.driver_id) details.push(`Driver ID: ${data.driver_id}`);
-        if (data?.vehicle_id) details.push(`Vehicle ID: ${data.vehicle_id}`);
+        if (data?.driver_id !== undefined && data?.driver_id !== null) details.push(`Driver ID: ${data.driver_id}`);
+        if (data?.vehicle_id !== undefined && data?.vehicle_id !== null) details.push(`Vehicle ID: ${data.vehicle_id}`);
 
         return details;
     }
@@ -135,10 +151,23 @@ const getEventDetails = (event: TripEvent) => {
 };
 
 export const TripTimeline = ({ tripId }: { tripId: number }) => {
+    const [selectedType, setSelectedType] = useState<EventFilter>("all");
+    const [search, setSearch] = useState("");
     const { data, isLoading, isFetching, error } = useTripEvents(tripId);
     const [isExpanded, setIsExpanded] = useLocalStorage("trip-history-expanded", true);
     const events = data?.data ?? [];
     const contentId = `trip-history-content-${tripId}`;
+    const normalizedSearch = search.trim().toLowerCase();
+    const visibleEvents = events
+        .filter(event => selectedType === "all" || event.event_type === selectedType)
+        .map(event => ({ event, details: getEventDetails(event) }))
+        .filter(({ event, details }) => {
+            if (!normalizedSearch) return true;
+
+            return [eventTitles[event.event_type], event.user?.name ?? "System", ...details].some(text =>
+                text.toLowerCase().includes(normalizedSearch)
+            );
+        });
 
     return (
         <section className="trip-page__section trip-timeline-section">
@@ -173,40 +202,50 @@ export const TripTimeline = ({ tripId }: { tripId: number }) => {
                     )}
 
                     {!isLoading && !error && events.length > 0 && (
-                        <ol className="trip-timeline">
-                            {events.map(event => {
-                                const details = getEventDetails(event);
+                        <>
+                            <EventFilters
+                                eventTitles={eventTitles}
+                                selectedType={selectedType}
+                                onTypeChange={setSelectedType}
+                                search={search}
+                                onSearchChange={setSearch}
+                            />
 
-                                return (
-                                    <li
-                                        className="trip-timeline__item"
-                                        key={event.id}
-                                    >
-                                        <div className="trip-timeline__marker" />
-                                        <article className="trip-timeline__content">
-                                            <div className="trip-timeline__main">
-                                                <h3>{eventTitles[event.event_type] ?? "Trip event"}</h3>
-                                                <time dateTime={event.created_at}>
-                                                    {formatDateTime(event.created_at, {
-                                                        hour12: false,
-                                                        locale: "en-GB",
-                                                        timeZone: "Europe/Kiev",
-                                                    })}
-                                                </time>
-                                            </div>
-                                            <p className="trip-timeline__actor">{event.user?.name ?? "System"}</p>
-                                            {details.length > 0 && (
-                                                <ul className="trip-timeline__details">
-                                                    {details.map(detail => (
-                                                        <li key={detail}>{detail}</li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        </article>
-                                    </li>
-                                );
-                            })}
-                        </ol>
+                            {visibleEvents.length === 0 ? (
+                                <p className="trip-details-empty">No events match the filters.</p>
+                            ) : (
+                                <ol className="trip-timeline">
+                                    {visibleEvents.map(({ event, details }) => (
+                                        <li
+                                            className="trip-timeline__item"
+                                            key={event.id}
+                                        >
+                                            <div className="trip-timeline__marker" />
+                                            <article className="trip-timeline__content">
+                                                <div className="trip-timeline__main">
+                                                    <h3>{eventTitles[event.event_type]}</h3>
+                                                    <time dateTime={event.created_at}>
+                                                        {formatDateTime(event.created_at, {
+                                                            hour12: false,
+                                                            locale: "en-GB",
+                                                            timeZone: "Europe/Kiev",
+                                                        })}
+                                                    </time>
+                                                </div>
+                                                <p className="trip-timeline__actor">{event.user?.name ?? "System"}</p>
+                                                {details.length > 0 && (
+                                                    <ul className="trip-timeline__details">
+                                                        {details.map(detail => (
+                                                            <li key={detail}>{detail}</li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </article>
+                                        </li>
+                                    ))}
+                                </ol>
+                            )}
+                        </>
                     )}
                 </div>
             )}
