@@ -34,7 +34,7 @@ class TripController extends Controller
             ]
         );
 
-        $query = Trip::with(['driver', 'vehicle', 'client']);
+        $query = Trip::with(['driver', 'vehicle', 'client.phones']);
 
         $query->when($request->filled('status'), function ($query) use ($request) {
             $query->whereIn('status', $request->input('status'));
@@ -62,7 +62,7 @@ class TripController extends Controller
     public function show(Trip $trip)
     {
 
-        $trip->load(['driver', 'vehicle', 'client']);
+        $trip->load(['driver', 'vehicle', 'client.phones']);
 
         return response()->json(
             [
@@ -130,7 +130,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip created successfully.',
-            'trip' => $trip->load(['driver', 'vehicle', 'client']),
+            'trip' => $trip->load(['driver', 'vehicle', 'client.phones']),
         ], 201);
     }
 
@@ -261,7 +261,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip updated successfully.',
-            'trip' => $trip->load(['driver', 'vehicle', 'client']),
+            'trip' => $trip->load(['driver', 'vehicle', 'client.phones']),
         ]);
     }
 
@@ -304,7 +304,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip was started successfully.',
-            'trip' => $trip->load(['driver', 'vehicle', 'client']),
+            'trip' => $trip->load(['driver', 'vehicle', 'client.phones']),
 
         ]);
     }

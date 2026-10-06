@@ -162,11 +162,21 @@ export const TripCard = () => {
                             <dd>{trip.client.address ?? "-"}</dd>
                         </div>
                         <div>
-                            <dt>Phone</dt>
+                            <dt>{trip.client.phones?.length > 1 ? "Phones" : "Phone"}</dt>
                             <dd>
-                                {trip.client.phones?.length
-                                    ? trip.client.phones.map(phone => phone.phone_number).join(", ")
-                                    : "-"}
+                                {trip.client.phones?.length ? (
+                                    trip.client.phones.map(phone => {
+                                        const phoneNumber = phone.phone_number ?? phone.phone;
+
+                                        return (
+                                            <div key={`${phoneNumber}-${phone.label ?? ""}`}>
+                                                {phone.label ? `${phoneNumber} [${phone.label}]` : phoneNumber}
+                                            </div>
+                                        );
+                                    })
+                                ) : (
+                                    "-"
+                                )}
                             </dd>
                         </div>
                     </dl>

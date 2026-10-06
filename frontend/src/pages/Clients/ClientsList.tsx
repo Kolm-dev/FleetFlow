@@ -63,7 +63,10 @@ const ClientsList = () => {
                     <h2>Clients</h2>
                     <p>Total found: {clients.length}</p>
                 </div>
-                <NavLink className="create-link entity-action--create" to="/clients/create">
+                <NavLink
+                    className="create-link entity-action--create"
+                    to="/clients/create"
+                >
                     Create client
                 </NavLink>
             </header>
@@ -94,14 +97,22 @@ const ClientsList = () => {
             </div>
 
             <div className="clients-type-actions">
-                <button className={type === "all" ? "is-active" : undefined} onClick={() => setType("all")}>All</button>
+                <button
+                    className={type === "all" ? "is-active" : undefined}
+                    onClick={() => setType("all")}
+                >
+                    All
+                </button>
                 <button
                     className={type === "individual" ? "is-active" : undefined}
                     onClick={() => setType("individual")}
                 >
                     Individual
                 </button>
-                <button className={type === "company" ? "is-active" : undefined} onClick={() => setType("company")}>
+                <button
+                    className={type === "company" ? "is-active" : undefined}
+                    onClick={() => setType("company")}
+                >
                     Company
                 </button>
             </div>
@@ -113,7 +124,7 @@ const ClientsList = () => {
                         <th>Name</th>
                         <th>Type</th>
                         <th>Email</th>
-                        <th>Phone</th>
+                        <th>Phone(s)</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -144,18 +155,22 @@ const ClientsList = () => {
                             <td
                                 className="clients-table__copy-cell"
                                 data-copy-label="Copy"
-                                onClick={() =>
-                                    copyCellText(client.phones.map(phone => phone.phone_number).join(", "))
-                                }
+                                onClick={() => copyCellText(client.phones.map(phone => phone.phone_number).join(", "))}
                             >
                                 {client.phones.length ? client.phones.map(phone => phone.phone_number).join(", ") : "-"}
                             </td>
                             <td>
                                 <div className="clients-table__actions">
-                                    <button className="entity-action entity-action--details" onClick={() => navigate(`/clients/${client.id}`)}>
+                                    <button
+                                        className="entity-action entity-action--details"
+                                        onClick={() => navigate(`/clients/${client.id}`)}
+                                    >
                                         Open
                                     </button>
-                                    <button className="entity-action entity-action--edit" onClick={() => navigate(`/clients/${client.id}/edit`)}>
+                                    <button
+                                        className="entity-action entity-action--edit"
+                                        onClick={() => navigate(`/clients/${client.id}/edit`)}
+                                    >
                                         Edit
                                     </button>
                                     <button

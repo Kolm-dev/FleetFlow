@@ -1,6 +1,7 @@
 export type ClientType = "individual" | "company";
 
 export type ClientPhone = {
+    phone?: string;
     phone_number: string;
     label: string | null;
 };
