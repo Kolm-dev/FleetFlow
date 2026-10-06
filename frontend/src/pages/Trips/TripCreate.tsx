@@ -1,3 +1,4 @@
+import { getClients } from "@/api/clients";
 import { getDrivers } from "@/api/drivers";
 import { createTrip } from "@/api/trips";
 import TripCreateForm from "@/components/Trips/TripCreateForm";
@@ -39,6 +40,10 @@ export const TripCreate = () => {
         queryKey: ["drivers"],
         queryFn: () => getDrivers({ status: "available" }),
     });
+    const { data: clientsData } = useQuery({
+        queryKey: ["clients"],
+        queryFn: () => getClients(),
+    });
 
     const {
         mutate,
@@ -71,12 +76,14 @@ export const TripCreate = () => {
     });
 
     const availableDrivers = data?.drivers ?? [];
+    const clients = clientsData?.data ?? [];
     const errorMessages = getTripCreateErrorMessages(createError);
 
     return (
         <>
             <TripCreateForm
                 availableDrivers={availableDrivers}
+                clients={clients}
                 isCreating={isCreating}
                 errorMessages={errorMessages}
                 onSubmit={(newTrip) => mutate(newTrip)}

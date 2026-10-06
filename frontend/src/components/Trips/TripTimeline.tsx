@@ -28,6 +28,7 @@ const eventTitles: Record<TripEventType, string> = {
 
 const fieldLabels: Record<string, string> = {
     title: "Title",
+    client_id: "Client ID",
     driver_id: "Driver ID",
     vehicle_id: "Vehicle ID",
     distance: "Distance",
@@ -121,6 +122,7 @@ const getEventDetails = (event: TripEvent) => {
             details.push(`Price: ${formatEventValue("price", data.price)}`);
         }
         if (data?.status) details.push(`Status: ${formatEventValue("status", data.status)}`);
+        if (data?.client_id !== undefined && data?.client_id !== null) details.push(`Client ID: ${data.client_id}`);
         if (data?.driver_id !== undefined && data?.driver_id !== null) details.push(`Driver ID: ${data.driver_id}`);
         if (data?.vehicle_id !== undefined && data?.vehicle_id !== null) details.push(`Vehicle ID: ${data.vehicle_id}`);
 

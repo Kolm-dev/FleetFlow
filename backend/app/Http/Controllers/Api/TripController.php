@@ -34,7 +34,7 @@ class TripController extends Controller
             ]
         );
 
-        $query = Trip::with(['driver', 'vehicle']);
+        $query = Trip::with(['driver', 'vehicle', 'client']);
 
         $query->when($request->filled('status'), function ($query) use ($request) {
             $query->whereIn('status', $request->input('status'));
@@ -59,7 +59,17 @@ class TripController extends Controller
 
         return response()->json($trips);
     }
+    public function show(Trip $trip)
+    {
 
+        $trip->load(['driver', 'vehicle', 'client']);
+
+        return response()->json(
+            [
+                'trip' => $trip,
+            ]
+        );
+    }
     private function sort(Builder $query, Request $request)
     {
         if (! $request->has('sort')) {
@@ -110,6 +120,7 @@ class TripController extends Controller
                     'price' => $trip->price,
                     'vehicle_id' => $trip->vehicle_id,
                     'driver_id' => $trip->driver_id,
+                    'client_id' => $trip->client_id,
                     'status' => $trip->status,
                 ],
             ]);
@@ -119,21 +130,11 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip created successfully.',
-            'trip' => $trip->load(['driver', 'vehicle']),
+            'trip' => $trip->load(['driver', 'vehicle', 'client']),
         ], 201);
     }
 
-    public function show(Trip $trip)
-    {
 
-        $trip->load(['driver', 'vehicle']);
-
-        return response()->json(
-            [
-                'trip' => $trip,
-            ]
-        );
-    }
 
     public function update(UpdateTripRequest $request, int $id)
     {
@@ -144,13 +145,19 @@ class TripController extends Controller
 
             $currentDriverId = $currentTrip->driver_id;
             $currentVehicleId = $currentTrip->vehicle_id;
+            $currentClientId = $currentTrip->client_id;
             $newDriverId = (int) ($newTripData['driver_id'] ?? $currentDriverId);
             $newVehicleId = (int) ($newTripData['vehicle_id'] ?? $currentVehicleId);
+            $newClientId = array_key_exists('client_id', $newTripData)
+                ? (int) $newTripData['client_id']
+                : $currentClientId;
 
             $driverWasChanged = $newDriverId !== $currentDriverId;
             $vehicleWasChanged = $newVehicleId !== $currentVehicleId;
+            $clientWasChanged = $newClientId !== $currentClientId;
             $assignmentWasChanged = $driverWasChanged || $vehicleWasChanged;
             $tripIsPlanned = $currentTrip->status === TripStatus::Planned;
+
 
             if ($assignmentWasChanged && ! $tripIsPlanned) {
                 $errors = [];
@@ -164,6 +171,12 @@ class TripController extends Controller
                 }
 
                 throw ValidationException::withMessages($errors);
+            }
+
+            if ($clientWasChanged && ! $tripIsPlanned) {
+                throw ValidationException::withMessages([
+                    'client_id' => ['Client can be changed only for planned trips.'],
+                ]);
             }
 
             $newVehicle = Vehicle::findOrFail($newVehicleId);
@@ -248,7 +261,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip updated successfully.',
-            'trip' => $trip->load(['driver', 'vehicle']),
+            'trip' => $trip->load(['driver', 'vehicle', 'client']),
         ]);
     }
 
@@ -269,7 +282,7 @@ class TripController extends Controller
 
         if ($reasons) {
             return response()->json([
-                'message' => 'Trip cannot be started because '.implode(' and ', $reasons).'.',
+                'message' => 'Trip cannot be started because ' . implode(' and ', $reasons) . '.',
                 'trip' => $trip,
             ], 422);
         }
@@ -291,7 +304,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip was started successfully.',
-            'trip' => $trip,
+            'trip' => $trip->load(['driver', 'vehicle', 'client']),
 
         ]);
     }
@@ -400,7 +413,7 @@ class TripController extends Controller
 
             $attachmentsToDelete = $actualTrip->attachments()
                 ->get(['disk', 'path'])
-                ->map(fn ($attachment) => [
+                ->map(fn($attachment) => [
                     'disk' => $attachment->disk,
                     'path' => $attachment->path,
                 ])

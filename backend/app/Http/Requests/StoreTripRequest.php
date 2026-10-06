@@ -25,6 +25,7 @@ class StoreTripRequest extends FormRequest
             'price' => 'nullable|numeric|min:0',
             'driver_id' => 'required|integer|exists:drivers,id',
             'vehicle_id' => 'required|integer|exists:vehicles,id',
+            'client_id' => 'required|integer|exists:clients,id',
             'status' => 'prohibited',
 
         ];
@@ -63,6 +64,7 @@ class StoreTripRequest extends FormRequest
         return [
             'driver_id.exists' => 'Driver does not exist.',
             'vehicle_id.exists' => 'Vehicle does not exist.',
+            'client_id.exists' => 'Client does not exist.',
         ];
     }
 }

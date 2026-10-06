@@ -134,7 +134,45 @@ export const TripCard = () => {
                         <dt>Vehicle ID</dt>
                         <dd>{trip.vehicle_id}</dd>
                     </div>
+                    <div>
+                        <dt>Client ID</dt>
+                        <dd>{trip.client_id}</dd>
+                    </div>
                 </dl>
+            </section>
+
+            <section className="trip-page__section">
+                <h2>Client</h2>
+                {trip.client ? (
+                    <dl className="trip-details-grid">
+                        <div>
+                            <dt>Name</dt>
+                            <dd>{trip.client.name}</dd>
+                        </div>
+                        <div>
+                            <dt>Type</dt>
+                            <dd>{trip.client.type}</dd>
+                        </div>
+                        <div>
+                            <dt>Email</dt>
+                            <dd>{trip.client.email ?? "-"}</dd>
+                        </div>
+                        <div>
+                            <dt>Address</dt>
+                            <dd>{trip.client.address ?? "-"}</dd>
+                        </div>
+                        <div>
+                            <dt>Phone</dt>
+                            <dd>
+                                {trip.client.phones?.length
+                                    ? trip.client.phones.map(phone => phone.phone_number).join(", ")
+                                    : "-"}
+                            </dd>
+                        </div>
+                    </dl>
+                ) : (
+                    <p className="trip-details-empty">No client data.</p>
+                )}
             </section>
 
             <section className="trip-page__section">

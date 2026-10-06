@@ -1,5 +1,7 @@
+import { ClientCombobox } from "@/components/Trips/ClientCombobox";
 import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
 import { toNullableNumber } from "@/libs/utils";
+import type { Client } from "@/types/clientTypes";
 import type { Driver } from "@/types/driversTypes";
 import type { Trip, UpdateTripData } from "@/types/tripsTypes";
 import type React from "react";
@@ -8,6 +10,7 @@ import { useState } from "react";
 type TripFormEditProps = {
     trip: Trip;
     availableDrivers: Driver[];
+    clients: Client[];
     isPending: boolean;
     errorMessages: string[];
     onSubmit: (data: UpdateTripData) => void;
@@ -26,6 +29,7 @@ export const TripEditForm = ({
     trip,
     onSubmit,
     availableDrivers,
+    clients,
     isPending,
     errorMessages,
 }: TripFormEditProps) => {
@@ -38,7 +42,14 @@ export const TripEditForm = ({
     const [vehicleId, setVehicleId] = useState<number | undefined>(
         trip.vehicle_id,
     );
+    const [clientId, setClientId] = useState<number | undefined>(
+        trip.client_id,
+    );
     const canEditAssignment = trip.status === "planned";
+    const clientsForSelect =
+        trip.client && !clients.some(client => client.id === trip.client?.id)
+            ? [...clients, trip.client]
+            : clients;
 
     const filteredDriversForSelect = getDriversForSelect(
         availableDrivers,
@@ -63,7 +74,7 @@ export const TripEditForm = ({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (canEditAssignment && (driverId === undefined || vehicleId === undefined)) return;
+        if (canEditAssignment && (driverId === undefined || vehicleId === undefined || clientId === undefined)) return;
 
         const data: UpdateTripData = {
             distance: toNullableNumber(distance),
@@ -74,6 +85,7 @@ export const TripEditForm = ({
         if (canEditAssignment) {
             data.driver_id = driverId;
             data.vehicle_id = vehicleId;
+            data.client_id = clientId;
         }
 
         onSubmit(data);
@@ -101,6 +113,12 @@ export const TripEditForm = ({
                     />
                 </label>
 
+                <ClientCombobox
+                    clients={clientsForSelect}
+                    disabled={!canEditAssignment}
+                    value={clientId}
+                    onChange={setClientId}
+                />
                 <label>
                     Driver
                     <select
@@ -162,7 +180,11 @@ export const TripEditForm = ({
                 <button
                     className="entity-action entity-action--update"
                     type="submit"
-                    disabled={isPending || (canEditAssignment && (driverId === undefined || vehicleId === undefined))}
+                    disabled={
+                        isPending ||
+                        (canEditAssignment &&
+                            (driverId === undefined || vehicleId === undefined || clientId === undefined))
+                    }
                 >
                     {isPending ? "Saving..." : "Save"}
                 </button>

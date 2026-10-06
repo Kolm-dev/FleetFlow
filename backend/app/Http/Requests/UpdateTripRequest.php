@@ -19,6 +19,7 @@ class UpdateTripRequest extends FormRequest
             'distance' => 'sometimes|nullable|integer|min:0',
             'driver_id' => 'sometimes|integer|exists:drivers,id',
             'vehicle_id' => 'sometimes|integer|exists:vehicles,id',
+            'client_id' => 'sometimes|integer|exists:clients,id',
             'price' => 'sometimes|nullable|numeric|min:0',
             'status' => ['prohibited']
 

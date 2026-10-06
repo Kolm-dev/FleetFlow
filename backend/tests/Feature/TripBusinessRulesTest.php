@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ClientType;
 use App\Enums\DriverStatus;
 use App\Enums\TripEventEnum;
 use App\Enums\TripStatus;
+use App\Models\Client;
 use App\Models\Driver;
 use App\Models\Trip;
 use App\Models\User;
@@ -35,6 +37,7 @@ class TripBusinessRulesTest extends TestCase
     {
         $driver = Driver::factory()->create(['status' => DriverStatus::Available]);
         $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+        $client = $this->createClient();
 
         $response = $this->postJson('/api/trips', [
             'title' => 'Valid create trip',
@@ -42,6 +45,7 @@ class TripBusinessRulesTest extends TestCase
             'price' => 500,
             'driver_id' => $driver->id,
             'vehicle_id' => $vehicle->id,
+            'client_id' => $client->id,
         ]);
 
         $response->assertCreated();
@@ -61,6 +65,7 @@ class TripBusinessRulesTest extends TestCase
             'price' => 500,
             'vehicle_id' => $vehicle->id,
             'driver_id' => $driver->id,
+            'client_id' => $client->id,
             'status' => TripStatus::Planned->value,
         ], $event->data);
     }
@@ -112,15 +117,62 @@ class TripBusinessRulesTest extends TestCase
         ]);
     }
 
+    public function test_can_change_client_only_for_planned_trip(): void
+    {
+        $driver = Driver::factory()->create(['status' => DriverStatus::OnTrip]);
+        $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+        $oldClient = $this->createClient([
+            'name' => 'Old client',
+            'type' => ClientType::Individual,
+        ]);
+        $newClient = $this->createClient([
+            'name' => 'New client',
+            'type' => ClientType::Company,
+        ]);
+        $trip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+            'client_id' => $oldClient->id,
+            'status' => TripStatus::Planned,
+        ]);
+
+        $response = $this->patchJson("/api/trips/{$trip->id}", [
+            'client_id' => $newClient->id,
+        ]);
+
+        $response->assertOk();
+        $this->assertDatabaseHas('trips', [
+            'id' => $trip->id,
+            'client_id' => $newClient->id,
+        ]);
+
+        $trip->update([
+            'status' => TripStatus::Pending,
+        ]);
+
+        $response = $this->patchJson("/api/trips/{$trip->id}", [
+            'client_id' => $oldClient->id,
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors('client_id');
+        $this->assertDatabaseHas('trips', [
+            'id' => $trip->id,
+            'client_id' => $newClient->id,
+        ]);
+    }
+
     public function test_cannot_create_trip_with_manual_status(): void
     {
         $driver = Driver::factory()->create(['status' => DriverStatus::Available]);
         $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+        $client = $this->createClient();
 
         $response = $this->postJson('/api/trips', [
             'title' => 'Manual status trip',
             'driver_id' => $driver->id,
             'vehicle_id' => $vehicle->id,
+            'client_id' => $client->id,
             'status' => TripStatus::Closed->value,
         ]);
 
@@ -154,11 +206,13 @@ class TripBusinessRulesTest extends TestCase
     {
         $driver = Driver::factory()->create(['status' => DriverStatus::Unavailable]);
         $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+        $client = $this->createClient();
 
         $response = $this->postJson('/api/trips', [
             'title' => 'Invalid unavailable driver',
             'driver_id' => $driver->id,
             'vehicle_id' => $vehicle->id,
+            'client_id' => $client->id,
         ]);
 
         $response->assertUnprocessable();
@@ -170,11 +224,13 @@ class TripBusinessRulesTest extends TestCase
         $driver = Driver::factory()->create(['status' => DriverStatus::Available]);
         $anotherDriver = Driver::factory()->create(['status' => DriverStatus::Available]);
         $vehicle = Vehicle::factory()->create(['driver_id' => $anotherDriver->id]);
+        $client = $this->createClient();
 
         $response = $this->postJson('/api/trips', [
             'title' => 'Invalid vehicle owner',
             'driver_id' => $driver->id,
             'vehicle_id' => $vehicle->id,
+            'client_id' => $client->id,
         ]);
 
         $response->assertUnprocessable();
@@ -242,6 +298,14 @@ class TripBusinessRulesTest extends TestCase
         $response->assertJsonPath('message', 'Trip cannot be deleted because it is already in use.');
         $this->assertDatabaseHas('trips', [
             'id' => $trip->id,
+        ]);
+    }
+
+    private function createClient(array $attributes = []): Client
+    {
+        return Client::query()->create([
+            'name' => $attributes['name'] ?? 'Test client',
+            'type' => $attributes['type'] ?? ClientType::Individual,
         ]);
     }
 }

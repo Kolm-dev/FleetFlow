@@ -20,6 +20,10 @@ import PublicOnlyRoute from "@/components/Auth/PublicOnlyRoute";
 import { Register } from "@/components/Auth/Register";
 import { PricingSettings } from "@/pages/PricingSettings";
 import { TripCard } from "@/pages/Trips/TripCard";
+import ClientsList from "@/pages/Clients/ClientsList";
+import ClientCard from "@/pages/Clients/ClientCard";
+import { ClientEdit } from "@/components/Clients/ClientEdit";
+import { ClientCreate } from "@/components/Clients/ClientCreate";
 
 export const App = () => {
     return (
@@ -60,7 +64,19 @@ export const App = () => {
                             path="vehicles/create"
                             element={<VehicleCreate />}
                         />
-
+                        <Route path="clients" element={<ClientsList />} />
+                        <Route
+                            path="clients/:clientId"
+                            element={<ClientCard />}
+                        />
+                        <Route
+                            path="clients/:id/edit"
+                            element={<ClientEdit />}
+                        />
+                        <Route
+                            path="clients/create"
+                            element={<ClientCreate />}
+                        />
                         <Route path="trips" element={<TripsList />} />
                         <Route path="trips/:tripId" element={<TripCard />} />
                         <Route

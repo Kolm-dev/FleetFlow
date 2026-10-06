@@ -60,7 +60,25 @@ const TripDetailsPanel = ({ onClose, trip }: TripDetailsType) => {
                             <dt>Vehicle ID</dt>
                             <dd>{trip.vehicle_id}</dd>
                         </div>
+                        <div>
+                            <dt>Client ID</dt>
+                            <dd>{trip.client_id}</dd>
+                        </div>
                     </dl>
+                </div>
+
+                <div className="trip-details-section">
+                    <h3>Client</h3>
+                    {trip.client ? (
+                        <dl className="trip-details-grid">
+                            <div>
+                                <dt>Name</dt>
+                                <dd>{trip.client.name}</dd>
+                            </div>
+                        </dl>
+                    ) : (
+                        <p className="trip-details-empty">No client data.</p>
+                    )}
                 </div>
 
                 <div className="trip-details-section">

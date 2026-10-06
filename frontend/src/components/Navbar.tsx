@@ -2,8 +2,15 @@ import { NavLink } from "react-router";
 
 const Navbar = () => {
     return (
-        <nav className="navbar" aria-label="Primary navigation">
-            <NavLink className="navbar__brand" to="/" aria-label="FleetFlow home">
+        <nav
+            className="navbar"
+            aria-label="Primary navigation"
+        >
+            <NavLink
+                className="navbar__brand"
+                to="/"
+                aria-label="FleetFlow home"
+            >
                 <img
                     className="navbar__brand-icon"
                     src="/favicon"
@@ -14,19 +21,39 @@ const Navbar = () => {
             </NavLink>
 
             <div className="navbar__links">
-                <NavLink className="navbar__link" to="/" end>
+                <NavLink
+                    className="navbar__link"
+                    to="/"
+                    end
+                >
                     Home
                 </NavLink>
-                <NavLink className="navbar__link" to="/trips">
+                <NavLink
+                    className="navbar__link"
+                    to="/trips"
+                >
                     Trips
                 </NavLink>
 
-                <NavLink className="navbar__link" to="/drivers">
+                <NavLink
+                    className="navbar__link"
+                    to="/drivers"
+                >
                     Drivers
                 </NavLink>
 
-                <NavLink className="navbar__link" to="/vehicles">
+                <NavLink
+                    className="navbar__link"
+                    to="/vehicles"
+                >
                     Vehicles
+                </NavLink>
+
+                <NavLink
+                    className="navbar__link"
+                    to="/clients"
+                >
+                    Clients
                 </NavLink>
             </div>
         </nav>

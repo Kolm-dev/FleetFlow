@@ -1,3 +1,4 @@
+import { getClients } from "@/api/clients";
 import { getDrivers } from "@/api/drivers";
 import { getTrip, updateTrip } from "@/api/trips";
 import { Spinner } from "@/components/Spinner/Spinner";
@@ -49,6 +50,10 @@ const TripEdit = () => {
         queryKey: ["drivers"],
         queryFn: () => getDrivers(),
     });
+    const { data: clientsResponse, isLoading: isClientsLoading } = useQuery({
+        queryKey: ["clients"],
+        queryFn: () => getClients(),
+    });
 
     const { mutate, isPending, error: updateError } = useMutation({
         mutationFn: (data: UpdateTripData) =>
@@ -66,15 +71,18 @@ const TripEdit = () => {
 
     if (tripId === undefined || Number.isNaN(tripId))
         return <p className="error-message">Invalid trip id</p>;
-    if (isTripLoading || isDriversLoading) return <Spinner />;
+    if (isTripLoading || isDriversLoading || isClientsLoading) return <Spinner />;
     if (!trip) return <p className="error-message">Trip not found</p>;
     if (!driversResponse)
         return <p className="error-message">No drivers data</p>;
+    if (!clientsResponse)
+        return <p className="error-message">No clients data</p>;
 
     return (
         <TripEditForm
             trip={trip}
             availableDrivers={driversResponse.drivers}
+            clients={clientsResponse.data}
             isPending={isPending}
             errorMessages={getTripEditErrorMessages(updateError)}
             onSubmit={(data) => mutate(data)}

@@ -1,5 +1,6 @@
 import type { Driver } from "@/types/driversTypes";
 import type { Vehicle } from "@/types/vehiclesTypes";
+import type { Client } from "@/types/clientTypes";
 
 export interface Trip {
     id: number;
@@ -12,6 +13,8 @@ export interface Trip {
     created_at?: string;
     driver?: Driver;
     vehicle?: Vehicle;
+    client?: Client;
+    client_id: number;
 }
 
 export type TripStatus = "closed" | "pending" | "planned" | "cancelled";
@@ -47,6 +50,7 @@ export type CreateTripData = {
     vehicle_id: number;
     distance?: number | null;
     price?: number | null;
+    client_id: number;
 };
 
 export type UpdateTripData = Partial<{
@@ -55,6 +59,7 @@ export type UpdateTripData = Partial<{
     vehicle_id: number;
     distance: number | null;
     price: number | null;
+    client_id: number;
 }>;
 
 export type TripAttachmentKind = "image" | "document" | "text";
@@ -117,6 +122,7 @@ export type TripEventData = {
     old_status?: TripStatus;
     new_status?: TripStatus;
     driver_id?: number;
+    client_id?: number;
     old_driver_id?: number;
     new_driver_id?: number;
     vehicle_id?: number;

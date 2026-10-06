@@ -1,20 +1,24 @@
+import { ClientCombobox } from "@/components/Trips/ClientCombobox";
 import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
+import type { Client } from "@/types/clientTypes";
 import type { Driver } from "@/types/driversTypes";
 import type { CreateTripData } from "@/types/tripsTypes";
 import { useState, type FormEvent } from "react";
 type TripCreatePropsType = {
     isCreating: boolean;
     availableDrivers: Driver[];
+    clients: Client[];
     errorMessages: string[];
     onSubmit: (data: CreateTripData) => void;
 };
 
-const TripCreateForm = ({ isCreating, availableDrivers, errorMessages, onSubmit }: TripCreatePropsType) => {
+const TripCreateForm = ({ isCreating, availableDrivers, clients, errorMessages, onSubmit }: TripCreatePropsType) => {
     const [title, setTitle] = useState("");
     const [distance, setDistance] = useState("");
     const [price, setPrice] = useState("");
     const [driverId, setDriverId] = useState<number>(availableDrivers[0]?.id);
     const [vehicleId, setVehicleId] = useState<number>();
+    const [clientId, setClientId] = useState<number | undefined>(clients[0]?.id);
 
     const handleDriverChange = (value: string) => {
         const valueToNumber = Number(value);
@@ -25,14 +29,19 @@ const TripCreateForm = ({ isCreating, availableDrivers, errorMessages, onSubmit 
         drivers.find(driver => driver.id === driverId)?.vehicles ?? [];
 
     const selectedDriverId = driverId ?? availableDrivers[0]?.id;
+    const selectedClientId = clientId ?? clients[0]?.id;
     const vehiclesForDriverId = getVehiclesByDriverId(availableDrivers, selectedDriverId);
     const selectedVehicleId = vehicleId;
 
-    const isSubmitDisabled = title.trim() === "" || selectedDriverId === undefined || selectedVehicleId === undefined;
+    const isSubmitDisabled =
+        title.trim() === "" ||
+        selectedDriverId === undefined ||
+        selectedVehicleId === undefined ||
+        selectedClientId === undefined;
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        if (selectedDriverId === undefined || selectedVehicleId === undefined) {
+        if (selectedDriverId === undefined || selectedVehicleId === undefined || selectedClientId === undefined) {
             return;
         }
         onSubmit({
@@ -41,10 +50,12 @@ const TripCreateForm = ({ isCreating, availableDrivers, errorMessages, onSubmit 
             price: Number(price),
             driver_id: selectedDriverId,
             vehicle_id: selectedVehicleId,
+            client_id: selectedClientId,
         });
     };
 
     if (availableDrivers.length <= 0) return <p>No availables drivers</p>;
+    if (clients.length <= 0) return <p>No clients</p>;
 
     return (
         <form
@@ -70,6 +81,11 @@ const TripCreateForm = ({ isCreating, availableDrivers, errorMessages, onSubmit 
                         onChange={e => setDistance(e.currentTarget.value)}
                     />
                 </label>
+                <ClientCombobox
+                    clients={clients}
+                    value={selectedClientId}
+                    onChange={setClientId}
+                />
                 <label>
                     Choose driver:
                     <select
