@@ -52,6 +52,7 @@ export const DriverCard = () => {
     const driver = data?.driver;
     const statistics = data?.statistics;
     const closedTrips = data?.closed_trips;
+    const currentTrip = data?.current_trip;
 
     const goToPage = (nextPage: number) => {
         setSearchParams((currentParams) => {
@@ -160,6 +161,16 @@ export const DriverCard = () => {
                                             : driver.status}
                                     </dd>
                                 </div>
+                                {currentTrip && (
+                                    <div>
+                                        <dt>Current trip</dt>
+                                        <dd>
+                                            <Link to={`/trips/${currentTrip.id}`}>
+                                                {currentTrip.title}
+                                            </Link>
+                                        </dd>
+                                    </div>
+                                )}
                             </dl>
                         </div>
                         <img

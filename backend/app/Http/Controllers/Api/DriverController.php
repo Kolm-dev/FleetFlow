@@ -58,6 +58,11 @@ class DriverController extends Controller
             'to' => ['sometimes', 'date', 'after_or_equal:from'],
         ]);
         $closedTripsBuilder = $driver->trips()->where('status', TripStatus::Closed);
+        $currentTrip = $driver->trips()
+            ->with('vehicle')
+            ->whereIn('status', [TripStatus::Planned, TripStatus::Pending])
+            ->latest('updated_at')
+            ->first();
 
         if (isset($validated['from'])) {
             $closedTripsBuilder->whereDate('completed_at', '>=', $validated['from']);
@@ -82,6 +87,7 @@ class DriverController extends Controller
                 'total_distance' => $totalDistance,
             ],
             'closed_trips' => $allClosedTrips,
+            'current_trip' => $currentTrip,
 
         ]);
     }

@@ -1,4 +1,6 @@
+import { getDrivers } from "@/api/drivers";
 import { deleteVehicle, getVehicle } from "@/api/vehicles";
+import { updateVehicle } from "@/api/vehicles";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { VehicleServicesSection } from "@/components/Vehicles/VehicleServicesSection";
@@ -14,6 +16,7 @@ export const VehicleCard = () => {
     const [redirectCountdown, setRedirectCountdown] = useState(5);
     const [deletedVehicleLabel, setDeletedVehicleLabel] = useState("");
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [driverIdToAssign, setDriverIdToAssign] = useState<number | undefined>();
     const { mutate, isSuccess, isPending } = useMutation({
         mutationFn: (id: number) => deleteVehicle(id),
         onSuccess: () => {
@@ -28,7 +31,27 @@ export const VehicleCard = () => {
         queryKey: ["vehicles", numericVehicleId],
         queryFn: () => getVehicle(numericVehicleId),
     });
+    const { isLoading: isDriversLoading, data: driversResponse } = useQuery({
+        queryKey: ["drivers", { status: "available" }],
+        queryFn: () => getDrivers({ status: "available" }),
+    });
     const vehicle = data?.vehicle;
+    const availableDrivers = driversResponse?.drivers ?? [];
+    const hasAvailableDrivers = availableDrivers.length > 0;
+    const driversForSelect =
+        vehicle?.driver && !availableDrivers.some(driver => driver.id === vehicle.driver.id)
+            ? [vehicle.driver, ...availableDrivers]
+            : availableDrivers;
+    const selectedDriverId = driverIdToAssign ?? vehicle?.driver_id;
+
+    const assignDriverMutation = useMutation({
+        mutationFn: (driverId: number) => updateVehicle({ driver_id: driverId }, numericVehicleId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+            queryClient.invalidateQueries({ queryKey: ["vehicles", numericVehicleId] });
+            queryClient.invalidateQueries({ queryKey: ["drivers"] });
+        },
+    });
 
     useEffect(() => {
         if (!isSuccess) return;
@@ -67,7 +90,7 @@ export const VehicleCard = () => {
         );
     }
 
-    if (isLoading) return <Spinner />;
+    if (isLoading || isDriversLoading) return <Spinner />;
 
     if (!vehicle) return <p>Vehicle not found</p>;
 
@@ -143,6 +166,53 @@ export const VehicleCard = () => {
                         </dl>
                     ) : (
                         <p className="vehicle-overview__empty">No assigned driver</p>
+                    )}
+                    {hasAvailableDrivers && (
+                        <form
+                            className="vehicle-driver-assignment"
+                            onSubmit={event => {
+                                event.preventDefault();
+
+                                if (selectedDriverId !== undefined) {
+                                    assignDriverMutation.mutate(selectedDriverId);
+                                }
+                            }}
+                        >
+                            <label>
+                                Assign available driver
+                                <select
+                                    value={selectedDriverId ?? ""}
+                                    onChange={event => {
+                                        const value = event.currentTarget.value;
+                                        setDriverIdToAssign(value === "" ? undefined : Number(value));
+                                    }}
+                                >
+                                    <option value="">Select driver</option>
+                                    {driversForSelect.map(driver => (
+                                        <option key={driver.id} value={driver.id}>
+                                            {driver.name} - {driver.status === "on_trip" ? "on trip" : driver.status}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <button
+                                className="entity-action entity-action--update"
+                                type="submit"
+                                disabled={
+                                    assignDriverMutation.isPending ||
+                                    selectedDriverId === undefined ||
+                                    selectedDriverId === vehicle.driver_id
+                                }
+                            >
+                                {assignDriverMutation.isPending ? "Assigning..." : "Assign driver"}
+                            </button>
+                            {assignDriverMutation.isError && (
+                                <p className="error-message">{assignDriverMutation.error.message}</p>
+                            )}
+                            {assignDriverMutation.isSuccess && (
+                                <p className="success-message">Driver assigned successfully.</p>
+                            )}
+                        </form>
                     )}
                 </div>
             </section>

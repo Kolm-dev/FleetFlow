@@ -1,5 +1,5 @@
 import type { DriverStatistics } from "@/types/statsTypes";
-import type { PaginatedTrips } from "@/types/tripsTypes";
+import type { PaginatedTrips, Trip } from "@/types/tripsTypes";
 import type { Vehicle } from "@/types/vehiclesTypes";
 
 export type DriverStatus = "available" | "on_trip" | "unavailable";
@@ -55,4 +55,5 @@ export type DriverDetailsResponse = {
     driver: Driver;
     statistics: DriverStatistics;
     closed_trips: PaginatedTrips;
+    current_trip: Trip | null;
 };

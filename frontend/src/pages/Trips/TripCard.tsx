@@ -96,7 +96,7 @@ export const TripCard = () => {
             {cancelMutation.isError && (
                 <p className="error-message">
                     {axios.isAxiosError<TripActionErrorResponse>(cancelMutation.error)
-                        ? cancelMutation.error.response?.data.message ?? cancelMutation.error.message
+                        ? (cancelMutation.error.response?.data.message ?? cancelMutation.error.message)
                         : cancelMutation.error.message}
                 </p>
             )}
@@ -189,7 +189,7 @@ export const TripCard = () => {
                         </div>
                         <div>
                             <dt>Status</dt>
-                            <dd>{trip.driver.status}</dd>
+                            <dd>{trip.driver.status === "on_trip" ? "on trip" : trip.driver.status}</dd>
                         </div>
                     </dl>
                 ) : (

@@ -5,6 +5,7 @@ import type {
 import { isHttpUrl } from "@/libs/utils";
 import type { FormEvent } from "react";
 import { useState } from "react";
+import type { Vehicle } from "@/types/vehiclesTypes";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
 
@@ -14,13 +15,15 @@ const formatDriverStatus = (status: Driver["status"]) => {
 
 type DriverEditFormProps = {
     driver: Driver;
+    vehicles: Vehicle[];
     isPending?: boolean;
-    onSubmit: (data: UpdateDriverData) => void;
+    onSubmit: (data: { driver: UpdateDriverData; vehicleId?: number }) => void;
     onCancel: () => void;
 };
 
 export const DriverEditForm = ({
     driver,
+    vehicles,
     isPending = false,
     onSubmit,
     onCancel,
@@ -28,6 +31,7 @@ export const DriverEditForm = ({
     const [name, setName] = useState(driver.name);
     const [phoneNumber, setPhoneNumber] = useState(driver.phone_number);
     const [photo, setPhoto] = useState(driver.photo ?? "");
+    const [vehicleId, setVehicleId] = useState<number | undefined>(driver.vehicles[0]?.id);
     const [isPreviewError, setIsPreviewError] = useState(false);
     const canPreviewPhoto = isHttpUrl(photo) && !isPreviewError;
 
@@ -35,9 +39,12 @@ export const DriverEditForm = ({
         event.preventDefault();
 
         onSubmit({
-            name,
-            phone_number: phoneNumber,
-            photo: photo.trim() || null,
+            driver: {
+                name,
+                phone_number: phoneNumber,
+                photo: photo.trim() || null,
+            },
+            vehicleId,
         });
     };
 
@@ -99,6 +106,24 @@ export const DriverEditForm = ({
                                 setIsPreviewError(false);
                             }}
                         />
+                    </label>
+
+                    <label>
+                        Assigned vehicle
+                        <select
+                            value={vehicleId ?? ""}
+                            onChange={event => {
+                                const value = event.currentTarget.value;
+                                setVehicleId(value === "" ? undefined : Number(value));
+                            }}
+                        >
+                            <option value="">Do not assign vehicle</option>
+                            {vehicles.map(vehicle => (
+                                <option key={vehicle.id} value={vehicle.id}>
+                                    {vehicle.brand} {vehicle.model} - {vehicle.license_plate}
+                                </option>
+                            ))}
+                        </select>
                     </label>
                 </div>
 
