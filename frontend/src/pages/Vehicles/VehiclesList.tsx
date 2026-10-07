@@ -3,22 +3,39 @@ import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getValidPage } from "@/libs/utils";
+import type { VehicleDriverAssignment } from "@/types/vehiclesTypes";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { NavLink, useSearchParams } from "react-router";
 
+type DriverAssignmentFilter = VehicleDriverAssignment | "all";
+
+const DRIVER_ASSIGNMENT_OPTIONS: { value: DriverAssignmentFilter; label: string }[] = [
+    { value: "all", label: "All" },
+    { value: "assigned", label: "Assigned" },
+    { value: "unassigned", label: "Unassigned" },
+];
+
+const getDriverAssignmentFilter = (value: string | null): DriverAssignmentFilter => {
+    if (value === "assigned" || value === "unassigned") {
+        return value;
+    }
+
+    return "all";
+};
+
 const VehiclesList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const urlSearch = searchParams.get("search")?.trim() ?? "";
+    const driverAssignment = getDriverAssignmentFilter(searchParams.get("driver_assignment"));
+    const selectedDriverAssignment = driverAssignment === "all" ? undefined : driverAssignment;
     const page = getValidPage(searchParams.get("page"));
     const [searchInput, setSearchInput] = useState(urlSearch);
-    const [lastUrlSearch, setLastUrlSearch] = useState(urlSearch);
     const debouncedSearch = useDebounce(searchInput.trim(), 500);
 
-    if (urlSearch !== lastUrlSearch) {
-        setLastUrlSearch(urlSearch);
+    useEffect(() => {
         setSearchInput(urlSearch);
-    }
+    }, [urlSearch]);
 
     useEffect(() => {
         if (debouncedSearch === urlSearch) return;
@@ -40,6 +57,24 @@ const VehiclesList = () => {
         );
     }, [debouncedSearch, setSearchParams, urlSearch]);
 
+    const changeDriverAssignment = (nextAssignment: DriverAssignmentFilter) => {
+        setSearchParams(
+            currentParams => {
+                const nextParams = new URLSearchParams(currentParams);
+
+                if (nextAssignment === "all") {
+                    nextParams.delete("driver_assignment");
+                } else {
+                    nextParams.set("driver_assignment", nextAssignment);
+                }
+
+                nextParams.delete("page");
+                return nextParams;
+            },
+            { replace: true }
+        );
+    };
+
     const goToPage = (nextPage: number) => {
         setSearchParams(
             currentParams => {
@@ -58,8 +93,13 @@ const VehiclesList = () => {
     };
 
     const { data, isPending, isFetching, isError, error } = useQuery({
-        queryKey: ["vehicles", { search: urlSearch, page }],
-        queryFn: () => getVehicles({ search: urlSearch || undefined, page }),
+        queryKey: ["vehicles", { search: urlSearch, page, driverAssignment: selectedDriverAssignment }],
+        queryFn: () =>
+            getVehicles({
+                search: urlSearch || undefined,
+                page,
+                driver_assignment: selectedDriverAssignment,
+            }),
         placeholderData: keepPreviousData,
     });
 
@@ -95,7 +135,24 @@ const VehiclesList = () => {
                         onChange={event => setSearchInput(event.currentTarget.value)}
                     />
                 </label>
-                {isFetching && !isPending && <span>Searching...</span>}
+                {isFetching && !isPending && <Spinner text="Searching vehicles..." />}
+
+                <label>
+                    Driver assignment
+                    <select
+                        value={driverAssignment}
+                        onChange={event => changeDriverAssignment(event.currentTarget.value as DriverAssignmentFilter)}
+                    >
+                        {DRIVER_ASSIGNMENT_OPTIONS.map(option => (
+                            <option
+                                key={option.value}
+                                value={option.value}
+                            >
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </label>
             </div>
 
             <div className="vehicles-list">

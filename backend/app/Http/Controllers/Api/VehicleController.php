@@ -30,11 +30,21 @@ class VehicleController extends Controller
                 'license_plate' => 'sometimes|string|max:8',
                 'search' => 'sometimes|string|max:50',
                 'page' => 'sometimes|integer|min:1',
+                'driver_assignment' => 'sometimes|in:assigned,unassigned',
 
             ]
         );
 
         $query = Vehicle::with('driver');
+
+
+        if ($request->input('driver_assignment') === 'assigned') {
+            $query->whereNotNull('driver_id');
+        } elseif ($request->input('driver_assignment') === 'unassigned') {
+            $query->whereNull('driver_id');
+        }
+
+
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -49,6 +59,9 @@ class VehicleController extends Controller
                 }
             });
         }
+
+
+
         $vehicles = $query->orderBy('id')->paginate(15);
 
         return response()->json(

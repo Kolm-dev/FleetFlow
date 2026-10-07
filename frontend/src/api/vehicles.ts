@@ -27,6 +27,10 @@ export function getVehicles(filters?: VehiclesFilters) {
         params.set("page", filters.page.toString());
     }
 
+    if (filters?.driver_assignment) {
+        params.set("driver_assignment", filters.driver_assignment);
+    }
+
     const query = params.toString();
 
     return apiClient<VehiclesResponse>(`/vehicles${query ? `?${query}` : ""}`);

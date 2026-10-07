@@ -7,11 +7,9 @@ export interface Vehicle {
     model: string;
     license_plate: string;
     year: number | null;
-    driver_id: number;
-    driver: Driver;
+    driver_id: number | null;
+    driver: Driver | null;
 }
-
-
 
 export type CreateVehicleData = {
     brand: string;
@@ -26,7 +24,10 @@ export type VehiclesFilters = {
     license_plate?: string;
     search?: string;
     page?: number;
+    driver_assignment?: VehicleDriverAssignment;
 };
+
+export type VehicleDriverAssignment = "assigned" | "unassigned";
 
 export type VehiclesResponse = {
     total: number;

@@ -39,9 +39,10 @@ export const VehicleCard = () => {
     const vehicle = data?.vehicle;
     const availableDrivers = driversResponse?.drivers ?? [];
     const hasAvailableDrivers = availableDrivers.length > 0;
+    const assignedDriver = vehicle?.driver;
     const driversForSelect =
-        vehicle?.driver && !availableDrivers.some(driver => driver.id === vehicle.driver.id)
-            ? [vehicle.driver, ...availableDrivers]
+        assignedDriver && !availableDrivers.some(driver => driver.id === assignedDriver.id)
+            ? [assignedDriver, ...availableDrivers]
             : availableDrivers;
     const selectedDriverId = driverIdToAssign ?? vehicle?.driver_id;
 
@@ -174,7 +175,7 @@ export const VehicleCard = () => {
                             onSubmit={event => {
                                 event.preventDefault();
 
-                                if (selectedDriverId !== undefined) {
+                                if (selectedDriverId !== undefined && selectedDriverId !== null) {
                                     assignDriverMutation.mutate(selectedDriverId);
                                 }
                             }}
