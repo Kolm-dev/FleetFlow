@@ -2,6 +2,7 @@ import { getDriver, updateDriver } from "@/api/drivers";
 import { getVehicles, updateVehicle } from "@/api/vehicles";
 import { DriverEditForm } from "@/components/Drivers/DriverEditForm";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { getBackendErrorMessage } from "@/libs/errors";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UpdateDriverData } from "@/types/driversTypes";
 import { useNavigate, useParams } from "react-router";
@@ -75,7 +76,7 @@ export const DriverEdit = () => {
     return (
         <div className="driver-edit-page">
             {updateError && (
-                <p className="error-message">{updateError.message}</p>
+                <p className="error-message">{getBackendErrorMessage(updateError, "Could not update driver.")}</p>
             )}
             <DriverEditForm
                 onSubmit={(data) => mutate(data)}

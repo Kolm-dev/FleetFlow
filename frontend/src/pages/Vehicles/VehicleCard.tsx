@@ -4,6 +4,7 @@ import { updateVehicle } from "@/api/vehicles";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { VehicleServicesSection } from "@/components/Vehicles/VehicleServicesSection";
+import { getBackendErrorMessage } from "@/libs/errors";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
@@ -207,7 +208,9 @@ export const VehicleCard = () => {
                                 {assignDriverMutation.isPending ? "Assigning..." : "Assign driver"}
                             </button>
                             {assignDriverMutation.isError && (
-                                <p className="error-message">{assignDriverMutation.error.message}</p>
+                                <p className="error-message">
+                                    {getBackendErrorMessage(assignDriverMutation.error, "Could not assign driver.")}
+                                </p>
                             )}
                             {assignDriverMutation.isSuccess && (
                                 <p className="success-message">Driver assigned successfully.</p>

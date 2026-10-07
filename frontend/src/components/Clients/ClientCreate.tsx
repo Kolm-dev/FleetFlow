@@ -1,6 +1,7 @@
 import { createClient } from "@/api/clients";
 import { ClientForm } from "@/components/Clients/ClientForm";
 import type { ClientFormData } from "@/components/Clients/ClientForm";
+import { getBackendErrorMessage } from "@/libs/errors";
 import type { CreateClientData } from "@/types/clientTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
@@ -23,7 +24,7 @@ export const ClientCreate = () => {
 
     return (
         <div>
-            {error && <p>{error.message}</p>}
+            {error && <p className="error-message">{getBackendErrorMessage(error, "Could not create client.")}</p>}
             <ClientForm
                 isPending={isPending}
                 onCancel={() => navigate("/clients")}

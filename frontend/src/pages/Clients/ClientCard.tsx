@@ -1,5 +1,6 @@
 import { deleteClient, getClient } from "@/api/clients";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { getBackendErrorMessage } from "@/libs/errors";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
 
@@ -70,7 +71,9 @@ const ClientCard = () => {
                         : "-"}
                 </dd>
             </dl>
-            {deleteError && <p>{deleteError.message}</p>}
+            {deleteError && (
+                <p className="error-message">{getBackendErrorMessage(deleteError, "Could not delete client.")}</p>
+            )}
             <button className="entity-action entity-action--edit" onClick={() => navigate(`/clients/${client.id}/edit`)}>
                 Edit
             </button>

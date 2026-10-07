@@ -2,12 +2,8 @@ import { deleteDriver, getDriverDetails } from "@/api/drivers";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
-import {
-    formatCurrency,
-    formatNumber,
-    formatNumberWithSuffix,
-    getValidPage,
-} from "@/libs/utils";
+import { getBackendErrorMessage } from "@/libs/errors";
+import { formatCurrency, formatNumber, formatNumberWithSuffix, getValidPage } from "@/libs/utils";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
@@ -55,7 +51,7 @@ export const DriverCard = () => {
     const currentTrip = data?.current_trip;
 
     const goToPage = (nextPage: number) => {
-        setSearchParams((currentParams) => {
+        setSearchParams(currentParams => {
             const nextParams = new URLSearchParams(currentParams);
             nextParams.set("page", nextPage.toString());
             return nextParams;
@@ -63,7 +59,7 @@ export const DriverCard = () => {
     };
 
     const changeDateFilter = (name: "from" | "to", value: string) => {
-        setSearchParams((currentParams) => {
+        setSearchParams(currentParams => {
             const nextParams = new URLSearchParams(currentParams);
 
             if (value) {
@@ -81,10 +77,8 @@ export const DriverCard = () => {
         if (!isSuccess) return;
 
         const intervalId = window.setInterval(() => {
-            setRedirectCountdown((currentCountdown) => {
-                const nextCountdown = Number(
-                    (currentCountdown - 0.1).toFixed(1),
-                );
+            setRedirectCountdown(currentCountdown => {
+                const nextCountdown = Number((currentCountdown - 0.1).toFixed(1));
 
                 return Math.max(nextCountdown, 0);
             });
@@ -110,30 +104,22 @@ export const DriverCard = () => {
         return (
             <div className="success-message">
                 <p>
-                    {driver?.name} - {driver?.phone_number} was successfully
-                    deleted!
+                    {driver?.name} - {driver?.phone_number} was successfully deleted!
                 </p>
-                <p>
-                    Redirecting to drivers list in{" "}
-                    {redirectCountdown.toFixed(1)}s
-                </p>
+                <p>Redirecting to drivers list in {redirectCountdown.toFixed(1)}s</p>
             </div>
         );
     }
 
     return (
         <div>
-            {isError && <div>{error.message}</div>}
+            {isError && <div className="error-message">{getBackendErrorMessage(error, "Could not delete driver.")}</div>}
 
-            {driverError && (
-                <p className="error-message">{driverError.message}</p>
-            )}
+            {driverError && <p className="error-message">{driverError.message}</p>}
 
             {isLoading && <Spinner />}
 
-            {!isLoading && !driver && !driverError && (
-                <p className="error-message">Driver not found</p>
-            )}
+            {!isLoading && !driver && !driverError && <p className="error-message">Driver not found</p>}
 
             {driver && statistics && closedTrips && (
                 <>
@@ -155,19 +141,13 @@ export const DriverCard = () => {
                                 </div>
                                 <div>
                                     <dt>Status</dt>
-                                    <dd>
-                                        {driver.status === "on_trip"
-                                            ? "on trip"
-                                            : driver.status}
-                                    </dd>
+                                    <dd>{driver.status === "on_trip" ? "on trip" : driver.status}</dd>
                                 </div>
                                 {currentTrip && (
                                     <div>
                                         <dt>Current trip</dt>
                                         <dd>
-                                            <Link to={`/trips/${currentTrip.id}`}>
-                                                {currentTrip.title}
-                                            </Link>
+                                            <Link to={`/trips/${currentTrip.id}`}>{currentTrip.title}</Link>
                                         </dd>
                                     </div>
                                 )}
@@ -184,7 +164,7 @@ export const DriverCard = () => {
                         <h2>Assigned vehicles - {driver.vehicles.length}</h2>
                         {driver.vehicles.length > 0 ? (
                             <ul className="driver-vehicles__list">
-                                {driver.vehicles.map((vehicle) => (
+                                {driver.vehicles.map(vehicle => (
                                     <li
                                         className="driver-vehicles__item"
                                         key={vehicle.id}
@@ -197,10 +177,7 @@ export const DriverCard = () => {
                                         </Link>
                                         <span className="driver-vehicles__meta">
                                             <span>{vehicle.license_plate}</span>
-                                            <span>
-                                                {vehicle.year ??
-                                                    "Year not specified"}
-                                            </span>
+                                            <span>{vehicle.year ?? "Year not specified"}</span>
                                         </span>
                                     </li>
                                 ))}
@@ -217,9 +194,7 @@ export const DriverCard = () => {
                                 max={to || undefined}
                                 type="date"
                                 value={from}
-                                onChange={(event) =>
-                                    changeDateFilter("from", event.currentTarget.value)
-                                }
+                                onChange={event => changeDateFilter("from", event.currentTarget.value)}
                             />
                         </label>
                         <label>
@@ -228,9 +203,7 @@ export const DriverCard = () => {
                                 min={from || undefined}
                                 type="date"
                                 value={to}
-                                onChange={(event) =>
-                                    changeDateFilter("to", event.currentTarget.value)
-                                }
+                                onChange={event => changeDateFilter("to", event.currentTarget.value)}
                             />
                         </label>
                     </div>
@@ -240,35 +213,25 @@ export const DriverCard = () => {
                         <div className="driver-statistics">
                             <div className="driver-statistics__item">
                                 <span>Completed trips</span>
-                                <strong>
-                                    {formatNumber(
-                                        statistics.closed_trips_count,
-                                    )}
-                                </strong>
+                                <strong>{formatNumber(statistics.closed_trips_count)}</strong>
                             </div>
                             <div className="driver-statistics__item">
                                 <span>Total distance</span>
-                                <strong>
-                                    {formatNumber(statistics.total_distance)} km
-                                </strong>
+                                <strong>{formatNumber(statistics.total_distance)} km</strong>
                             </div>
                             <div className="driver-statistics__item">
                                 <span>Total earnings</span>
-                                <strong>
-                                    {formatCurrency(statistics.total_earnings)}
-                                </strong>
+                                <strong>{formatCurrency(statistics.total_earnings)}</strong>
                             </div>
                         </div>
                     </div>
 
                     <div>
                         <h2>Closed trips - {closedTrips.total}</h2>
-                        {isFetching && !isLoading && (
-                            <p className="trips-updating">Updating trips...</p>
-                        )}
+                        {isFetching && !isLoading && <p className="trips-updating">Updating trips...</p>}
                         {closedTrips.data.length > 0 ? (
                             <div className="driver-closed-trips">
-                                {closedTrips.data.map((trip) => (
+                                {closedTrips.data.map(trip => (
                                     <div
                                         className="driver-closed-trip"
                                         key={trip.id}
@@ -277,20 +240,12 @@ export const DriverCard = () => {
                                             <strong>{trip.title}</strong>
                                         </p>
                                         <p>
-                                            Distance:{" "}
-                                            {formatNumberWithSuffix(
-                                                trip.distance,
-                                                " km",
-                                            )}{" "}
-                                            | Earnings:{" "}
-                                            {trip.price === null
-                                                ? "Not specified"
-                                                : formatCurrency(trip.price)}
+                                            Distance: {formatNumberWithSuffix(trip.distance, " km")} | Earnings:{" "}
+                                            {trip.price === null ? "Not specified" : formatCurrency(trip.price)}
                                         </p>
                                         {trip.vehicle && (
                                             <p>
-                                                Vehicle: {trip.vehicle.brand}{" "}
-                                                {trip.vehicle.model} (
+                                                Vehicle: {trip.vehicle.brand} {trip.vehicle.model} (
                                                 {trip.vehicle.license_plate})
                                             </p>
                                         )}
@@ -298,20 +253,14 @@ export const DriverCard = () => {
                                 ))}
                             </div>
                         ) : (
-                            <p className="empty-state">
-                                No closed trips found
-                            </p>
+                            <p className="empty-state">No closed trips found</p>
                         )}
                         <Pagination
                             page={closedTrips.current_page}
                             lastPage={closedTrips.last_page}
                             isFetching={isFetching}
-                            onPreviousPage={() =>
-                                goToPage(closedTrips.current_page - 1)
-                            }
-                            onNextPage={() =>
-                                goToPage(closedTrips.current_page + 1)
-                            }
+                            onPreviousPage={() => goToPage(closedTrips.current_page - 1)}
+                            onNextPage={() => goToPage(closedTrips.current_page + 1)}
                         />
                     </div>
 
@@ -322,9 +271,7 @@ export const DriverCard = () => {
                                 className="entity-action entity-action--driver entity-action--edit"
                                 type="button"
                                 hidden={isSuccess}
-                                onClick={() =>
-                                    navigate(`/drivers/${driverId}/edit`)
-                                }
+                                onClick={() => navigate(`/drivers/${driverId}/edit`)}
                             >
                                 Edit
                             </button>
@@ -335,11 +282,7 @@ export const DriverCard = () => {
                                 hidden={isSuccess}
                                 onClick={() => setIsDeleteConfirmOpen(true)}
                             >
-                                {isPending ? (
-                                    <Spinner text="DELETING..." />
-                                ) : (
-                                    "Delete"
-                                )}
+                                {isPending ? <Spinner text="DELETING..." /> : "Delete"}
                             </button>
                         </div>
                         <ConfirmModal

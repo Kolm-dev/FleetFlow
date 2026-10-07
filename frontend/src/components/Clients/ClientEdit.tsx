@@ -2,6 +2,7 @@ import { getClient, updateClient } from "@/api/clients";
 import { ClientForm } from "@/components/Clients/ClientForm";
 import type { ClientFormData } from "@/components/Clients/ClientForm";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { getBackendErrorMessage } from "@/libs/errors";
 import type { UpdateClientData } from "@/types/clientTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
@@ -51,7 +52,9 @@ export const ClientEdit = () => {
 
     return (
         <div>
-            {updateError && <p>{updateError.message}</p>}
+            {updateError && (
+                <p className="error-message">{getBackendErrorMessage(updateError, "Could not update client.")}</p>
+            )}
             <ClientForm
                 client={data.data}
                 isPending={isPending}

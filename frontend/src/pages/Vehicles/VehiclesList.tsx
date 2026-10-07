@@ -24,7 +24,7 @@ const VehiclesList = () => {
         if (debouncedSearch === urlSearch) return;
 
         setSearchParams(
-            (currentParams) => {
+            currentParams => {
                 const nextParams = new URLSearchParams(currentParams);
 
                 if (debouncedSearch) {
@@ -36,13 +36,13 @@ const VehiclesList = () => {
                 nextParams.delete("page");
                 return nextParams;
             },
-            { replace: true },
+            { replace: true }
         );
     }, [debouncedSearch, setSearchParams, urlSearch]);
 
     const goToPage = (nextPage: number) => {
         setSearchParams(
-            (currentParams) => {
+            currentParams => {
                 const nextParams = new URLSearchParams(currentParams);
 
                 if (nextPage > 1) {
@@ -53,20 +53,19 @@ const VehiclesList = () => {
 
                 return nextParams;
             },
-            { replace: true },
+            { replace: true }
         );
     };
 
     const { data, isPending, isFetching, isError, error } = useQuery({
         queryKey: ["vehicles", { search: urlSearch, page }],
-        queryFn: () =>
-            getVehicles({ search: urlSearch || undefined, page }),
+        queryFn: () => getVehicles({ search: urlSearch || undefined, page }),
         placeholderData: keepPreviousData,
     });
 
     if (isPending) return <Spinner text="Loading vehicles..." />;
     if (isError) {
-        return <div>Failed to load vehicles: {error.message}</div>;
+        return <div>Failed to load vehicles: {error?.message}</div>;
     }
 
     const vehicles = data.vehicles;
@@ -78,7 +77,10 @@ const VehiclesList = () => {
                     <h2>Vehicles</h2>
                     <p>Total found: {data.total}</p>
                 </div>
-                <NavLink className="create-link entity-action--create" to="/vehicles/create">
+                <NavLink
+                    className="create-link entity-action--create"
+                    to="/vehicles/create"
+                >
                     Create vehicle
                 </NavLink>
             </header>
@@ -90,7 +92,7 @@ const VehiclesList = () => {
                         type="search"
                         value={searchInput}
                         placeholder="Brand, model, license plate or ID"
-                        onChange={(event) => setSearchInput(event.currentTarget.value)}
+                        onChange={event => setSearchInput(event.currentTarget.value)}
                     />
                 </label>
                 {isFetching && !isPending && <span>Searching...</span>}

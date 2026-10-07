@@ -1,6 +1,7 @@
 import { getVehicle, updateVehicle } from "@/api/vehicles";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { VehicleEditForm } from "@/components/Vehicles/VehicleEditForm";
+import { getBackendErrorMessage } from "@/libs/errors";
 import type { UpdateVehicleData } from "@/types/vehiclesTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
@@ -44,7 +45,9 @@ export const VehicleEdit = () => {
 
     return (
         <div className="vehicle-edit-page">
-            {updateError && <p className="error-message">{updateError.message}</p>}
+            {updateError && (
+                <p className="error-message">{getBackendErrorMessage(updateError, "Could not update vehicle.")}</p>
+            )}
             <VehicleEditForm
                 onSubmit={data => mutate(data)}
                 onCancel={() => navigate(`/vehicles/${vehicleId}`)}

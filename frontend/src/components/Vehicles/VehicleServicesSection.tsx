@@ -8,6 +8,7 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { VehicleServiceForm } from "@/components/Vehicles/VehicleServiceForm";
+import { getBackendErrorMessage } from "@/libs/errors";
 import { formatCurrency, formatDateOnly, formatMileage } from "@/libs/utils";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
 import type {
@@ -121,6 +122,9 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
     };
 
     const mutationError = createMutation.error ?? updateMutation.error ?? deleteMutation.error;
+    const mutationErrorMessage = mutationError
+        ? getBackendErrorMessage(mutationError, "Could not save service record.")
+        : null;
 
     return (
         <section className="vehicle-services">
@@ -246,7 +250,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
             </div>
 
             {error && <p className="error-message">{error.message}</p>}
-            {mutationError && <p className="error-message">{mutationError.message}</p>}
+            {mutationErrorMessage && <p className="error-message">{mutationErrorMessage}</p>}
             {isLoading && <Spinner />}
             {isFetching && !isLoading && <p className="vehicle-services__updating">Updating service history...</p>}
 

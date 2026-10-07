@@ -1,6 +1,8 @@
 import { deleteClient, getClients } from "@/api/clients";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { useDebounce } from "@/hooks/useDebounce";
+import { getBackendErrorMessage } from "@/libs/errors";
 import type { Client, ClientType } from "@/types/clientTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -11,6 +13,8 @@ const ClientsList = () => {
     const queryClient = useQueryClient();
     const [type, setType] = React.useState<ClientType | "all">("all");
     const [nameInput, setNameInput] = React.useState("");
+    const [clientToDelete, setClientToDelete] = React.useState<Client | null>(null);
+    const [deleteErrorMessage, setDeleteErrorMessage] = React.useState<string | null>(null);
     const debouncedName = useDebounce(nameInput, 700);
     const nameInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -32,18 +36,28 @@ const ClientsList = () => {
     const {
         mutate: removeClient,
         isPending: isDeleting,
-        error: deleteError,
     } = useMutation({
         mutationFn: (id: number) => deleteClient(id),
         onSuccess: () => {
+            setClientToDelete(null);
+            setDeleteErrorMessage(null);
             queryClient.invalidateQueries({ queryKey: ["clients"] });
+        },
+        onError: error => {
+            setClientToDelete(null);
+            setDeleteErrorMessage(getBackendErrorMessage(error, "Could not delete client."));
         },
     });
 
     const handleDelete = (client: Client) => {
-        if (window.confirm(`Delete client "${client.name}"?`)) {
-            removeClient(client.id);
-        }
+        setDeleteErrorMessage(null);
+        setClientToDelete(client);
+    };
+
+    const handleConfirmDelete = () => {
+        if (!clientToDelete) return;
+
+        removeClient(clientToDelete.id);
     };
 
     const copyCellText = (text: string) => {
@@ -116,7 +130,7 @@ const ClientsList = () => {
                     Company
                 </button>
             </div>
-            {deleteError && <p>{deleteError.message}</p>}
+            {deleteErrorMessage && <div className="error-message">{deleteErrorMessage}</div>}
 
             <table className="clients-table">
                 <thead>
@@ -187,6 +201,18 @@ const ClientsList = () => {
                 </tbody>
             </table>
             {clients.length === 0 && <p className="empty-state">No clients found</p>}
+
+            <ConfirmModal
+                isOpen={clientToDelete !== null}
+                title="Delete client?"
+                message={
+                    clientToDelete ? `Client "${clientToDelete.name}" will be permanently deleted.` : undefined
+                }
+                confirmText="Delete client"
+                isConfirming={isDeleting}
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setClientToDelete(null)}
+            />
         </div>
     );
 };
