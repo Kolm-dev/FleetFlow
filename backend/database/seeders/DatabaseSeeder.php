@@ -13,6 +13,9 @@ class DatabaseSeeder extends Seeder
     {
 
 
-        $this->call(FleetSeeder::class);
+        $this->call([
+            PriceSeeder::class,
+            // FleetSeeder::class,
+        ]);
     }
 }

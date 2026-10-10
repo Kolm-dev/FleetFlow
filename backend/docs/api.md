@@ -129,11 +129,15 @@ Example:
 GET /api/vehicles?search=Toyota&page=2
 ```
 
-Create fields: `brand`, `model`, `license_plate`, `year`, `driver_id`.
+Create fields: `brand`, `model`, `license_plate`, `year`, `driver_id`,
+`fuel_type`, and `fuel_consumption`. Fuel type is `diesel` or `gasoline`;
+consumption is a positive number in liters per 100 km. Both fuel fields are
+required on create and optional on update.
 Update fields: same fields, all optional.
 
 Vehicle object includes assigned `driver`.
 `license_plate` is converted to uppercase automatically.
+Vehicle responses also include `fuel_type` and `fuel_consumption`.
 Vehicle details include service count, total and average cost, and the latest
 service date, cost, and mileage. Latest-service values may be `null`.
 
@@ -176,13 +180,24 @@ Frontend keeps these filters in the URL, so the Trips page can be refreshed or s
 
 Create fields: `title`, `driver_id`, `vehicle_id`, `distance`, `price`.
 `status` is assigned by the backend and is prohibited in create requests.
+`distance` is required and must be a positive integer. `price` may be omitted
+while the trip is being planned, but must be set before closing it.
 
 Update fields: `title`, `driver_id`, `vehicle_id`, `distance`, `price`; all are optional.
 `status` is prohibited in update requests. Use `/start`, `/close`, and `/cancel`
 to change trip lifecycle state.
 
 Trip object includes `driver` and `vehicle`.
-Closing a trip sets its `completed_at` timestamp.
+Closing a trip sets its `completed_at` timestamp and snapshots the estimated
+fuel usage and profit: `fuel_liters`, `fuel_type_snapshot`,
+`fuel_price_per_liter`, `fuel_consumption_snapshot`, `fuel_cost`, and
+`estimated_profit`. Fuel liters are rounded to three decimals; fuel cost and
+estimated profit are rounded to two decimals. Estimated profit means trip
+price minus fuel cost; it excludes driver pay, maintenance, and other expenses.
+Closing is rejected with `422` if trip price, vehicle fuel consumption, or the
+configured price for that fuel type is missing or not positive. Once closed,
+trip distance, price, vehicle, driver, and client cannot be changed, so the
+saved estimate remains tied to its source data.
 
 Trips are paginated by 5 records.
 
@@ -277,12 +292,16 @@ Update fields: same fields, all optional.
 
 | Method | Endpoint            | Response                       |
 | ------ | ------------------- | ------------------------------ |
-| GET    | `/pricing-settings` | `{ pricing_setting }`          |
-| PATCH  | `/pricing-settings` | `{ message, pricing_setting }` |
+| GET    | `/pricing-settings` | `{ fuel, trips }`               |
+| PATCH  | `/pricing-settings` | `{ message, fuel, trips }`      |
 
-Fields: `price_per_km`, `base_price`, `minimum_price`.
+Trip pricing fields: `price_per_km`, `base_price`, `minimum_price`.
+Fuel prices: `diesel_price` and `gasoline_price`, in USD per liter.
 
-All pricing fields are optional on update and must be non-negative numbers.
+All pricing fields are optional on update. Trip price fields must be
+non-negative numbers. Fuel prices must be greater than zero.
+The PATCH request accepts the changed fields as top-level keys (for example,
+`diesel_price`); GET and PATCH responses group them under `fuel` and `trips`.
 
 ## Trip Price Calculation
 

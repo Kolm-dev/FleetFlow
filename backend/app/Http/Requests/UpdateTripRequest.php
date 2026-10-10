@@ -16,7 +16,7 @@ class UpdateTripRequest extends FormRequest
 
         return [
             'title' => 'sometimes|string|max:255',
-            'distance' => 'sometimes|nullable|integer|min:0',
+            'distance' => 'sometimes|integer|gt:0',
             'driver_id' => 'sometimes|integer|exists:drivers,id',
             'vehicle_id' => 'sometimes|integer|exists:vehicles,id',
             'client_id' => 'sometimes|integer|exists:clients,id',
@@ -25,5 +25,4 @@ class UpdateTripRequest extends FormRequest
 
         ];
     }
-
 }

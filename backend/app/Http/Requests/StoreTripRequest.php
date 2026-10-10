@@ -21,7 +21,7 @@ class StoreTripRequest extends FormRequest
 
         return [
             'title' => 'required|string|max:255',
-            'distance' => 'nullable|integer|min:0',
+            'distance' => 'required|integer|gt:0',
             'price' => 'nullable|numeric|min:0',
             'driver_id' => 'required|integer|exists:drivers,id',
             'vehicle_id' => 'required|integer|exists:vehicles,id',

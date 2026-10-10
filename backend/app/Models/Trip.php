@@ -22,6 +22,12 @@ class Trip extends Model
         'vehicle_id',
         'client_id',
         'completed_at',
+        'fuel_liters',
+        'fuel_type_snapshot',
+        'fuel_price_per_liter',
+        'fuel_consumption_snapshot',
+        'fuel_cost',
+        'estimated_profit',
     ];
 
     public function driver(): BelongsTo
@@ -35,6 +41,11 @@ class Trip extends Model
             'price' => 'float',
             'status' => TripStatus::class,
             'completed_at' => 'datetime',
+            'fuel_liters' => 'decimal:3',
+            'fuel_price_per_liter' => 'decimal:2',
+            'fuel_consumption_snapshot' => 'decimal:2',
+            'fuel_cost' => 'decimal:2',
+            'estimated_profit' => 'decimal:2',
         ];
     }
 

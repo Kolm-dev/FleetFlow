@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\DriverStatus;
+use App\Enums\FuelType;
 use App\Enums\TripEventEnum;
 use App\Enums\TripStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTripRequest;
 use App\Http\Requests\UpdateTripRequest;
 use App\Models\Driver;
+use App\Models\PricingSetting;
 use App\Models\Trip;
 use App\Models\Vehicle;
 use App\Services\TripPriceCalculator;
@@ -157,6 +159,19 @@ class TripController extends Controller
             $clientWasChanged = $newClientId !== $currentClientId;
             $assignmentWasChanged = $driverWasChanged || $vehicleWasChanged;
             $tripIsPlanned = $currentTrip->status === TripStatus::Planned;
+
+            if ($currentTrip->status === TripStatus::Closed) {
+                $closedTripFields = array_intersect(
+                    array_keys($newTripData),
+                    ['distance', 'price', 'driver_id', 'vehicle_id', 'client_id']
+                );
+
+                if ($closedTripFields !== []) {
+                    throw ValidationException::withMessages([
+                        $closedTripFields[0] => ['Financial and assignment details cannot be changed after a trip is closed.'],
+                    ]);
+                }
+            }
 
 
             if ($assignmentWasChanged && ! $tripIsPlanned) {
@@ -311,30 +326,76 @@ class TripController extends Controller
 
     public function close(Trip $trip)
     {
-        if ($trip->status !== TripStatus::Pending) {
-            return response()->json([
-                'message' => 'Trip cannot be closed because it is not in progress.',
-            ], 422);
-        }
-
         $userID = Auth::id();
-        $currentTripStatus = $trip->status;
+        DB::transaction(function () use ($trip, $userID) {
+            $currentTrip = Trip::query()->lockForUpdate()->findOrFail($trip->id);
 
-        DB::transaction(function () use ($trip, $userID, $currentTripStatus) {
-            $trip->update([
+            if ($currentTrip->status !== TripStatus::Pending) {
+                throw ValidationException::withMessages([
+                    'status' => ['Trip cannot be closed because it is not in progress.'],
+                ]);
+            }
+
+            if ($currentTrip->distance === null) {
+                throw ValidationException::withMessages([
+                    'distance' => ['A trip distance is required before closing.'],
+                ]);
+            }
+
+            if ($currentTrip->price === null) {
+                throw ValidationException::withMessages([
+                    'price' => ['A trip price is required before closing.'],
+                ]);
+            }
+
+            $vehicle = Vehicle::query()->lockForUpdate()->findOrFail($currentTrip->vehicle_id);
+            if ($vehicle->fuel_consumption === null || (float) $vehicle->fuel_consumption <= 0) {
+                throw ValidationException::withMessages([
+                    'vehicle.fuel_consumption' => ['The assigned vehicle must have a fuel consumption greater than zero.'],
+                ]);
+            }
+
+            $setting = PricingSetting::query()->lockForUpdate()->first();
+            $fuelPrice = match ($vehicle->fuel_type) {
+                FuelType::Diesel => $setting?->diesel_price,
+                FuelType::Gasoline => $setting?->gasoline_price,
+                default => null,
+            };
+
+            if ($fuelPrice === null || (float) $fuelPrice <= 0) {
+                throw ValidationException::withMessages([
+                    'fuel_price' => ['A positive price must be configured for the vehicle fuel type.'],
+                ]);
+            }
+
+            $fuelLiters = round(
+                $currentTrip->distance * (float) $vehicle->fuel_consumption / 100,
+                3
+            );
+            $fuelCost = round($fuelLiters * (float) $fuelPrice, 2);
+            $estimatedProfit = round((float) $currentTrip->price - $fuelCost, 2);
+            $oldTripStatus = $currentTrip->status;
+
+            $currentTrip->update([
                 'status' => TripStatus::Closed,
                 'completed_at' => now(),
+                'fuel_liters' => $fuelLiters,
+                'fuel_type_snapshot' => $vehicle->fuel_type->value,
+                'fuel_price_per_liter' => $fuelPrice,
+                'fuel_consumption_snapshot' => $vehicle->fuel_consumption,
+                'fuel_cost' => $fuelCost,
+                'estimated_profit' => $estimatedProfit,
             ]);
 
-            $trip->driver->update([
+            $currentTrip->driver()->firstOrFail()->update([
                 'status' => DriverStatus::Available,
             ]);
 
-            $trip->events()->create([
+            $currentTrip->events()->create([
                 'type' => TripEventEnum::CLOSED,
                 'user_id' => $userID,
                 'data' => [
-                    'old_status' => $currentTripStatus,
+                    'old_status' => $oldTripStatus,
                     'new_status' => TripStatus::Closed,
                 ],
 
@@ -343,7 +404,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip closed successfully.',
-            'trip' => $trip->load(['driver', 'vehicle']),
+            'trip' => $trip->fresh(['driver', 'vehicle', 'client.phones']),
         ]);
     }
 

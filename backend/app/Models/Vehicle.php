@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\FuelType;
 
 class Vehicle extends Model
 {
@@ -15,9 +16,16 @@ class Vehicle extends Model
         'license_plate',
         'year',
         'driver_id',
+        'fuel_consumption',
+        'fuel_type',
     ];
 
-    public function setLicensePlateAttribute($value)
+    protected $casts = [
+        'fuel_consumption' => 'decimal:2',
+        'fuel_type' => FuelType::class,
+    ];
+
+    public function setLicensePlateAttribute(string $value)
     {
         $this->attributes['license_plate'] = strtoupper($value);
     }

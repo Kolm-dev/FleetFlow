@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Driver;
 use App\Models\Vehicle;
+use App\Enums\FuelType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,6 +25,8 @@ class VehicleFactory extends Factory
             'license_plate' => strtoupper(fake()->unique()->bothify('??####')),
             'year' => fake()->numberBetween(2000, 2026),
             'driver_id' => Driver::factory(),
+            'fuel_type' => FuelType::Diesel,
+            'fuel_consumption' => 10,
         ];
     }
 }
