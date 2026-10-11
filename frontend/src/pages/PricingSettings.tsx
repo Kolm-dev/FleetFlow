@@ -1,6 +1,7 @@
 import { getPricingSettings, updatePricingSettings } from "@/api/pricing";
 import { PricingSettingsForm } from "@/components/PricingSettingsForm";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { getBackendErrorMessages } from "@/libs/errors";
 import { formatCurrency, formatDateTime } from "@/libs/utils";
 import type { UpdatePricingType } from "@/types/pricingTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,7 +18,7 @@ export const PricingSettings = () => {
         queryKey: ["pricingSettings"],
         queryFn: () => getPricingSettings(),
     });
-    const { mutate } = useMutation({
+    const { mutate, error } = useMutation({
         mutationKey: ["pricingSettings"],
         mutationFn: (data: UpdatePricingType) => updatePricingSettings(data),
         onSuccess: () => {
@@ -75,6 +76,13 @@ export const PricingSettings = () => {
             {isFetched && showForm && (
                 <section className="pricing-settings-editor">
                     <h2>Edit tariff</h2>
+                    {error && (
+                        <ul className="error-message">
+                            {getBackendErrorMessages(error, "Could not update pricing settings.").map(message => (
+                                <li key={message}>{message}</li>
+                            ))}
+                        </ul>
+                    )}
                     <PricingSettingsForm
                         handleSubmit={(data) => mutate(data)}
                         onClose={() => setShowForm(false)}

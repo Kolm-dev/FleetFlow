@@ -4,15 +4,11 @@ import { Spinner } from "@/components/Spinner/Spinner";
 import { TripAttachmentsSection } from "@/components/Trips/TripAttachmentsSection";
 import { TripTimeline } from "@/components/Trips/TripTimeline";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
+import { getBackendErrorMessage } from "@/libs/errors";
 import { formatCurrency, formatDateTime, formatNullableValue } from "@/libs/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-
-type TripActionErrorResponse = {
-    message?: string;
-};
 
 export const TripCard = () => {
     const { tripId } = useParams();
@@ -95,9 +91,7 @@ export const TripCard = () => {
             {cancelMutation.isSuccess && <p className="success-message">{cancelMutation.data.message}</p>}
             {cancelMutation.isError && (
                 <p className="error-message">
-                    {axios.isAxiosError<TripActionErrorResponse>(cancelMutation.error)
-                        ? (cancelMutation.error.response?.data.message ?? cancelMutation.error.message)
-                        : cancelMutation.error.message}
+                    {getBackendErrorMessage(cancelMutation.error, "Could not cancel trip.")}
                 </p>
             )}
 

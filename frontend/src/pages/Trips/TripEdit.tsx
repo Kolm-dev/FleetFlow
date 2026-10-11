@@ -4,35 +4,10 @@ import { getTrip, updateTrip } from "@/api/trips";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { TripEditForm } from "@/components/Trips/TripEditForm";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
+import { getBackendErrorMessages } from "@/libs/errors";
 import type { UpdateTripData } from "@/types/tripsTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router";
-
-type TripEditErrorResponse = {
-    message?: string;
-    errors?: Record<string, string[]>;
-};
-
-const getTripEditErrorMessages = (error: Error | null) => {
-    if (!error) return [];
-
-    if (axios.isAxiosError<TripEditErrorResponse>(error)) {
-        const errors = error.response?.data.errors;
-        const validationMessages = errors ? Object.values(errors).flat() : [];
-
-        if (validationMessages.length > 0) {
-            return validationMessages;
-        }
-
-        const message = error.response?.data.message;
-        if (message) {
-            return [message];
-        }
-    }
-
-    return ["Could not update trip. Please try again."];
-};
 
 const TripEdit = () => {
     const { tripsId } = useParams();
@@ -84,7 +59,7 @@ const TripEdit = () => {
             availableDrivers={driversResponse.drivers}
             clients={clientsResponse.data}
             isPending={isPending}
-            errorMessages={getTripEditErrorMessages(updateError)}
+            errorMessages={getBackendErrorMessages(updateError, "Could not update trip. Please try again.")}
             onSubmit={(data) => mutate(data)}
         />
     );

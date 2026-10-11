@@ -10,14 +10,10 @@ import { useErrorMessageScroll } from "@/hooks/useErrorMessageScroll";
 import { useSuccessMessageScroll } from "@/hooks/useSuccessMessageScroll";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import { useTripsFilters } from "@/hooks/useTripsFilters";
+import { getBackendErrorMessage } from "@/libs/errors";
 import type { Trip } from "@/types/tripsTypes";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useState } from "react";
-
-type TripActionErrorResponse = {
-    message: string;
-};
 
 const getCloseTripSuccessMessage = (trip: Trip) => {
     const driverName = trip.driver?.name ?? "Driver";
@@ -76,10 +72,8 @@ const TripsList = () => {
         onError: error => {
             errorScrollReturnPositionRef.current = window.scrollY;
 
-            const message = axios.isAxiosError<TripActionErrorResponse>(error) ? error.response?.data.message : null;
-
             setSuccessMessage(null);
-            setErrorMessage(message ?? "Could not start trip.");
+            setErrorMessage(getBackendErrorMessage(error, "Could not start trip."));
         },
     });
     const { mutate: closeTripMutation } = useMutation({
@@ -95,10 +89,8 @@ const TripsList = () => {
         onError: error => {
             errorScrollReturnPositionRef.current = window.scrollY;
 
-            const message = axios.isAxiosError<TripActionErrorResponse>(error) ? error.response?.data.message : null;
-
             setSuccessMessage(null);
-            setErrorMessage(message ?? "Could not close trip.");
+            setErrorMessage(getBackendErrorMessage(error, "Could not close trip."));
         },
     });
 
@@ -115,10 +107,8 @@ const TripsList = () => {
         onError: error => {
             errorScrollReturnPositionRef.current = window.scrollY;
 
-            const message = axios.isAxiosError<TripActionErrorResponse>(error) ? error.response?.data.message : null;
-
             setSuccessMessage(null);
-            setErrorMessage(message ?? "Could not cancel trip.");
+            setErrorMessage(getBackendErrorMessage(error, "Could not cancel trip."));
         },
     });
 
@@ -132,10 +122,8 @@ const TripsList = () => {
             setSuccessMessage("Trip deleted successfully.");
         },
         onError: error => {
-            const message = axios.isAxiosError<TripActionErrorResponse>(error) ? error.response?.data.message : null;
-
             setSuccessMessage(null);
-            setErrorMessage(message ?? "Could not delete trip.");
+            setErrorMessage(getBackendErrorMessage(error, "Could not delete trip."));
         },
     });
 
