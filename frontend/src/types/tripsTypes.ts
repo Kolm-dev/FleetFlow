@@ -16,6 +16,7 @@ export interface Trip {
     fuel_cost: number | null;
     estimated_profit: number | null;
     status: TripStatus;
+    started_at: string | null;
     created_at?: string;
     driver?: Driver;
     vehicle?: Vehicle;

@@ -305,7 +305,10 @@ class TripController extends Controller
         DB::transaction(function () use ($trip, $oldTripStatus) {
             $trip->update([
                 'status' => TripStatus::Pending,
+                'started_at' => now(),
             ]);
+
+
 
             $trip->events()->create([
                 'type' => TripEventEnum::STARTED,

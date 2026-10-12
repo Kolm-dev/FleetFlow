@@ -114,16 +114,27 @@ export const TripCard = () => {
                         <dt>Created</dt>
                         <dd>
                             {formatDateTime(trip.created_at, {
-                                hour12: false,
+                                hour12: true,
                                 locale: "en-GB",
-                                timeZone: "Europe/Kiev",
                             })}
                         </dd>
                     </div>
+
                     <div>
                         <dt>Driver ID</dt>
                         <dd>{trip.driver_id}</dd>
                     </div>
+                    {trip.status === "pending" && (
+                        <div>
+                            <dt>Started at</dt>
+                            <dd>
+                                {formatDateTime(trip.started_at, {
+                                    hour12: true,
+                                    locale: "en-GB",
+                                })}
+                            </dd>
+                        </div>
+                    )}
                     <div>
                         <dt>Vehicle ID</dt>
                         <dd>{trip.vehicle_id}</dd>
@@ -231,11 +242,7 @@ export const TripCard = () => {
                     <dl className="trip-details-grid">
                         <div>
                             <dt>Fuel used</dt>
-                            <dd>
-                                {trip.fuel_liters == null
-                                    ? "Not recorded"
-                                    : `${trip.fuel_liters} L`}
-                            </dd>
+                            <dd>{trip.fuel_liters == null ? "Not recorded" : `${trip.fuel_liters} L`}</dd>
                         </div>
                         <div>
                             <dt>Fuel type</dt>
@@ -265,18 +272,12 @@ export const TripCard = () => {
                         </div>
                         <div>
                             <dt>Fuel cost</dt>
-                            <dd>
-                                {trip.fuel_cost == null
-                                    ? "Not recorded"
-                                    : formatCurrency(trip.fuel_cost)}
-                            </dd>
+                            <dd>{trip.fuel_cost == null ? "Not recorded" : formatCurrency(trip.fuel_cost)}</dd>
                         </div>
                         <div>
                             <dt>Estimated profit after fuel</dt>
                             <dd>
-                                {trip.estimated_profit == null
-                                    ? "Not recorded"
-                                    : formatCurrency(trip.estimated_profit)}
+                                {trip.estimated_profit == null ? "Not recorded" : formatCurrency(trip.estimated_profit)}
                             </dd>
                         </div>
                     </dl>

@@ -19,6 +19,7 @@ export type PricingSettingResponse = PricingSetting;
 
 export type PricingSettingActionResponse = PricingSettingResponse & {
     message: string;
+    
 };
 
 export type CalculatePriceResponse = {
@@ -31,4 +32,6 @@ export type UpdatePricingType = {
     minimum_price?: number;
     diesel_price?: number;
     gasoline_price?: number;
+    
+    
 };

@@ -28,6 +28,7 @@ class Trip extends Model
         'fuel_consumption_snapshot',
         'fuel_cost',
         'estimated_profit',
+        'started_at',
     ];
 
     public function driver(): BelongsTo
@@ -41,6 +42,7 @@ class Trip extends Model
             'price' => 'float',
             'status' => TripStatus::class,
             'completed_at' => 'datetime',
+            'started_at' => 'datetime',
             'fuel_liters' => 'float',
             'fuel_price_per_liter' => 'float',
             'fuel_consumption_snapshot' => 'float',
