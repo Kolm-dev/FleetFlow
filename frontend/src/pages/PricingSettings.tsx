@@ -9,6 +9,7 @@ import { useState } from "react";
 
 export const PricingSettings = () => {
     const [showForm, setShowForm] = useState(false);
+    const [onSuccess, setOnSuccess] = useState<boolean>(false);
     const queryClient = useQueryClient();
     const {
         isLoading,
@@ -18,7 +19,11 @@ export const PricingSettings = () => {
         queryKey: ["pricingSettings"],
         queryFn: () => getPricingSettings(),
     });
-    const { mutate, error } = useMutation({
+    const {
+        mutate,
+        error,
+        data: updateResult,
+    } = useMutation({
         mutationKey: ["pricingSettings"],
         mutationFn: (data: UpdatePricingType) => updatePricingSettings(data),
         onSuccess: () => {
@@ -26,19 +31,22 @@ export const PricingSettings = () => {
                 queryKey: ["pricingSettings"],
             });
             setShowForm(false);
+            setOnSuccess(true);
         },
     });
 
     if (isLoading) {
         return <Spinner />;
     }
+
     return (
         <div className="pricing-settings-page">
             <header className="page-header entity-list-header">
                 <div>
                     <h2>Pricing settings</h2>
-                    <p>Current trip tariff values</p>
+                    <p>Current pricing values</p>
                 </div>
+                {onSuccess && <div className="success-message">{updateResult?.message}</div>}
                 <button
                     className="entity-action pricing-settings-edit-button entity-action--edit"
                     onClick={() => setShowForm(!showForm)}
@@ -47,25 +55,44 @@ export const PricingSettings = () => {
                     Edit pricing
                 </button>
             </header>
-
-            <section className="pricing-settings-summary">
+            <section className="pricing-settings-summary trips">
                 <dl>
                     <div>
                         <dt>Base price</dt>
-                        <dd>{formatCurrency(pricing?.base_price)}</dd>
+                        <dd>{formatCurrency(pricing?.trips.base_price)}</dd>
                     </div>
                     <div>
                         <dt>Price per km</dt>
-                        <dd>{formatCurrency(pricing?.price_per_km)}</dd>
+                        <dd>{formatCurrency(pricing?.trips.price_per_km)}</dd>
                     </div>
                     <div>
                         <dt>Minimum price</dt>
-                        <dd>{formatCurrency(pricing?.minimum_price)}</dd>
+                        <dd>{formatCurrency(pricing?.trips.minimum_price)}</dd>
                     </div>
                     <div>
                         <dt>Updated at</dt>
                         <dd>
-                            {formatDateTime(pricing?.updated_at, {
+                            {formatDateTime(pricing?.trips.updated_at, {
+                                fallback: "Not updated yet",
+                            })}
+                        </dd>
+                    </div>
+                </dl>
+            </section>
+            <section className="pricing-settings-summary">
+                <dl>
+                    <div>
+                        <dt>Gasoline price</dt>
+                        <dd>{formatCurrency(pricing?.fuel.gasoline_price)}</dd>
+                    </div>
+                    <div>
+                        <dt>Diesel price</dt>
+                        <dd>{formatCurrency(pricing?.fuel.diesel_price)}</dd>
+                    </div>
+                    <div>
+                        <dt>Updated at</dt>
+                        <dd>
+                            {formatDateTime(pricing?.fuel.updated_at, {
                                 fallback: "Not updated yet",
                             })}
                         </dd>
@@ -75,7 +102,6 @@ export const PricingSettings = () => {
 
             {isFetched && showForm && (
                 <section className="pricing-settings-editor">
-                    <h2>Edit tariff</h2>
                     {error && (
                         <ul className="error-message">
                             {getBackendErrorMessages(error, "Could not update pricing settings.").map(message => (
@@ -84,9 +110,10 @@ export const PricingSettings = () => {
                         </ul>
                     )}
                     <PricingSettingsForm
-                        handleSubmit={(data) => mutate(data)}
+                        handleSubmit={data => mutate(data)}
                         onClose={() => setShowForm(false)}
-                        pricingSettings={pricing}
+                        pricingSettingsTrips={pricing?.trips}
+                        pricingSettingsFuel={pricing?.fuel}
                     />
                 </section>
             )}

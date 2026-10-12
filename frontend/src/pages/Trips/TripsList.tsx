@@ -29,6 +29,7 @@ const invalidateTripLifecycleQueries = (queryClient: ReturnType<typeof useQueryC
         queryClient.invalidateQueries({ queryKey: tripEventsQueryKey(tripId) });
     }
     queryClient.invalidateQueries({ queryKey: ["drivers"] });
+    queryClient.invalidateQueries({ queryKey: ["driver"] });
     queryClient.invalidateQueries({ queryKey: ["vehicles"] });
     queryClient.invalidateQueries({ queryKey: ["stats"] });
 };

@@ -158,19 +158,17 @@ export const TripCard = () => {
                         <div>
                             <dt>{trip.client.phones?.length > 1 ? "Phones" : "Phone"}</dt>
                             <dd>
-                                {trip.client.phones?.length ? (
-                                    trip.client.phones.map(phone => {
-                                        const phoneNumber = phone.phone_number ?? phone.phone;
+                                {trip.client.phones?.length
+                                    ? trip.client.phones.map(phone => {
+                                          const phoneNumber = phone.phone_number ?? phone.phone;
 
-                                        return (
-                                            <div key={`${phoneNumber}-${phone.label ?? ""}`}>
-                                                {phone.label ? `${phoneNumber} [${phone.label}]` : phoneNumber}
-                                            </div>
-                                        );
-                                    })
-                                ) : (
-                                    "-"
-                                )}
+                                          return (
+                                              <div key={`${phoneNumber}-${phone.label ?? ""}`}>
+                                                  {phone.label ? `${phoneNumber} [${phone.label}]` : phoneNumber}
+                                              </div>
+                                          );
+                                      })
+                                    : "-"}
                             </dd>
                         </div>
                     </dl>
@@ -226,6 +224,65 @@ export const TripCard = () => {
                     <p className="trip-details-empty">No vehicle data.</p>
                 )}
             </section>
+
+            {trip.status === "closed" && (
+                <section className="trip-page__section">
+                    <h2>Fuel and profit estimate</h2>
+                    <dl className="trip-details-grid">
+                        <div>
+                            <dt>Fuel used</dt>
+                            <dd>
+                                {trip.fuel_liters == null
+                                    ? "Not recorded"
+                                    : `${trip.fuel_liters} L`}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Fuel type</dt>
+                            <dd>
+                                {trip.fuel_type_snapshot == null
+                                    ? "Not recorded"
+                                    : trip.fuel_type_snapshot === "diesel"
+                                      ? "Diesel"
+                                      : "Gasoline"}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Price per liter</dt>
+                            <dd>
+                                {trip.fuel_price_per_liter == null
+                                    ? "Not recorded"
+                                    : `${formatCurrency(trip.fuel_price_per_liter)}/L`}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Fuel consumption used</dt>
+                            <dd>
+                                {trip.fuel_consumption_snapshot == null
+                                    ? "Not recorded"
+                                    : `${trip.fuel_consumption_snapshot} L/100 km`}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Fuel cost</dt>
+                            <dd>
+                                {trip.fuel_cost == null
+                                    ? "Not recorded"
+                                    : formatCurrency(trip.fuel_cost)}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Estimated profit after fuel</dt>
+                            <dd>
+                                {trip.estimated_profit == null
+                                    ? "Not recorded"
+                                    : formatCurrency(trip.estimated_profit)}
+                            </dd>
+                        </div>
+                    </dl>
+                </section>
+            )}
+
             <section className="trip-page__section">
                 <TripAttachmentsSection tripId={trip.id} />
             </section>

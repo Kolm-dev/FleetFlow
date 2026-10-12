@@ -1,5 +1,5 @@
 import type { Driver } from "@/types/driversTypes";
-import type { Vehicle } from "@/types/vehiclesTypes";
+import type { FuelType, Vehicle } from "@/types/vehiclesTypes";
 import type { Client } from "@/types/clientTypes";
 
 export interface Trip {
@@ -9,6 +9,12 @@ export interface Trip {
     vehicle_id: number;
     distance: number | null;
     price: number | null;
+    fuel_liters: number | null;
+    fuel_type_snapshot: FuelType | null;
+    fuel_price_per_liter: number | null;
+    fuel_consumption_snapshot: number | null;
+    fuel_cost: number | null;
+    estimated_profit: number | null;
     status: TripStatus;
     created_at?: string;
     driver?: Driver;

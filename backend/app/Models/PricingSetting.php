@@ -25,6 +25,9 @@ class PricingSetting extends Model
             'minimum_price' => 'decimal:2',
             'diesel_price' => 'decimal:2',
             'gasoline_price' => 'decimal:2',
+
+            'fuel_pricing_updated_at' => 'datetime',
+            'trip_pricing_updated_at' => 'datetime'
         ];
     }
 }

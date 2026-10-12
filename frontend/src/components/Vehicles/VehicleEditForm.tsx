@@ -14,6 +14,7 @@ export const VehicleEditForm = (props: PropsEditForm) => {
     const [model, setModel] = useState(vehicle.model);
     const [licensePlate, setLicensePlate] = useState(vehicle.license_plate);
     const [year, setYear] = useState(vehicle.year?.toString() ?? "");
+    const [fuelConsumption, setFuelConsumption] = useState(vehicle.fuel_consumption);
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -31,11 +32,15 @@ export const VehicleEditForm = (props: PropsEditForm) => {
             model,
             license_plate: licensePlate,
             year: correctYear,
+            fuel_consumption: vehicle.fuel_consumption,
         });
     };
 
     return (
-        <form className="vehicle-edit-form" onSubmit={handleSubmit}>
+        <form
+            className="vehicle-edit-form"
+            onSubmit={handleSubmit}
+        >
             <header className="vehicle-edit-form__header">
                 <p>Edit vehicle</p>
                 <h1>
@@ -53,10 +58,9 @@ export const VehicleEditForm = (props: PropsEditForm) => {
                         name="brand"
                         type="text"
                         value={brand}
-                        onChange={(e) => setBrand(e.currentTarget.value)}
+                        onChange={e => setBrand(e.currentTarget.value)}
                     />
                 </label>
-
                 <label>
                     Model
                     <input
@@ -64,10 +68,9 @@ export const VehicleEditForm = (props: PropsEditForm) => {
                         name="model"
                         type="text"
                         value={model}
-                        onChange={(e) => setModel(e.currentTarget.value)}
+                        onChange={e => setModel(e.currentTarget.value)}
                     />
                 </label>
-
                 <label>
                     License plate
                     <input
@@ -76,10 +79,9 @@ export const VehicleEditForm = (props: PropsEditForm) => {
                         name="licensePlate"
                         type="text"
                         value={licensePlate}
-                        onChange={(e) => setLicensePlate(e.currentTarget.value)}
+                        onChange={e => setLicensePlate(e.currentTarget.value)}
                     />
                 </label>
-
                 <label>
                     Year
                     <input
@@ -88,9 +90,24 @@ export const VehicleEditForm = (props: PropsEditForm) => {
                         min={1900}
                         max={new Date().getFullYear()}
                         value={year}
-                        onChange={(e) => setYear(e.currentTarget.value)}
+                        onChange={e => setYear(e.currentTarget.value)}
                     />
                 </label>
+                <div>
+                    <label htmlFor="fuelConsumption">
+                        Fuel consumption
+                        <input
+                            name="fuelConsumption"
+                            type="number"
+                            min={1}
+                            step={0.1}
+                            placeholder="L/100km)"
+                            value={fuelConsumption}
+                            onChange={(e) => setFuelConsumption(Number(e.currentTarget.value))}
+                        />
+                    </label>
+                </div>
+                        
             </section>
 
             <footer className="vehicle-edit-form__actions">

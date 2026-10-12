@@ -1,13 +1,19 @@
 import type { Driver } from "@/types/driversTypes";
 import type { VehicleServiceStatistics } from "@/types/vehicleServicesTypes";
 
+export type FuelType = "diesel" | "gasoline";
+
+
+
 export interface Vehicle {
     id: number;
     brand: string;
     model: string;
     license_plate: string;
     year: number | null;
+    fuel_type: FuelType;
     driver_id: number | null;
+    fuel_consumption: number;
     driver: Driver | null;
 }
 
@@ -15,6 +21,8 @@ export type CreateVehicleData = {
     brand: string;
     model: string;
     license_plate: string;
+    fuel_type: FuelType;
+    fuel_consumption?: number
     driver_id: number;
     year?: number | null;
 };

@@ -41,11 +41,11 @@ class Trip extends Model
             'price' => 'float',
             'status' => TripStatus::class,
             'completed_at' => 'datetime',
-            'fuel_liters' => 'decimal:3',
-            'fuel_price_per_liter' => 'decimal:2',
-            'fuel_consumption_snapshot' => 'decimal:2',
-            'fuel_cost' => 'decimal:2',
-            'estimated_profit' => 'decimal:2',
+            'fuel_liters' => 'float',
+            'fuel_price_per_liter' => 'float',
+            'fuel_consumption_snapshot' => 'float',
+            'fuel_cost' => 'float',
+            'estimated_profit' => 'float',
         ];
     }
 

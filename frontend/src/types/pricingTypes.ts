@@ -1,17 +1,24 @@
-export type PricingSetting = {
+export type PricingSettingTrips = {
     price_per_km: number;
     base_price: number;
     minimum_price: number;
     updated_at: string | null;
 };
 
-export type PricingSettingResponse = {
-    pricing_setting: PricingSetting;
+export type PricingSettingFuel = {
+    diesel_price: number;
+    gasoline_price: number;
+    updated_at: string;
+};
+export type PricingSetting = {
+    fuel: PricingSettingFuel;
+    trips: PricingSettingTrips;
 };
 
-export type PricingSettingActionResponse = {
+export type PricingSettingResponse = PricingSetting;
+
+export type PricingSettingActionResponse = PricingSettingResponse & {
     message: string;
-    pricing_setting: PricingSetting;
 };
 
 export type CalculatePriceResponse = {
@@ -22,4 +29,6 @@ export type UpdatePricingType = {
     price_per_km?: number;
     base_price?: number;
     minimum_price?: number;
+    diesel_price?: number;
+    gasoline_price?: number;
 };

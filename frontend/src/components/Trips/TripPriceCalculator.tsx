@@ -69,6 +69,8 @@ export const TripPriceCalculator = ({
                 Price (USD)
                 <input
                     type="number"
+                    min="0"
+                    step="0.01"
                     value={price}
                     onChange={(event) => handlePriceChange(event.currentTarget.value)}
                 />

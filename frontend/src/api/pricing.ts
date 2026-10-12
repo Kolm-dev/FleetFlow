@@ -1,7 +1,6 @@
 import { apiClient } from "@/api/client";
 import type {
     CalculatePriceResponse,
-    PricingSetting,
     PricingSettingActionResponse,
     PricingSettingResponse,
     UpdatePricingType,
@@ -18,12 +17,12 @@ export async function calculateTripPrice(
     });
 }
 
-export async function getPricingSettings(): Promise<PricingSetting> {
+export async function getPricingSettings(): Promise<PricingSettingResponse> {
     const response = await apiClient<PricingSettingResponse>(
         "/pricing-settings",
     );
 
-    return response.pricing_setting;
+    return response;
 }
 
 export async function updatePricingSettings(

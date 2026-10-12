@@ -148,6 +148,16 @@ export const VehicleCard = () => {
                             <dt>License plate</dt>
                             <dd>{vehicle.license_plate}</dd>
                         </div>
+                        <div>
+                            <dt>Fuel</dt>
+                            <dd>{vehicle.fuel_type ?? "Not specified"}</dd>
+                        </div>
+                        <div>
+                            <dt>Fuel consumption</dt>
+                            <dd>
+                                {vehicle.fuel_consumption ? `${vehicle.fuel_consumption} L/100km` : "Not specified"}
+                            </dd>
+                        </div>
                     </dl>
                 </div>
 
@@ -167,7 +177,10 @@ export const VehicleCard = () => {
                             </div>
                         </dl>
                     ) : (
-                        <p className="vehicle-overview__empty">No assigned driver</p>
+                        <p className="vehicle-overview__empty">
+                            No driver selected. <br />
+                            You can assign a driver using the form below.
+                        </p>
                     )}
                     {hasAvailableDrivers && (
                         <form
@@ -191,7 +204,10 @@ export const VehicleCard = () => {
                                 >
                                     <option value="">Select driver</option>
                                     {driversForSelect.map(driver => (
-                                        <option key={driver.id} value={driver.id}>
+                                        <option
+                                            key={driver.id}
+                                            value={driver.id}
+                                        >
                                             {driver.name} - {driver.status === "on_trip" ? "on trip" : driver.status}
                                         </option>
                                     ))}

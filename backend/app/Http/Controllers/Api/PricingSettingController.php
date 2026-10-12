@@ -13,17 +13,17 @@ class PricingSettingController extends Controller
         $setting = PricingSetting::firstOrFail();
 
         return response()->json([
-
             'fuel' => [
-                'diesel_price' => $setting->diesel_price,
-                'gasoline_price' => $setting->gasoline_price,
+                'diesel_price' => (float) $setting->diesel_price,
+                'gasoline_price' => (float) $setting->gasoline_price,
+                'updated_at' => $setting->fuel_pricing_updated_at,
             ],
             'trips' => [
-                'price_per_km' => $setting->price_per_km,
-                'base_price' => $setting->base_price,
-                'minimum_price' => $setting->minimum_price,
-            ]
-
+                'price_per_km' => (float) $setting->price_per_km,
+                'base_price' => (float) $setting->base_price,
+                'minimum_price' => (float) $setting->minimum_price,
+                'updated_at' => $setting->trip_pricing_updated_at,
+            ],
         ]);
     }
 
@@ -41,19 +41,36 @@ class PricingSettingController extends Controller
         ]);
 
         $setting = PricingSetting::firstOrFail();
-        $setting->update($data);
+        $setting->fill($data);
+
+        $tripPricingChanged = $setting->isDirty(['price_per_km', 'base_price', 'minimum_price']);
+        $fuelPricingChanged = $setting->isDirty(['diesel_price', 'gasoline_price']);
+
+        if ($tripPricingChanged) {
+            $setting->trip_pricing_updated_at = now();
+        }
+
+        if ($fuelPricingChanged) {
+            $setting->fuel_pricing_updated_at = now();
+        }
+
+
+        $setting->save();
         $setting->refresh();
 
         return response()->json([
             'message' => 'Pricing settings updated successfully.',
+
             'fuel' => [
-                'diesel_price' => $setting->diesel_price,
-                'gasoline_price' => $setting->gasoline_price,
+                'diesel_price' => (float) $setting->diesel_price,
+                'gasoline_price' => (float) $setting->gasoline_price,
+                'updated_at' => $setting->fuel_pricing_updated_at,
             ],
             'trips' => [
-                'price_per_km' => $setting->price_per_km,
-                'base_price' => $setting->base_price,
-                'minimum_price' => $setting->minimum_price,
+                'price_per_km' => (float) $setting->price_per_km,
+                'base_price' => (float) $setting->base_price,
+                'minimum_price' => (float) $setting->minimum_price,
+                'updated_at' => $setting->trip_pricing_updated_at,
             ],
         ]);
     }

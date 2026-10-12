@@ -31,11 +31,15 @@ const VehiclesList = () => {
     const selectedDriverAssignment = driverAssignment === "all" ? undefined : driverAssignment;
     const page = getValidPage(searchParams.get("page"));
     const [searchInput, setSearchInput] = useState(urlSearch);
+    const [lastUrlSearch, setLastUrlSearch] = useState(urlSearch);
     const debouncedSearch = useDebounce(searchInput.trim(), 500);
 
-    useEffect(() => {
+    if (urlSearch !== lastUrlSearch) {
+        setLastUrlSearch(urlSearch);
         setSearchInput(urlSearch);
-    }, [urlSearch]);
+    }
+
+  
 
     useEffect(() => {
         if (debouncedSearch === urlSearch) return;
