@@ -45,11 +45,7 @@ const TripDetailsPanel = ({ onClose, trip }: TripDetailsType) => {
                         <div>
                             <dt>Created</dt>
                             <dd>
-                                {formatDateTime(trip.created_at, {
-                                    hour12: false,
-                                    locale: "en-GB",
-                                    timeZone: "Europe/Kiev",
-                                })}
+                                {formatDateTime(trip.created_at)}
                             </dd>
                         </div>
                         <div>

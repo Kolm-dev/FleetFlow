@@ -227,11 +227,7 @@ export const TripTimeline = ({ tripId }: { tripId: number }) => {
                                                 <div className="trip-timeline__main">
                                                     <h3>{eventTitles[event.event_type]}</h3>
                                                     <time dateTime={event.created_at}>
-                                                        {formatDateTime(event.created_at, {
-                                                            hour12: false,
-                                                            locale: "en-GB",
-                                                            timeZone: "Europe/Kiev",
-                                                        })}
+                                                        {formatDateTime(event.created_at)}
                                                     </time>
                                                 </div>
                                                 <p className="trip-timeline__actor">{event.user?.name ?? "System"}</p>

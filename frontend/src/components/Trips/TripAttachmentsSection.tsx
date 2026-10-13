@@ -20,7 +20,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import {
     ACCEPTED_FILE_TYPES,
-    formatDateOnly,
+    formatDateTime,
     formatFileSize,
     formatMIME,
     getAttachmentIcon,
@@ -497,7 +497,7 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
                                                                 </div>
                                                                 <div>
                                                                     <dt>Uploaded</dt>
-                                                                    <dd>{formatDateOnly(attachment.created_at)}</dd>
+                                                                    <dd>{formatDateTime(attachment.created_at)}</dd>
                                                                 </div>
                                                             </dl>
                                                         </div>

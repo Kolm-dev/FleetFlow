@@ -113,10 +113,7 @@ export const TripCard = () => {
                     <div>
                         <dt>Created</dt>
                         <dd>
-                            {formatDateTime(trip.created_at, {
-                                hour12: true,
-                                locale: "en-GB",
-                            })}
+                            {formatDateTime(trip.created_at)}
                         </dd>
                     </div>
 
@@ -128,10 +125,7 @@ export const TripCard = () => {
                         <div>
                             <dt>Started at</dt>
                             <dd>
-                                {formatDateTime(trip.started_at, {
-                                    hour12: true,
-                                    locale: "en-GB",
-                                })}
+                                {formatDateTime(trip.started_at)}
                             </dd>
                         </div>
                     )}

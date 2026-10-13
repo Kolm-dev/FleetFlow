@@ -47,34 +47,38 @@ export const getValidPage = (value: string | null) => {
 
 export const toDateInputValue = (value?: string) => value?.slice(0, 10) ?? "";
 
+const APP_LOCALE = "en-GB";
+const APP_TIME_ZONE = "Europe/Kyiv";
+
+const dateOnlyFormatter = new Intl.DateTimeFormat(APP_LOCALE, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+});
+
+const dateTimeFormatter = new Intl.DateTimeFormat(APP_LOCALE, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: APP_TIME_ZONE,
+});
+
 export const formatDateOnly = (value: string) =>
-    new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    }).format(new Date(`${value.slice(0, 10)}T00:00:00`));
+    dateOnlyFormatter.format(new Date(`${value.slice(0, 10)}T00:00:00`));
 
 type FormatDateTimeOptions = {
     fallback?: string;
-    hour12?: boolean;
-    locale?: string;
-    timeZone?: string;
 };
 
 export const formatDateTime = (value?: string | null, options: FormatDateTimeOptions = {}) => {
-    const { fallback = "-", hour12, locale = "en-US", timeZone } = options;
+    const { fallback = "-" } = options;
 
     if (!value) return fallback;
 
-    return new Intl.DateTimeFormat(locale, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12,
-        timeZone,
-    }).format(new Date(value));
+    return dateTimeFormatter.format(new Date(value));
 };
 
 export const isHttpUrl = (value: string) => {
