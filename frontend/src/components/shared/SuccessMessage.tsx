@@ -1,13 +1,5 @@
 import { cn } from "cn";
-import {
-    Building2,
-    DollarSign,
-    Paperclip,
-    Route,
-    Truck,
-    UserRound,
-    type LucideIcon,
-} from "lucide-react";
+import { Building2, DollarSign, Paperclip, Route, Truck, UserRound, type LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState, type Ref } from "react";
 
 export type SuccessTag = "pricing" | "vehicle" | "driver" | "client" | "trip" | "attachment";
@@ -26,6 +18,7 @@ type SuccessMessageProps = {
 
 const DEFAULT_TIME = 5000;
 const DEFAULT_FALLBACK_MESSAGE = "Successfully";
+const EXIT_ANIMATION_DURATION = 300;
 
 const tagIcons: Record<SuccessTag, LucideIcon> = {
     pricing: DollarSign,
@@ -47,14 +40,13 @@ export const SuccessMessage = ({
     ref,
 }: SuccessMessageProps) => {
     const [isVisible, setIsVisible] = useState(true);
+    const [isExiting, setIsExiting] = useState(false);
     const onCompleteRef = useRef(onComplete);
     const messages = (Array.isArray(successText) ? successText : [successText])
         .filter((message): message is string => typeof message === "string")
         .map(message => message.trim())
         .filter(Boolean);
-    const displayMessages = messages.length > 0
-        ? messages
-        : [fallbackMessage.trim() || DEFAULT_FALLBACK_MESSAGE];
+    const displayMessages = messages.length > 0 ? messages : [fallbackMessage.trim() || DEFAULT_FALLBACK_MESSAGE];
     const messageKey = displayMessages.join("\u0000");
     const TagIcon = tag ? tagIcons[tag] : null;
 
@@ -65,12 +57,22 @@ export const SuccessMessage = ({
     useEffect(() => {
         if (time === "inf") return;
 
-        const timeoutId = window.setTimeout(() => {
-            setIsVisible(false);
-            onCompleteRef.current?.();
-        }, Math.max(0, time));
+        let exitTimeoutId: number | undefined;
+        const timeoutId = window.setTimeout(
+            () => {
+                setIsExiting(true);
+                exitTimeoutId = window.setTimeout(() => {
+                    setIsVisible(false);
+                    onCompleteRef.current?.();
+                }, EXIT_ANIMATION_DURATION);
+            },
+            Math.max(0, time)
+        );
 
-        return () => window.clearTimeout(timeoutId);
+        return () => {
+            window.clearTimeout(timeoutId);
+            if (exitTimeoutId !== undefined) window.clearTimeout(exitTimeoutId);
+        };
     }, [messageKey, time]);
 
     if (!isVisible) return null;
@@ -78,8 +80,9 @@ export const SuccessMessage = ({
     return (
         <div
             className={cn(
-                "flex min-w-0 items-start gap-3 rounded-lg border border-emerald-600/25 bg-emerald-600/10 p-3 text-sm text-emerald-800 dark:text-emerald-300 sm:p-4",
-                className,
+                "flex min-w-0 items-start gap-3 rounded-lg border border-emerald-600/25 bg-emerald-600/10 p-3 text-sm text-emerald-800 animate-in fade-in slide-in-from-top-1 duration-200 dark:text-emerald-300 sm:p-4",
+                isExiting && "animate-out fade-out slide-out-to-top-1 duration-300",
+                className
             )}
             id={id}
             ref={ref}
@@ -87,14 +90,15 @@ export const SuccessMessage = ({
             aria-live="polite"
         >
             {TagIcon && (
-                <TagIcon className="mt-0.5 size-4 shrink-0 sm:size-[18px]" aria-hidden="true" />
+                <TagIcon
+                    className="mt-0.5 size-4 shrink-0 sm:size-4.5"
+                    aria-hidden="true"
+                />
             )}
             {displayMessages.length === 1 ? (
-                <p className="m-0 min-w-0 flex-1 break-words font-medium [overflow-wrap:anywhere]">
-                    {displayMessages[0]}
-                </p>
+                <p className="m-0 min-w-0 flex-1 wrap-break-word font-medium ">{displayMessages[0]}</p>
             ) : (
-                <ul className="m-0 min-w-0 flex-1 list-inside list-disc space-y-1 break-words pl-0 font-medium [overflow-wrap:anywhere]">
+                <ul className="m-0 min-w-0 flex-1 list-inside list-disc space-y-1 wrap-break-word pl-0 font-medium ">
                     {displayMessages.map((message, index) => (
                         <li key={`${message}-${index}`}>{message}</li>
                     ))}
