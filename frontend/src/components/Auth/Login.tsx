@@ -1,9 +1,10 @@
 import { login, type LoginErrorResponse } from "@/api/auth";
-import { Spinner } from "@/components/Spinner/Spinner";
+import { AuthForm, type AuthFormField } from "@/components/Auth/AuthForm";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { LockKeyhole, UserRound } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { NavLink, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 export const Login = () => {
     const [name, setName] = useState("");
@@ -13,76 +14,60 @@ export const Login = () => {
     const { mutate, isPending, error } = useMutation({
         mutationFn: () => login({ name, password }),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ["currentUser"],
-            });
+            await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
             navigate("/");
         },
     });
-    const handleSubmitForm = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+
+    const handleSubmitForm = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         mutate();
     };
 
-    let errorMessage = null;
+    const errorMessage = axios.isAxiosError<LoginErrorResponse>(error)
+        ? error.response?.data.message || "Connection error"
+        : error
+          ? "Something went wrong"
+          : null;
 
-    if (axios.isAxiosError<LoginErrorResponse>(error)) {
-        errorMessage = error.response?.data.message || "Connection error";
-    }
+    const fields: AuthFormField[] = [
+        {
+            id: "name",
+            label: "Name",
+            value: name,
+            type: "text",
+            autoComplete: "username",
+            placeholder: "Your name",
+            icon: UserRound,
+            autoFocus: true,
+            onChange: setName,
+        },
+        {
+            id: "password",
+            label: "Password",
+            value: password,
+            type: "password",
+            autoComplete: "current-password",
+            placeholder: "Enter password",
+            icon: LockKeyhole,
+            onChange: setPassword,
+        },
+    ];
 
     return (
-        <section className="login">
-            <div className="login__header">
-                <h1>Sign in</h1>
-
-                <p>Use your credentials to access your account.</p>
-            </div>
-
-            <form
-                className="login__form"
-                onSubmit={handleSubmitForm}
-                method="post"
-            >
-                <label htmlFor="name">
-                    Name
-                    <input
-                        id="name"
-                        name="name"
-                        value={name}
-                        type="text"
-                        autoComplete="username"
-                        placeholder="Your name"
-                        onChange={(e) => setName(e.currentTarget.value)}
-                    />
-                </label>
-
-                <label htmlFor="password">
-                    Password
-                    <input
-                        id="password"
-                        name="password"
-                        value={password}
-                        type="password"
-                        autoComplete="current-password"
-                        placeholder="Enter password"
-                        onChange={(e) => setPassword(e.currentTarget.value)}
-                    />
-                </label>
-
-                {errorMessage && <p className="login__error">{errorMessage}</p>}
-
-                <button
-                    disabled={isPending || !(name && password)}
-                    type="submit"
-                >
-                    {isPending ? <Spinner text="Logging in..." /> : "Login"}
-                </button>
-
-                <p className="login__switch">
-                    Don&apos;t have an account?{" "}
-                    <NavLink to="/registration">Create account</NavLink>
-                </p>
-            </form>
-        </section>
+        <AuthForm
+            title="Sign in"
+            description="Use your credentials to access your FleetFlow account."
+            fields={fields}
+            submitLabel="Login"
+            pendingLabel="Logging in..."
+            isPending={isPending}
+            isSubmitDisabled={!name || !password}
+            errorMessage={errorMessage}
+            footerText="Don't have an account?"
+            footerLinkLabel="Create account"
+            footerLinkTo="/registration"
+            onSubmit={handleSubmitForm}
+        />
     );
 };
