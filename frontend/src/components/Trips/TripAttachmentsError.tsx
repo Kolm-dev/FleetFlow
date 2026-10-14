@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 
 type ValidationErrorResponse = {
     message: string;
@@ -35,70 +36,15 @@ export const TripAttachmentsError = ({
 
     return (
         <>
-            {clientValidationError && (
-                <p
-                    className="error-message"
-                    role="alert"
-                >
-                    {clientValidationError}
-                </p>
-            )}
-
-            {backendValidationErrors.length > 0 && (
-                <ul
-                    className="error-message"
-                    role="alert"
-                >
-                    {backendValidationErrors.map((message, index) => (
-                        <li key={`${message}-${index}`}>{message}</li>
-                    ))}
-                </ul>
-            )}
-
-            {uploadErrorMessage && (
-                <p
-                    className="error-message"
-                    role="alert"
-                >
-                    {uploadErrorMessage}
-                </p>
-            )}
-
-            {queryError && (
-                <p
-                    className="error-message"
-                    role="alert"
-                >
-                    Could not load attachments. Please refresh the page.
-                </p>
-            )}
-
-            {previewError && (
-                <p
-                    className="error-message"
-                    role="alert"
-                >
-                    {previewError}
-                </p>
-            )}
-
-            {actionErrorMessage && (
-                <p
-                    className="error-message"
-                    role="alert"
-                >
-                    {actionErrorMessage}
-                </p>
-            )}
-
-            {renameErrorMessage && (
-                <p
-                    className="error-message"
-                    role="alert"
-                >
-                    {renameErrorMessage}
-                </p>
-            )}
+            <ErrorMessage messages={clientValidationError} />
+            <ErrorMessage messages={backendValidationErrors} />
+            <ErrorMessage messages={uploadErrorMessage} />
+            <ErrorMessage
+                messages={queryError ? "Could not load attachments. Please refresh the page." : null}
+            />
+            <ErrorMessage messages={previewError} />
+            <ErrorMessage messages={actionErrorMessage} />
+            <ErrorMessage messages={renameErrorMessage} />
         </>
     );
 };

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export const useSuccessMessageScroll = (successMessage: string | null) => {
-    const successMessageRef = useRef<HTMLParagraphElement | null>(null);
+    const successMessageRef = useRef<HTMLDivElement | null>(null);
     const scrollReturnPositionRef = useRef(0);
     const scrollReturnTimeoutRef = useRef<number | null>(null);
 

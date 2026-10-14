@@ -1,6 +1,8 @@
 import { deleteClient, getClients } from "@/api/clients";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getBackendErrorMessage } from "@/libs/errors";
 import type { Client, ClientType } from "@/types/clientTypes";
@@ -15,6 +17,7 @@ const ClientsList = () => {
     const [nameInput, setNameInput] = React.useState("");
     const [clientToDelete, setClientToDelete] = React.useState<Client | null>(null);
     const [deleteErrorMessage, setDeleteErrorMessage] = React.useState<string | null>(null);
+    const [deleteSuccessMessage, setDeleteSuccessMessage] = React.useState<string | null>(null);
     const debouncedName = useDebounce(nameInput, 700);
     const nameInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -41,6 +44,7 @@ const ClientsList = () => {
         onSuccess: () => {
             setClientToDelete(null);
             setDeleteErrorMessage(null);
+            setDeleteSuccessMessage("Client deleted successfully.");
             queryClient.invalidateQueries({ queryKey: ["clients"] });
         },
         onError: error => {
@@ -51,6 +55,7 @@ const ClientsList = () => {
 
     const handleDelete = (client: Client) => {
         setDeleteErrorMessage(null);
+        setDeleteSuccessMessage(null);
         setClientToDelete(client);
     };
 
@@ -130,7 +135,14 @@ const ClientsList = () => {
                     Company
                 </button>
             </div>
-            {deleteErrorMessage && <div className="error-message">{deleteErrorMessage}</div>}
+            {deleteErrorMessage && <ErrorMessage messages={deleteErrorMessage} />}
+            {deleteSuccessMessage && (
+                <SuccessMessage
+                    tag="client"
+                    successText={deleteSuccessMessage}
+                    onComplete={() => setDeleteSuccessMessage(null)}
+                />
+            )}
 
             <table className="clients-table">
                 <thead>

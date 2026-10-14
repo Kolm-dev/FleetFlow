@@ -1,6 +1,7 @@
 import { getStats } from "@/api/stats";
 import { StatCard } from "@/components/shared/StatCard";
 import { StatusBreakdownCard } from "@/components/shared/StatusBreakdownCard";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +18,7 @@ export const Home = () => {
     });
 
     if (isLoading) return <Spinner text="Loading fleet overview..." />;
-    if (error) return <p className="error-message">{error.message}</p>;
+    if (error) return <ErrorMessage messages={error.message} fallbackMessage="Could not load fleet statistics." />;
     if (!stats) return <p className="empty-state">No fleet statistics available.</p>;
 
     const activeTrips = stats.trips.planned + stats.trips.pending;

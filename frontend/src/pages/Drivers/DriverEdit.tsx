@@ -2,6 +2,8 @@ import { getDriver, updateDriver } from "@/api/drivers";
 import { getVehicles, updateVehicle } from "@/api/vehicles";
 import { DriverEditForm } from "@/components/Drivers/DriverEditForm";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessage } from "@/libs/errors";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { UpdateDriverData } from "@/types/driversTypes";
@@ -33,6 +35,7 @@ export const DriverEdit = () => {
         mutate,
         isPending,
         error: updateError,
+        isSuccess,
     } = useMutation({
         mutationFn: async (data: { driver: UpdateDriverData; vehicleId?: number }) => {
             const parsedDriverId = parseInt(driverId as string);
@@ -59,24 +62,34 @@ export const DriverEdit = () => {
             queryClient.invalidateQueries({
                 queryKey: ["vehicles"],
             });
-            navigate(`/drivers/${driverId}`);
         },
     });
 
     if (isLoading || isVehiclesLoading) return <Spinner />;
     if (driverError) {
-        return <p className="error-message">{driverError.message}</p>;
+        return <ErrorMessage messages={driverError.message} fallbackMessage="Could not load driver." />;
     }
     if (vehiclesError) {
-        return <p className="error-message">{vehiclesError.message}</p>;
+        return <ErrorMessage messages={vehiclesError.message} fallbackMessage="Could not load vehicles." />;
     }
-    if (!driver) return <p className="error-message">Driver not found</p>;
-    if (!vehiclesResponse) return <p className="error-message">Vehicles not found</p>;
+    if (!driver) return <ErrorMessage messages="Driver not found" />;
+    if (!vehiclesResponse) return <ErrorMessage messages="Vehicles not found" />;
+
+    if (isSuccess) {
+        return (
+            <SuccessMessage
+                tag="driver"
+                successText="Driver updated successfully. Returning to driver details shortly."
+                time={2000}
+                onComplete={() => navigate(`/drivers/${driverId}`)}
+            />
+        );
+    }
 
     return (
         <div className="driver-edit-page">
             {updateError && (
-                <p className="error-message">{getBackendErrorMessage(updateError, "Could not update driver.")}</p>
+                <ErrorMessage messages={getBackendErrorMessage(updateError, "Could not update driver.")} />
             )}
             <DriverEditForm
                 onSubmit={(data) => mutate(data)}

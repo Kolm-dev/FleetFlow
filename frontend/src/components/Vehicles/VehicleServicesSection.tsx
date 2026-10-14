@@ -8,6 +8,8 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { VehicleServiceForm } from "@/components/Vehicles/VehicleServiceForm";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessage } from "@/libs/errors";
 import { formatCurrency, formatDateOnly, formatMileage } from "@/libs/utils";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
@@ -42,6 +44,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [editingService, setEditingService] = useState<VehicleService | null>(null);
     const [deletingService, setDeletingService] = useState<VehicleService | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const sort = `${sortDirection === "desc" ? "-" : ""}${sortField}` as VehicleServiceSort;
     const servicesQueryKey = ["vehicle-services", vehicleId, { page, types: selectedTypes, sort }];
@@ -70,7 +73,9 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
 
     const createMutation = useMutation({
         mutationFn: (formData: CreateVehicleServiceData) => createVehicleService(vehicleId, formData),
+        onMutate: () => setSuccessMessage(null),
         onSuccess: () => {
+            setSuccessMessage("Service record created successfully.");
             setIsCreateOpen(false);
             const isChangingPage = page !== 1;
             setPage(1);
@@ -82,7 +87,9 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
     const updateMutation = useMutation({
         mutationFn: ({ serviceId, formData }: { serviceId: number; formData: UpdateVehicleServiceData }) =>
             updateVehicleService(vehicleId, serviceId, formData),
+        onMutate: () => setSuccessMessage(null),
         onSuccess: () => {
+            setSuccessMessage("Service record updated successfully.");
             setEditingService(null);
             return invalidateServices();
         },
@@ -90,7 +97,9 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
 
     const deleteMutation = useMutation({
         mutationFn: (serviceId: number) => deleteVehicleService(vehicleId, serviceId),
+        onMutate: () => setSuccessMessage(null),
         onSuccess: () => {
+            setSuccessMessage("Service record deleted successfully.");
             setDeletingService(null);
             const isChangingPage = page > 1 && data?.data.length === 1;
 
@@ -128,6 +137,13 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
 
     return (
         <section className="vehicle-services">
+            {successMessage && (
+                <SuccessMessage
+                    tag="vehicle"
+                    successText={successMessage}
+                    onComplete={() => setSuccessMessage(null)}
+                />
+            )}
             <div className="vehicle-services__header">
                 <div>
                     <h2>Service History</h2>
@@ -249,8 +265,8 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                 </div>
             </div>
 
-            {error && <p className="error-message">{error.message}</p>}
-            {mutationErrorMessage && <p className="error-message">{mutationErrorMessage}</p>}
+            {error && <ErrorMessage messages={error.message} fallbackMessage="Could not load service history." />}
+            {mutationErrorMessage && <ErrorMessage messages={mutationErrorMessage} />}
             {isLoading && <Spinner />}
             {isFetching && !isLoading && <p className="vehicle-services__updating">Updating service history...</p>}
 

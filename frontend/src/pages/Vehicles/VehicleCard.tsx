@@ -4,9 +4,11 @@ import { updateVehicle } from "@/api/vehicles";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { VehicleServicesSection } from "@/components/Vehicles/VehicleServicesSection";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessage } from "@/libs/errors";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
 export const VehicleCard = () => {
@@ -14,7 +16,6 @@ export const VehicleCard = () => {
     const numericVehicleId = Number(vehicleId);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const [redirectCountdown, setRedirectCountdown] = useState(5);
     const [deletedVehicleLabel, setDeletedVehicleLabel] = useState("");
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const [driverIdToAssign, setDriverIdToAssign] = useState<number | undefined>();
@@ -55,26 +56,6 @@ export const VehicleCard = () => {
         },
     });
 
-    useEffect(() => {
-        if (!isSuccess) return;
-
-        const intervalId = window.setInterval(() => {
-            setRedirectCountdown(currentCountdown => {
-                const nextCountdown = Number((currentCountdown - 0.1).toFixed(1));
-
-                return Math.max(nextCountdown, 0);
-            });
-        }, 100);
-
-        return () => window.clearInterval(intervalId);
-    }, [isSuccess]);
-
-    useEffect(() => {
-        if (isSuccess && redirectCountdown <= 0) {
-            navigate("/vehicles");
-        }
-    }, [isSuccess, navigate, redirectCountdown]);
-
     const handleConfirmDelete = () => {
         if (!vehicleId || !vehicle) return;
 
@@ -85,16 +66,18 @@ export const VehicleCard = () => {
 
     if (isSuccess) {
         return (
-            <div className="success-message">
-                <p>{deletedVehicleLabel} was successfully deleted!</p>
-                <p>Redirecting to vehicles list in {redirectCountdown.toFixed(1)}s</p>
-            </div>
+            <SuccessMessage
+                tag="vehicle"
+                successText={`${deletedVehicleLabel} was successfully deleted. Redirecting to the vehicles list in 3 seconds.`}
+                time={3000}
+                onComplete={() => navigate("/vehicles")}
+            />
         );
     }
 
     if (isLoading || isDriversLoading) return <Spinner />;
 
-    if (!vehicle) return <p>Vehicle not found</p>;
+    if (!vehicle) return ErrorMessage({ messages: ["Vehicle not found."] });
 
     return (
         <div className="vehicle-details-page">
@@ -225,12 +208,19 @@ export const VehicleCard = () => {
                                 {assignDriverMutation.isPending ? "Assigning..." : "Assign driver"}
                             </button>
                             {assignDriverMutation.isError && (
-                                <p className="error-message">
-                                    {getBackendErrorMessage(assignDriverMutation.error, "Could not assign driver.")}
-                                </p>
+                                <ErrorMessage
+                                    messages={getBackendErrorMessage(
+                                        assignDriverMutation.error,
+                                        "Could not assign driver."
+                                    )}
+                                />
                             )}
                             {assignDriverMutation.isSuccess && (
-                                <p className="success-message">Driver assigned successfully.</p>
+                                <SuccessMessage
+                                    tag="driver"
+                                    successText="Driver assigned successfully."
+                                    time={3000}
+                                />
                             )}
                         </form>
                     )}

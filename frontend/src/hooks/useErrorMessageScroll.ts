@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 export const useErrorMessageScroll = (errorMessage: string | null) => {
     // Элемент с ошибкой
-    const errorMessageRef = useRef<HTMLParagraphElement | null>(null);
+    const errorMessageRef = useRef<HTMLDivElement | null>(null);
     // Куда нужно вернуть пользователя.
     const scrollReturnPositionRef = useRef(0);
     const scrollReturnTimeoutRef = useRef<number | null>(null);

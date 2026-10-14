@@ -2,6 +2,7 @@ import { getClients } from "@/api/clients";
 import { getDrivers } from "@/api/drivers";
 import { createTrip } from "@/api/trips";
 import TripCreateForm from "@/components/Trips/TripCreateForm";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import { getBackendErrorMessages } from "@/libs/errors";
 import type { CreateTripData } from "@/types/tripsTypes";
@@ -24,6 +25,8 @@ export const TripCreate = () => {
         mutate,
         isPending: isCreating,
         error: createError,
+        isSuccess,
+        data: createResult,
     } = useMutation({
         mutationFn: (trip: CreateTripData) => createTrip(trip),
         onSuccess: (response) => {
@@ -42,17 +45,23 @@ export const TripCreate = () => {
             queryClient.invalidateQueries({
                 queryKey: ["stats"],
             });
-            navigate("/trips", {
-                state: {
-                    selectedTripId: response.trip.id,
-                },
-            });
         },
     });
 
     const availableDrivers = data?.drivers ?? [];
     const clients = clientsData?.data ?? [];
     const errorMessages = getBackendErrorMessages(createError, "Could not create trip. Please try again.");
+
+    if (isSuccess && createResult) {
+        return (
+            <SuccessMessage
+                tag="trip"
+                successText="Trip created successfully. Opening the trips list shortly."
+                time={2000}
+                onComplete={() => navigate("/trips", { state: { selectedTripId: createResult.trip.id } })}
+            />
+        );
+    }
 
     return (
         <>

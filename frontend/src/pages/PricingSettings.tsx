@@ -1,6 +1,8 @@
 import { getPricingSettings, updatePricingSettings } from "@/api/pricing";
 import { PricingSettingsForm } from "@/components/PricingSettingsForm";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessages } from "@/libs/errors";
 import { formatCurrency, formatDateTime } from "@/libs/utils";
 import type { UpdatePricingType } from "@/types/pricingTypes";
@@ -46,10 +48,19 @@ export const PricingSettings = () => {
                     <h2>Pricing settings</h2>
                     <p>Current pricing values</p>
                 </div>
-                {onSuccess && <div className="success-message">{updateResult?.message}</div>}
+                {onSuccess && (
+                    <SuccessMessage
+                        tag="pricing"
+                        successText={updateResult?.message}
+                        onComplete={() => setOnSuccess(false)}
+                    />
+                )}
                 <button
                     className="entity-action pricing-settings-edit-button entity-action--edit"
-                    onClick={() => setShowForm(!showForm)}
+                    onClick={() => {
+                        setShowForm(!showForm);
+                        setOnSuccess(false);
+                    }}
                     type="button"
                 >
                     Edit pricing
@@ -103,14 +114,15 @@ export const PricingSettings = () => {
             {isFetched && showForm && (
                 <section className="pricing-settings-editor">
                     {error && (
-                        <ul className="error-message">
-                            {getBackendErrorMessages(error, "Could not update pricing settings.").map(message => (
-                                <li key={message}>{message}</li>
-                            ))}
-                        </ul>
+                        <ErrorMessage
+                            messages={getBackendErrorMessages(error, "Could not update pricing settings.")}
+                        />
                     )}
                     <PricingSettingsForm
-                        handleSubmit={data => mutate(data)}
+                        handleSubmit={data => {
+                            setOnSuccess(false);
+                            mutate(data);
+                        }}
                         onClose={() => setShowForm(false)}
                         pricingSettingsTrips={pricing?.trips}
                         pricingSettingsFuel={pricing?.fuel}

@@ -14,6 +14,7 @@ import eyePreviewIcon from "@/assets/icons/trip-attachment-icons/eye-preview.svg
 import viewIcon from "@/assets/icons/trip-attachment-icons/view.svg";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { TripAttachmentsError } from "@/components/Trips/TripAttachmentsError";
 import { TripAttachmentPreviewModal } from "@/components/Trips/TripAttachmentPreviewModal";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -44,6 +45,7 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
     const [previewError, setPreviewError] = useState<string | null>(null);
     const [attachmentToDelete, setAttachmentToDelete] = useState<TripAttachment | null>(null);
     const [previewAttachment, setPreviewAttachment] = useState<TripAttachment | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isExpanded, setIsExpanded] = useLocalStorage("trip-attachments-expanded", true);
 
     const {
@@ -57,8 +59,10 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
     });
 
     const uploadMutation = useMutation({
-        mutationFn: uploadTripAttachments.bind(null, tripId),
-        onSuccess: async () => {
+        mutationFn: (files: File[]) => uploadTripAttachments(tripId, files),
+        onMutate: () => setSuccessMessage(null),
+        onSuccess: async response => {
+            setSuccessMessage(response.message);
             setSelectedFiles([]);
             setClientValidationError(null);
 
@@ -79,7 +83,9 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
 
     const deleteMutation = useMutation({
         mutationFn: deleteTripAttachment.bind(null, tripId),
+        onMutate: () => setSuccessMessage(null),
         onSuccess: async () => {
+            setSuccessMessage("Attachment deleted successfully.");
             setAttachmentToDelete(null);
 
             await queryClient.invalidateQueries({
@@ -94,7 +100,9 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
     const changeNameMutation = useMutation({
         mutationFn: ({ attachmentId, displayName }: { attachmentId: number; displayName: string }) =>
             updateTripAttachmentName(tripId, attachmentId, displayName),
+        onMutate: () => setSuccessMessage(null),
         onSuccess: async () => {
+            setSuccessMessage("Attachment name updated successfully.");
             setEditingAttachmentId(null);
 
             await queryClient.invalidateQueries({
@@ -241,6 +249,13 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
 
     return (
         <>
+            {successMessage && (
+                <SuccessMessage
+                    tag="attachment"
+                    successText={successMessage}
+                    onComplete={() => setSuccessMessage(null)}
+                />
+            )}
             <header className="trip-attachments__section-header">
                 <div>
                     <h2>Attachments</h2>
@@ -345,14 +360,6 @@ export const TripAttachmentsSection = ({ tripId }: { tripId: number }) => {
                                     {uploadMutation.isPending ? "Uploading..." : "Upload files"}
                                 </button>
 
-                                {uploadMutation.isSuccess && (
-                                    <p
-                                        className="success-message"
-                                        role="status"
-                                    >
-                                        {uploadMutation.data.message}
-                                    </p>
-                                )}
                             </form>
                         </div>
 

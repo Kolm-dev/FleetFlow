@@ -1,6 +1,8 @@
 import { cancelTrip, closeTrip, deleteTrip, getTrips, startTrip } from "@/api/trips";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import TripDetailsPanel from "@/components/Trips/TripDetailsPanel";
 import { TripsContent } from "@/components/Trips/TripsContent";
 import { TripsHeader } from "@/components/Trips/TripsHeader";
@@ -149,22 +151,15 @@ const TripsList = () => {
             />
 
             {successMessage && (
-                <p
+                <SuccessMessage
+                    tag="trip"
                     ref={successMessageRef}
-                    className="success-message"
-                >
-                    {successMessage}
-                </p>
+                    successText={successMessage}
+                    onComplete={() => setSuccessMessage(null)}
+                />
             )}
 
-            {errorMessage && (
-                <p
-                    ref={errorMessageRef}
-                    className="error-message"
-                >
-                    {errorMessage}
-                </p>
-            )}
+            {errorMessage && <ErrorMessage ref={errorMessageRef} messages={errorMessage} />}
 
             <TripsToolbar
                 searchInput={searchInput}
