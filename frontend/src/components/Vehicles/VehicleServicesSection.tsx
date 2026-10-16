@@ -157,8 +157,9 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                         {data ? `${data.total} service records` : "Maintenance and repair records"}
                     </p>
                 </div>
-                <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                     <Button
+                        className="w-full sm:w-auto"
                         type="button"
                         variant="outline"
                         aria-expanded={isServicesVisible}
@@ -169,6 +170,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                         {isServicesVisible ? "Hide services" : `Show services${data ? ` (${data.total})` : ""}`}
                     </Button>
                     <Button
+                        className="w-full sm:w-auto"
                         type="button"
                         onClick={() => {
                             setEditingService(null);

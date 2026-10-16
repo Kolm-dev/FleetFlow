@@ -181,6 +181,10 @@ Rule:
         margin-left: 8px;
     }
 
+    button[data-slot="button"] + button[data-slot="button"] {
+        margin-left: 0;
+    }
+
     button:disabled {
         border-color: var(--color-disabled-border);
         background: var(--color-disabled-bg);

@@ -36,7 +36,7 @@ export const AttachmentFileRow = <T extends AttachmentFile>({
     const documentIcon = extension === "pdf" ? pdfIcon : extension === "txt" ? txtIcon : null;
 
     return (
-        <li className="flex min-w-0 flex-col gap-3 rounded-lg border bg-background p-3 sm:flex-row sm:items-center sm:justify-between">
+        <li className="flex w-full min-w-0 flex-col gap-3 rounded-lg border-0 bg-background p-2.5 sm:flex-row sm:items-center sm:justify-between sm:border sm:p-3">
             <div className="flex min-w-0 items-start gap-3">
                 <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
                     {documentIcon ? (
@@ -59,7 +59,7 @@ export const AttachmentFileRow = <T extends AttachmentFile>({
                         />
                     )}
                 </span>
-                <div className="grid min-w-0 gap-1">
+                <div className="grid min-w-0 flex-1 gap-1">
                     {isImage && onPreview ? (
                         <Button
                             className="h-auto min-w-0 justify-start gap-1.5 bg-transparent px-0 py-0 text-left text-sm font-medium text-foreground hover:bg-transparent hover:underline"
@@ -91,9 +91,9 @@ export const AttachmentFileRow = <T extends AttachmentFile>({
                     </div>
                 </div>
             </div>
-            <div className="flex shrink-0 gap-2">
+            <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto">
                 <Button
-                    className="ml-0 w-full sm:w-auto"
+                    className="ml-0 w-full min-w-0 px-2 sm:w-auto sm:px-2.5"
                     type="button"
                     size="sm"
                     variant="outline"
@@ -105,7 +105,7 @@ export const AttachmentFileRow = <T extends AttachmentFile>({
                 </Button>
                 {onDelete && (
                     <Button
-                        className="ml-0 w-full sm:w-auto"
+                        className="ml-0 w-full min-w-0 px-2 sm:w-auto sm:px-2.5"
                         type="button"
                         size="sm"
                         variant="destructive"

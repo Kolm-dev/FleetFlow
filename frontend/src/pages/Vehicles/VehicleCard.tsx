@@ -94,26 +94,26 @@ export const VehicleCard = () => {
         },
     ];
     return (
-        <main className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-6 sm:gap-8 sm:px-6">
-            <header className="flex min-w-0 flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <main className="mx-auto grid w-full max-w-6xl gap-4 px-3 py-3 sm:gap-8 sm:px-6 sm:py-6">
+            <header className="flex min-w-0 flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-5 sm:pb-6">
                 <div className="min-w-0">
-                    <Button variant="ghost" size="sm" className="mb-4 -ml-2" onClick={() => navigate("/vehicles")}>
+                    <Button variant="ghost" size="sm" className="mb-2 -ml-2" onClick={() => navigate("/vehicles")}>
                         <ArrowLeft aria-hidden="true" />
                         All vehicles
                     </Button>
-                    <div className="flex items-start gap-4">
-                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary sm:size-14">
-                            <Truck className="size-6 sm:size-7" aria-hidden="true" />
+                    <div className="flex min-w-0 items-start gap-3 sm:gap-4 max-[425px]:grid max-[425px]:grid-cols-2 max-[425px]:items-stretch max-[425px]:gap-0">
+                        <div className="relative flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary sm:size-14 max-[424px]:order-2 max-[424px]:h-auto max-[424px]:w-full">
+                            <Truck className="size-5 sm:size-7 max-[425px]:absolute max-[425px]:inset-0 max-[425px]:size-full" aria-hidden="true" />
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 max-[425px]:order-1 max-[425px]:flex max-[425px]:flex-col max-[425px]:items-center max-[425px]:justify-center max-[425px]:text-center">
                             <div className="min-w-0">
                                 <p className="mb-1 text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
                                     Vehicle details
                                 </p>
-                                <h1 className="wrap-break-word text-2xl font-semibold tracking-tight sm:text-3xl">
+                                <h1 className="wrap-break-word text-xl font-semibold tracking-tight sm:text-3xl">
                                     {vehicle.brand} {vehicle.model}
                                 </h1>
-                                <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-md border bg-muted/50 px-2.5 py-1 font-mono text-sm font-medium tracking-wide text-muted-foreground">
+                                <span className="mt-1.5 inline-flex max-w-full items-center gap-1.5 rounded-md border bg-muted/50 px-2.5 py-1 font-mono text-sm font-medium tracking-wide text-muted-foreground sm:mt-2">
                                     <Hash className="size-3.5 shrink-0" aria-hidden="true" />
                                     <span className="break-all">{vehicle.license_plate}</span>
                                 </span>
@@ -123,11 +123,12 @@ export const VehicleCard = () => {
                 </div>
 
                 <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                    <Button variant="outline" onClick={() => navigate(`/vehicles/${vehicleId}/edit`)}>
+                    <Button className="h-9 w-full sm:w-auto" variant="outline" onClick={() => navigate(`/vehicles/${vehicleId}/edit`)}>
                         <Pencil aria-hidden="true" />
                         Edit vehicle
                     </Button>
                     <Button
+                        className="h-9 w-full sm:w-auto"
                         variant="destructive"
                         disabled={isPending}
                         onClick={() => setIsDeleteConfirmOpen(true)}
