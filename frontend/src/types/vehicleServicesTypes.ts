@@ -73,4 +73,22 @@ export type CreateVehicleServiceData = {
     notes?: string | null;
 };
 
+export type VehicleServiceAttachment = {
+    id: number;
+    vehicle_service_id: number;
+    original_name: string;
+    mime_type: string;
+    size: number;
+    user_id: number | null;
+    uploaded_at: string;
+};
+
+export type VehicleServiceAttachmentsResponse = {
+    data: VehicleServiceAttachment[];
+};
+
+export type VehicleServiceAttachmentUploadResponse = VehicleServiceAttachmentsResponse & {
+    message: string;
+};
+
 export type UpdateVehicleServiceData = Partial<CreateVehicleServiceData>;

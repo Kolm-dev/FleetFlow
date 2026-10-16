@@ -1,11 +1,6 @@
 import { apiClient } from "@/api/client";
 import type { TripAttachmentsResponse, UploadTripAttachmentsResponse } from "@/types/tripsTypes";
-// 2. Добавить API-функции
-//  getTripAttachments(tripId) — получить список metadata.
-//  uploadTripAttachments(tripId, files) — создать FormData и добавить каждый файл как files[].
-//  deleteTripAttachment(tripId, attachmentId).
-//  downloadTripAttachment(tripId, attachment) — запросить Blob с responseType: "blob", создать временный object URL, запустить скачивание с original_name, затем вызвать URL.revokeObjectURL().
-//  Добавить helper для URL inline-preview или отдельную функцию загрузки Blob.
+
 
 export const getTripAttachments = (tripId: number) => {
     return apiClient<TripAttachmentsResponse>(`/trips/${tripId}/attachments`);

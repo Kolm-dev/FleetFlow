@@ -8,6 +8,7 @@ import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { VehicleServiceForm } from "@/components/Vehicles/VehicleServiceForm";
+import VehicleServiceAttachment from "@/components/Vehicles/VehicleServiceAttachment";
 import { getBackendErrorMessage } from "@/libs/errors";
 import { formatCurrency, formatDateOnly, formatMileage } from "@/libs/utils";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
@@ -281,6 +282,8 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                             </div>
 
                             <p className="vehicle-service__notes">{service.notes || "No notes"}</p>
+
+                            <VehicleServiceAttachment vehicleId={vehicleId} serviceId={service.id} />
 
                             <div className="vehicle-service__actions">
                                 <button
