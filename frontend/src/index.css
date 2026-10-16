@@ -91,7 +91,7 @@ Rule:
         --shadow-modal: 0 20px 60px rgb(0 0 0 / 25%);
         --focus-ring: 0 0 0 3px rgb(17 17 17 / 10%);
 
-        --container-width: 960px;
+        --container-width: 1024px;
         --radius-modal: 8px;
         --space-page-x: 32px;
         --transition-fast: 120ms ease;
@@ -409,6 +409,7 @@ Rule:
     }
 
     /* =======Layout======= */
+
     .center-x-y {
         display: flex;
         align-items: center;
@@ -417,15 +418,13 @@ Rule:
     }
 
     .container {
-        width: min(100% - var(--space-page-x), var(--container-width));
-        margin: 0 auto;
-        padding: 24px 0;
+        padding: 24px 10px;
     }
     /*
+
     .container > div,
     .container form {
-        display: grid;
-        gap: 20px;
+
     }
 
     .container > div > div,
@@ -456,7 +455,6 @@ Rule:
     }
 
     .entity-list-header {
-        border-bottom: 1px solid var(--color-border);
         padding-bottom: 18px;
     }
 
@@ -803,23 +801,22 @@ Rule:
     /* =======Shared filters======= */
     .container > div > .entity-search {
         display: flex;
-        align-items: flex-end;
+        align-items: center;
         justify-content: space-between;
         gap: 16px;
         border: 1px solid var(--color-border);
-        padding: 12px;
+        padding: 15px;
         background: var(--color-bg-subtle);
     }
 
     .entity-search label {
-        width: min(100%, 420px);
+        width: min(100%, 360px);
         margin: 0;
         font-size: 14px;
         font-weight: 600;
     }
 
     .entity-search input {
-        width: 100%;
         max-width: none;
     }
 

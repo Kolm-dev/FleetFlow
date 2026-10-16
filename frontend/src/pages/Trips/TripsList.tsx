@@ -139,60 +139,67 @@ const TripsList = () => {
 
     return (
         <div>
-            <TripsHeader
-                currentPage={current_page}
-                lastPage={last_page}
-                total={total}
-            />
-
-            <TripsStatusFilter
-                selectedStatuses={status}
-                onStatusChange={changeStatus}
-            />
-
-            {successMessage && (
-                <SuccessMessage
-                    tag="trip"
-                    ref={successMessageRef}
-                    successText={successMessage}
-                    onComplete={() => setSuccessMessage(null)}
+            <div>
+                <TripsHeader
+                    currentPage={current_page}
+                    lastPage={last_page}
+                    total={total}
                 />
-            )}
 
-            {errorMessage && <ErrorMessage ref={errorMessageRef} messages={errorMessage} />}
-
-            <TripsToolbar
-                searchInput={searchInput}
-                sort={sort}
-                onSearchChange={changeSearchInput}
-                onSortChange={changeSort}
-            />
-
-            {isFetching && !isLoading && <p className="trips-updating">Updating trips...</p>}
-
-            <TripsContent
-                onStartTrip={startTripMutation}
-                onCancelTrip={cancelTripMutation}
-                trips={trips}
-                onCloseTrip={closeTripMutation}
-                onDeleteTrip={deleteTripMutation}
-                onDetailsClick={setSelectedCard}
-            />
-
-            {selectedTrip && (
-                <TripDetailsPanel
-                    trip={selectedTrip}
-                    onClose={() => setSelectedCard(null)}
+                <TripsStatusFilter
+                    selectedStatuses={status}
+                    onStatusChange={changeStatus}
                 />
-            )}
 
-            <Pagination
-                page={page}
-                lastPage={last_page}
-                isFetching={isFetching}
-                onPreviousPage={goToPreviousPage}
-                onNextPage={goToNextPage}
-            />
+                {successMessage && (
+                    <SuccessMessage
+                        tag="trip"
+                        ref={successMessageRef}
+                        successText={successMessage}
+                        onComplete={() => setSuccessMessage(null)}
+                    />
+                )}
+
+                {errorMessage && (
+                    <ErrorMessage
+                        ref={errorMessageRef}
+                        messages={errorMessage}
+                    />
+                )}
+
+                <TripsToolbar
+                    searchInput={searchInput}
+                    sort={sort}
+                    onSearchChange={changeSearchInput}
+                    onSortChange={changeSort}
+                />
+
+                {isFetching && !isLoading && <p className="trips-updating">Updating trips...</p>}
+
+                <TripsContent
+                    onStartTrip={startTripMutation}
+                    onCancelTrip={cancelTripMutation}
+                    trips={trips}
+                    onCloseTrip={closeTripMutation}
+                    onDeleteTrip={deleteTripMutation}
+                    onDetailsClick={setSelectedCard}
+                />
+
+                {selectedTrip && (
+                    <TripDetailsPanel
+                        trip={selectedTrip}
+                        onClose={() => setSelectedCard(null)}
+                    />
+                )}
+
+                <Pagination
+                    page={page}
+                    lastPage={last_page}
+                    isFetching={isFetching}
+                    onPreviousPage={goToPreviousPage}
+                    onNextPage={goToNextPage}
+                />
+            </div>
         </div>
     );
 };

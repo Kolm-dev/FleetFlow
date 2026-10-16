@@ -41,8 +41,6 @@ const VehiclesList = () => {
         setSearchInput(urlSearch);
     }
 
-  
-
     useEffect(() => {
         if (debouncedSearch === urlSearch) return;
 
@@ -131,21 +129,22 @@ const VehiclesList = () => {
                 </NavLink>
             </header>
 
-            <div className="entity-search">
-                <label>
+            <div className="entity-search grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-[minmax(0,1fr)_16rem] sm:items-end sm:p-5 mt-3.5">
+                <label className="mb-0 grid max-w-none gap-1.5 text-sm font-medium text-foreground">
                     Search vehicles
                     <input
+                        className="mt-0 h-10 w-full max-w-none rounded-md border border-input bg-background px-3 text-sm font-normal text-foreground shadow-sm outline-none transition placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
                         type="search"
                         value={searchInput}
                         placeholder="Brand, model, license plate or ID"
                         onChange={event => setSearchInput(event.currentTarget.value)}
                     />
                 </label>
-                {isFetching && !isPending && <Spinner text="Searching vehicles..." />}
 
-                <label>
+                <label className="mb-0 grid w-full max-w-none gap-1.5 text-sm font-medium text-foreground">
                     Driver assignment
                     <select
+                        className="mt-0 h-10 w-full max-w-none rounded-md border border-input bg-background px-3 text-sm font-normal text-foreground shadow-sm outline-none transition focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
                         value={driverAssignment}
                         onChange={event => changeDriverAssignment(event.currentTarget.value as DriverAssignmentFilter)}
                     >
@@ -159,9 +158,14 @@ const VehiclesList = () => {
                         ))}
                     </select>
                 </label>
+                {isFetching && !isPending && (
+                    <div className="sm:col-span-2">
+                        <Spinner text="Searching vehicles..." />
+                    </div>
+                )}
             </div>
 
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),20rem))] justify-start gap-3">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),20rem))] gap-3 py-4 justify-center">
                 {vehicles.length > 0 ? (
                     vehicles.map((vehicle, index) => (
                         <NavLink
@@ -180,7 +184,10 @@ const VehiclesList = () => {
                                                 {vehicle.brand} {vehicle.model}
                                             </CardTitle>
                                             <CardDescription className="mt-1.5 flex min-w-0 items-center gap-1.5 font-mono text-sm">
-                                                <Hash className="size-3.5 shrink-0" aria-hidden="true" />
+                                                <Hash
+                                                    className="size-3.5 shrink-0"
+                                                    aria-hidden="true"
+                                                />
                                                 <span className="truncate">{vehicle.license_plate}</span>
                                             </CardDescription>
                                         </div>
@@ -192,17 +199,27 @@ const VehiclesList = () => {
                                 </CardHeader>
                                 <CardContent className="grid grid-cols-2 gap-3 rounded-b-xl border-t-2 bg-muted/20 px-4 py-3 sm:px-5">
                                     <div className="flex min-w-0 items-start gap-2">
-                                        <CalendarDays className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                                        <CalendarDays
+                                            className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                                            aria-hidden="true"
+                                        />
                                         <div className="min-w-0">
                                             <p className="text-xs text-muted-foreground">Year</p>
-                                            <p className="truncate text-sm font-medium">{vehicle.year ?? "Not specified"}</p>
+                                            <p className="truncate text-sm font-medium">
+                                                {vehicle.year ?? "Not specified"}
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="flex min-w-0 items-start gap-2">
-                                        <UserRound className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                                        <UserRound
+                                            className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                                            aria-hidden="true"
+                                        />
                                         <div className="min-w-0">
                                             <p className="text-xs text-muted-foreground">Driver</p>
-                                            <p className="truncate text-sm font-medium">{vehicle.driver?.name ?? "Unassigned"}</p>
+                                            <p className="truncate text-sm font-medium">
+                                                {vehicle.driver?.name ?? "Unassigned"}
+                                            </p>
                                         </div>
                                     </div>
                                 </CardContent>

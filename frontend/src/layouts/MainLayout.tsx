@@ -9,7 +9,7 @@ export const MainLayout = () => {
     return (
         <>
             <Header />
-            <main className={`container ${isVehicleDetailsPage ? "max-sm:w-full max-sm:px-0 max-sm:py-0" : ""}`}>
+            <main className={`container mx-auto w-full max-w-5xl ${isVehicleDetailsPage ? "max-sm:w-full max-sm:px-0 max-sm:py-0" : ""}`}>
                 <Outlet />
             </main>
             <Footer />
