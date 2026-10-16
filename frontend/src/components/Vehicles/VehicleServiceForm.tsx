@@ -5,7 +5,11 @@ import type {
 } from "@/types/vehicleServicesTypes";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
 import { toDateInputValue } from "@/libs/utils";
+import { Button } from "@/components/ui/button";
 import { useState, type FormEvent } from "react";
+
+const controlClassName =
+    "mt-1.5 h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40";
 
 type VehicleServiceFormProps = {
     service?: VehicleService;
@@ -45,11 +49,12 @@ export const VehicleServiceForm = ({
     };
 
     return (
-        <form className="vehicle-service-form" onSubmit={handleSubmit}>
-            <div className="vehicle-service-form__fields">
-                <label>
-                    Service date
+        <form className="grid min-w-0 gap-4" onSubmit={handleSubmit}>
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <label className="grid min-w-0 content-start text-sm font-medium">
+                    <span>Service date</span>
                     <input
+                        className={controlClassName}
                         required
                         name="service_date"
                         type="date"
@@ -58,9 +63,10 @@ export const VehicleServiceForm = ({
                     />
                 </label>
 
-                <label>
-                    Mileage
+                <label className="grid min-w-0 content-start text-sm font-medium">
+                    <span>Mileage</span>
                     <input
+                        className={controlClassName}
                         required
                         min="0"
                         name="mileage"
@@ -70,9 +76,10 @@ export const VehicleServiceForm = ({
                     />
                 </label>
 
-                <label>
-                    Type
+                <label className="grid min-w-0 content-start text-sm font-medium">
+                    <span>Type</span>
                     <select
+                        className={controlClassName}
                         name="type"
                         value={type}
                         onChange={(event) =>
@@ -87,9 +94,10 @@ export const VehicleServiceForm = ({
                     </select>
                 </label>
 
-                <label>
-                    Cost (USD)
+                <label className="grid min-w-0 content-start text-sm font-medium">
+                    <span>Cost (USD)</span>
                     <input
+                        className={controlClassName}
                         required
                         min="0"
                         name="cost"
@@ -101,9 +109,10 @@ export const VehicleServiceForm = ({
                 </label>
             </div>
 
-            <label>
-                Notes
+            <label className="grid min-w-0 text-sm font-medium">
+                <span>Notes</span>
                 <textarea
+                    className="mt-1.5 w-full min-w-0 resize-y rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-xs outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
                     name="notes"
                     rows={3}
                     value={notes}
@@ -111,22 +120,24 @@ export const VehicleServiceForm = ({
                 />
             </label>
 
-            <div className="vehicle-service-form__actions">
-                <button
-                    className="entity-action entity-action--update"
+            <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
+                <Button
+                    className="w-full sm:w-auto"
+                    variant="outline"
                     disabled={isPending}
                     type="submit"
                 >
                     {isPending ? "Saving..." : submitText}
-                </button>
-                <button
-                    className="vehicle-service-form__cancel"
+                </Button>
+                <Button
+                    className="ml-0 w-full sm:w-auto"
+                    variant="ghost"
                     disabled={isPending}
                     type="button"
                     onClick={onCancel}
                 >
                     Cancel
-                </button>
+                </Button>
             </div>
         </form>
     );

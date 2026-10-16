@@ -11,8 +11,9 @@ import { VehicleServiceForm } from "@/components/Vehicles/VehicleServiceForm";
 import VehicleServiceAttachment from "@/components/Vehicles/VehicleServiceAttachment";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { SuccessMessage } from "@/components/shared/SuccessMessage";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getBackendErrorMessage } from "@/libs/errors";
 import { formatCurrency, formatDateOnly, formatMileage } from "@/libs/utils";
 import { VEHICLE_SERVICE_TYPES } from "@/types/vehicleServicesTypes";
@@ -49,7 +50,7 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
     const [editingService, setEditingService] = useState<VehicleService | null>(null);
     const [deletingService, setDeletingService] = useState<VehicleService | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const [isServicesVisible, setIsServicesVisible] = useState(true);
+    const [isServicesVisible, setIsServicesVisible] = useLocalStorage("vehicle-services-visible", true);
 
     const sort = `${sortDirection === "desc" ? "-" : ""}${sortField}` as VehicleServiceSort;
     const servicesQueryKey = ["vehicle-services", vehicleId, { page, types: selectedTypes, sort }];
@@ -206,10 +207,14 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                                 : "Not available"}
                         </dd>
                         {statistics.last_service_cost !== null && (
-                            <span className="mt-1 block text-xs text-muted-foreground">{formatCurrency(statistics.last_service_cost)}</span>
+                            <span className="mt-1 block text-xs text-muted-foreground">
+                                {formatCurrency(statistics.last_service_cost)}
+                            </span>
                         )}
                         {statistics.last_service_mileage !== null && (
-                            <span className="mt-1 block text-xs text-muted-foreground">{formatMileage(statistics.last_service_mileage)}</span>
+                            <span className="mt-1 block text-xs text-muted-foreground">
+                                {formatMileage(statistics.last_service_mileage)}
+                            </span>
                         )}
                     </div>
                 </dl>
@@ -222,13 +227,13 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
             {isCreateOpen && (
                 <Card>
                     <CardContent className="grid gap-4 p-4 sm:p-5">
-                    <h3 className="font-semibold">New service record</h3>
-                    <VehicleServiceForm
-                        isPending={createMutation.isPending}
-                        submitText="Create service"
-                        onCancel={() => setIsCreateOpen(false)}
-                        onSubmit={formData => createMutation.mutate(formData)}
-                    />
+                        <h3 className="font-semibold">New service record</h3>
+                        <VehicleServiceForm
+                            isPending={createMutation.isPending}
+                            submitText="Create service"
+                            onCancel={() => setIsCreateOpen(false)}
+                            onSubmit={formData => createMutation.mutate(formData)}
+                        />
                     </CardContent>
                 </Card>
             )}
@@ -237,158 +242,191 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
                 id={`vehicle-services-list-${vehicleId}`}
                 className={`grid min-w-0 gap-4 ${isServicesVisible ? "" : "hidden"}`}
             >
-            <div className="grid min-w-0 gap-4 rounded-xl border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-5">
-                <fieldset className="grid gap-2">
+                <div className="grid min-w-0 gap-4 rounded-xl border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-5">
+                    <fieldset className="grid gap-2">
                         <legend className="mb-2 text-sm font-medium">Filter by service type</legend>
                         <p className="text-xs text-muted-foreground">
                             Multiple selections are available. Click the service types you’re interested in.
                         </p>
 
-                    <div className="flex flex-wrap gap-2">
-                        {VEHICLE_SERVICE_TYPES.map(option => {
-                            const selected = selectedTypes.includes(option.value);
+                        <div className="flex flex-wrap gap-2">
+                            {VEHICLE_SERVICE_TYPES.map(option => {
+                                const selected = selectedTypes.includes(option.value);
 
-                            return (
-                                <label
-                                    key={option.value}
-                                    className={`inline-flex cursor-pointer items-center rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${selected ? "border-primary bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:bg-muted"}`}
-                                >
-                                    <input
-                                        className="sr-only"
-                                        checked={selected}
-                                        type="checkbox"
-                                        onChange={() => toggleType(option.value)}
-                                    />
-                                    {option.label}
-                                </label>
-                            );
-                        })}
+                                return (
+                                    <label
+                                        key={option.value}
+                                        className={`inline-flex cursor-pointer items-center rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${selected ? "border-primary bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:bg-muted"}`}
+                                    >
+                                        <input
+                                            className="sr-only"
+                                            checked={selected}
+                                            type="checkbox"
+                                            onChange={() => toggleType(option.value)}
+                                        />
+                                        {option.label}
+                                    </label>
+                                );
+                            })}
+                        </div>
+                    </fieldset>
+
+                    <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:min-w-64">
+                        <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
+                            Sort by
+                            <select
+                                className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                                value={sortField}
+                                onChange={event => handleSortFieldChange(event.currentTarget.value as SortField)}
+                            >
+                                <option value="service_date">Service date</option>
+                                <option value="mileage">Mileage</option>
+                                <option value="cost">Cost</option>
+                            </select>
+                        </label>
+                        <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
+                            Direction
+                            <select
+                                className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                                value={sortDirection}
+                                onChange={event =>
+                                    handleSortDirectionChange(event.currentTarget.value as SortDirection)
+                                }
+                            >
+                                <option value="desc">Newest first</option>
+                                <option value="asc">Oldest first</option>
+                            </select>
+                        </label>
                     </div>
-                </fieldset>
-
-                <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:min-w-64">
-                    <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
-                        Sort by
-                        <select
-                            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-                            value={sortField}
-                            onChange={event => handleSortFieldChange(event.currentTarget.value as SortField)}
-                        >
-                            <option value="service_date">Service date</option>
-                            <option value="mileage">Mileage</option>
-                            <option value="cost">Cost</option>
-                        </select>
-                    </label>
-                    <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
-                        Direction
-                        <select
-                            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-                            value={sortDirection}
-                            onChange={event => handleSortDirectionChange(event.currentTarget.value as SortDirection)}
-                        >
-                            <option value="desc">Newest first</option>
-                            <option value="asc">Oldest first</option>
-                        </select>
-                    </label>
                 </div>
-            </div>
 
-            {error && <ErrorMessage messages={error.message} fallbackMessage="Could not load service history." />}
-            {mutationErrorMessage && <ErrorMessage messages={mutationErrorMessage} />}
-            {isLoading && <Spinner />}
-            {isFetching && !isLoading && (
-                <p className="text-sm text-muted-foreground" role="status">Updating service history...</p>
-            )}
+                {error && (
+                    <ErrorMessage
+                        messages={error.message}
+                        fallbackMessage="Could not load service history."
+                    />
+                )}
+                {mutationErrorMessage && <ErrorMessage messages={mutationErrorMessage} />}
+                {isLoading && <Spinner />}
+                {isFetching && !isLoading && (
+                    <p
+                        className="text-sm text-muted-foreground"
+                        role="status"
+                    >
+                        Updating service history...
+                    </p>
+                )}
 
-            {!isLoading && !error && data?.data.length === 0 && (
-                <p className="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-                    No service records match these filters.
-                </p>
-            )}
+                {!isLoading && !error && data?.data.length === 0 && (
+                    <p className="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+                        No service records match these filters.
+                    </p>
+                )}
 
-            {data && data.data.length > 0 && (
-                <div className="grid min-w-0 gap-3">
-                    {data.data.map(service => (
-                        <article
-                            className="grid min-w-0 gap-4 rounded-xl border bg-card p-4 shadow-sm sm:p-5"
-                            key={service.id}
-                        >
-                            <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
-                                <div className="min-w-0">
-                                    <p className="m-0 text-sm font-medium text-muted-foreground">{serviceTypeLabel(service.type)}</p>
-                                    <p className="mt-1 wrap-break-word text-base font-semibold">{formatDateOnly(service.service_date)}</p>
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="m-0 text-sm font-medium text-muted-foreground">Mileage</p>
-                                    <p className="mt-1 wrap-break-word text-base font-semibold">{formatMileage(service.mileage)}</p>
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="m-0 text-sm font-medium text-muted-foreground">Cost</p>
-                                    <p className="mt-1 wrap-break-word text-base font-semibold">{formatCurrency(service.cost)}</p>
-                                </div>
+                {data && data.data.length > 0 && (
+                    <div className="grid min-w-0 gap-3">
+                        {data.data.map(service => (
+                            <div
+                                className="grid min-w-0 gap-3"
+                                key={service.id}
+                            >
+                                <article className="grid min-w-0 gap-4 rounded-xl border bg-card p-4 shadow-sm sm:p-5">
+                                    <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+                                        <div className="min-w-0">
+                                            <p className="m-0 text-sm font-medium text-muted-foreground">
+                                                {serviceTypeLabel(service.type)}
+                                            </p>
+                                            <p className="mt-1 wrap-break-word text-base font-semibold">
+                                                {formatDateOnly(service.service_date)}
+                                            </p>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="m-0 text-sm font-medium text-muted-foreground">Mileage</p>
+                                            <p className="mt-1 wrap-break-word text-base font-semibold">
+                                                {formatMileage(service.mileage)}
+                                            </p>
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="m-0 text-sm font-medium text-muted-foreground">Cost</p>
+                                            <p className="mt-1 wrap-break-word text-base font-semibold">
+                                                {formatCurrency(service.cost)}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <p className="m-0 wrap-break-word text-sm text-muted-foreground">
+                                        {service.notes || "No notes"}
+                                    </p>
+
+                                    <div className="grid grid-cols-2 gap-2 border-t pt-3 sm:flex sm:justify-end">
+                                        <Button
+                                            className="w-full min-w-0 px-2 sm:w-40"
+                                            variant="outline"
+                                            type="button"
+                                            onClick={() => {
+                                                setIsCreateOpen(false);
+                                                setEditingService(editingService?.id === service.id ? null : service);
+                                            }}
+                                        >
+                                            <Pencil aria-hidden="true" />
+                                            {editingService?.id === service.id ? "Close edit" : "Edit service"}
+                                        </Button>
+                                        <Button
+                                            className="w-full min-w-0 px-2 sm:w-40"
+                                            variant="destructive"
+                                            type="button"
+                                            onClick={() => setDeletingService(service)}
+                                        >
+                                            <Trash2 aria-hidden="true" />
+                                            Delete service
+                                        </Button>
+                                    </div>
+
+                                    {editingService?.id === service.id ? (
+                                        <Card className="gap-0 border-2 border-primary/30 bg-muted/20 py-0 shadow-sm">
+                                            <CardHeader className="border-b border-primary/20 px-4 py-3 sm:px-5">
+                                                <CardTitle className="text-base">Edit service record</CardTitle>
+                                                <CardDescription>
+                                                    Update the details for {serviceTypeLabel(service.type).toLowerCase()}.
+                                                </CardDescription>
+                                            </CardHeader>
+                                            <CardContent className="p-4 sm:p-5">
+                                                <VehicleServiceForm
+                                                    key={service.id}
+                                                    service={service}
+                                                    isPending={updateMutation.isPending}
+                                                    submitText="Save changes"
+                                                    onCancel={() => setEditingService(null)}
+                                                    onSubmit={formData =>
+                                                        updateMutation.mutate({
+                                                            serviceId: service.id,
+                                                            formData,
+                                                        })
+                                                    }
+                                                />
+                                            </CardContent>
+                                        </Card>
+                                    ) : (
+                                        <VehicleServiceAttachment
+                                            vehicleId={vehicleId}
+                                            serviceId={service.id}
+                                        />
+                                    )}
+                                </article>
                             </div>
+                        ))}
+                    </div>
+                )}
 
-                            <p className="m-0 wrap-break-word text-sm text-muted-foreground">
-                                {service.notes || "No notes"}
-                            </p>
-
-                            <VehicleServiceAttachment vehicleId={vehicleId} serviceId={service.id} />
-
-                            <div className="grid grid-cols-2 gap-2 border-t pt-3 sm:flex sm:justify-end">
-                                <Button
-                                    className="w-full min-w-0 px-2 sm:w-40"
-                                    variant="outline"
-                                    type="button"
-                                    onClick={() => {
-                                        setIsCreateOpen(false);
-                                        setEditingService(editingService?.id === service.id ? null : service);
-                                    }}
-                                >
-                                    <Pencil aria-hidden="true" />
-                                    {editingService?.id === service.id ? "Close edit" : "Edit"}
-                                </Button>
-                                <Button
-                                    className="w-full min-w-0 px-2 sm:w-40"
-                                    variant="destructive"
-                                    type="button"
-                                    onClick={() => setDeletingService(service)}
-                                >
-                                    <Trash2 aria-hidden="true" />
-                                    Delete
-                                </Button>
-                            </div>
-
-                            {editingService?.id === service.id && (
-                                <div className="rounded-lg border bg-muted/20 p-3 sm:p-4">
-                                    <VehicleServiceForm
-                                        key={service.id}
-                                        service={service}
-                                        isPending={updateMutation.isPending}
-                                        submitText="Save changes"
-                                        onCancel={() => setEditingService(null)}
-                                        onSubmit={formData =>
-                                            updateMutation.mutate({
-                                                serviceId: service.id,
-                                                formData,
-                                            })
-                                        }
-                                    />
-                                </div>
-                            )}
-                        </article>
-                    ))}
-                </div>
-            )}
-
-            {data && (
-                <Pagination
-                    page={data.current_page}
-                    lastPage={data.last_page}
-                    isFetching={isFetching}
-                    onPreviousPage={() => setPage(current => Math.max(1, current - 1))}
-                    onNextPage={() => setPage(current => Math.min(data.last_page, current + 1))}
-                />
-            )}
+                {data && (
+                    <Pagination
+                        page={data.current_page}
+                        lastPage={data.last_page}
+                        isFetching={isFetching}
+                        onPreviousPage={() => setPage(current => Math.max(1, current - 1))}
+                        onNextPage={() => setPage(current => Math.min(data.last_page, current + 1))}
+                    />
+                )}
             </div>
 
             <ConfirmModal
