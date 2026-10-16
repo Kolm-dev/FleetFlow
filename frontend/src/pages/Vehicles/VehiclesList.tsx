@@ -1,6 +1,7 @@
 import { getVehicles } from "@/api/vehicles";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { CreateEntityButton } from "@/components/shared/CreateEntityButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getValidPage } from "@/libs/utils";
@@ -121,12 +122,7 @@ const VehiclesList = () => {
                     <h2>Vehicles</h2>
                     <p>Total found: {data.total}</p>
                 </div>
-                <NavLink
-                    className="create-link entity-action--create"
-                    to="/vehicles/create"
-                >
-                    Create vehicle
-                </NavLink>
+                <CreateEntityButton entity="vehicle" to="/vehicles/create" />
             </header>
 
             <div className="entity-search grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-[minmax(0,1fr)_16rem] sm:items-end sm:p-5 mt-3.5">

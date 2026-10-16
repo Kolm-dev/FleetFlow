@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { CreateEntityButton } from "@/components/shared/CreateEntityButton";
 
 type TripsHeaderProps = {
     currentPage: number;
@@ -14,11 +14,6 @@ export const TripsHeader = ({ currentPage, lastPage, total }: TripsHeaderProps) 
                 Page {currentPage} of {lastPage}. Total trips: {total}
             </p>
         </div>
-        <NavLink
-            className="create-link entity-action--create"
-            to="/trips/create"
-        >
-            Create trip
-        </NavLink>
+        <CreateEntityButton entity="trip" to="/trips/create" />
     </header>
 );

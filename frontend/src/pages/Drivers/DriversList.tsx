@@ -1,12 +1,13 @@
 import { getDrivers } from "@/api/drivers";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { CreateEntityButton } from "@/components/shared/CreateEntityButton";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getValidPage } from "@/libs/utils";
 import type { DriverStatus } from "@/types/driversTypes";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { NavLink, useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
 
@@ -118,9 +119,7 @@ export const DriversList = () => {
                     <h2>Drivers</h2>
                     <p>Total drivers: {response?.total ?? drivers.length}</p>
                 </div>
-                <NavLink className="create-link entity-action--create" to="/drivers/create">
-                    Create driver
-                </NavLink>
+                <CreateEntityButton entity="driver" to="/drivers/create" />
             </header>
 
             <div className="entity-search">

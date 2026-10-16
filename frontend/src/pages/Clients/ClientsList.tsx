@@ -1,6 +1,7 @@
 import { deleteClient, getClients } from "@/api/clients";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { CreateEntityButton } from "@/components/shared/CreateEntityButton";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -8,7 +9,7 @@ import { getBackendErrorMessage } from "@/libs/errors";
 import type { Client, ClientType } from "@/types/clientTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { NavLink, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 const ClientsList = () => {
     const navigate = useNavigate();
@@ -82,12 +83,7 @@ const ClientsList = () => {
                     <h2>Clients</h2>
                     <p>Total found: {clients.length}</p>
                 </div>
-                <NavLink
-                    className="create-link entity-action--create"
-                    to="/clients/create"
-                >
-                    Create client
-                </NavLink>
+                <CreateEntityButton entity="client" to="/clients/create" />
             </header>
 
             <div className="entity-search clients-search">
