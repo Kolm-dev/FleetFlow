@@ -24,7 +24,7 @@ export const Home = () => {
     const activeTrips = stats.trips.planned + stats.trips.pending;
 
     const tripStatuses = [
-        { label: "Planned", value: stats.trips.planned, tone: "blue" },
+        { label: "Planned", value: stats.trips.planned, tone: "slate" },
         { label: "Pending", value: stats.trips.pending, tone: "amber" },
         { label: "Closed", value: stats.trips.closed, tone: "emerald" },
         { label: "Cancelled", value: stats.trips.cancelled, tone: "rose" },

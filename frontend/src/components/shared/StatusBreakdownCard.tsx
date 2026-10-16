@@ -117,7 +117,7 @@ export const StatusBreakdownCard = ({
                     </div>
                 </div>
 
-                <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-2">
+                <ul className={`grid gap-2 ${statuses.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
                     {statuses.map((status) => (
                         <li
                             key={status.label}
