@@ -15,6 +15,13 @@ use Throwable;
 
 class VehicleServiceAttachmentController extends Controller
 {
+    public function index(Vehicle $vehicle, VehicleService $service)
+    {
+        $service = $vehicle->vehicleServices()->findOrFail($service->id);
+
+        return VehicleServiceAttachmentResource::collection($service->attachments()->latest('uploaded_at')->get());
+    }
+
     public function downloadAttachment(
         Vehicle $vehicle,
         VehicleService $service,
@@ -40,7 +47,7 @@ class VehicleServiceAttachmentController extends Controller
 
     public function uploadAttachment(
         UploadVehicleServiceAttachmentRequest $request,
-        VehicleService $service,
+        Vehicle $vehicle, VehicleService $service
     ) {
         $validated = $request->validated();
         $files = $validated['files'];

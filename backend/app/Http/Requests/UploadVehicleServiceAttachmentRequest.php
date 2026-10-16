@@ -25,7 +25,7 @@ class UploadVehicleServiceAttachmentRequest extends FormRequest
     {
         return [
             'files' => ['required', 'array', 'max:5'],
-            'files.*' => ['file', File::types(['txt,'])->max('10mb')],
+            'files.*' => ['file', File::types(['txt', 'pdf', 'png', 'jpg', 'jpeg'])->max('10mb')],
 
         ];
     }

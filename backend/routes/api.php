@@ -61,6 +61,10 @@ Route::middleware('auth:sanctum')->group(function () {
         VehicleServiceAttachmentController::class,
         'uploadAttachment',
     ]);
+    Route::get('vehicles/{vehicle}/services/{service}/attachments', [
+        VehicleServiceAttachmentController::class,
+        'index',
+    ]);
     Route::delete('vehicles/{vehicle}/services/{service}/attachments/{attachment}', [
         VehicleServiceAttachmentController::class,
         'deleteAttachment',
