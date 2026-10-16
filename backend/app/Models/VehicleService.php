@@ -5,6 +5,9 @@ namespace App\Models;
 use App\Enums\VehicleServiceType;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class VehicleService extends Model
 {
     protected $fillable = [
@@ -16,9 +19,14 @@ class VehicleService extends Model
         'notes',
     ];
 
-    public function vehicle()
+    public function vehicle() : BelongsTo
     {
         return $this->belongsTo(Vehicle::class);
+    }
+
+    public function attachments() : HasMany
+    {
+        return $this->hasMany(VehicleServiceAttachment::class, 'vehicle_service_id');
     }
 
     protected function casts(): array
