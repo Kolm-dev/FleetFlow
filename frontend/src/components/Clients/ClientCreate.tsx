@@ -1,6 +1,8 @@
 import { createClient } from "@/api/clients";
 import { ClientForm } from "@/components/Clients/ClientForm";
 import type { ClientFormData } from "@/components/Clients/ClientForm";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessage } from "@/libs/errors";
 import type { CreateClientData } from "@/types/clientTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,11 +12,10 @@ export const ClientCreate = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const { mutate, isPending, error } = useMutation({
+    const { mutate, isPending, error, isSuccess, data } = useMutation({
         mutationFn: (data: CreateClientData) => createClient(data),
-        onSuccess: response => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["clients"] });
-            navigate(`/clients/${response.data.id}`);
         },
     });
 
@@ -24,12 +25,21 @@ export const ClientCreate = () => {
 
     return (
         <div>
-            {error && <p className="error-message">{getBackendErrorMessage(error, "Could not create client.")}</p>}
-            <ClientForm
-                isPending={isPending}
-                onCancel={() => navigate("/clients")}
-                onSubmit={handleSubmit}
-            />
+            {error && <ErrorMessage messages={getBackendErrorMessage(error, "Could not create client.")} />}
+            {isSuccess && data ? (
+                <SuccessMessage
+                    tag="client"
+                    successText="Client created successfully. Opening client details shortly."
+                    time={2000}
+                    onComplete={() => navigate(`/clients/${data.data.id}`)}
+                />
+            ) : (
+                <ClientForm
+                    isPending={isPending}
+                    onCancel={() => navigate("/clients")}
+                    onSubmit={handleSubmit}
+                />
+            )}
         </div>
     );
 };

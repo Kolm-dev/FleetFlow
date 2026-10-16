@@ -1,6 +1,8 @@
 import { getVehicle, updateVehicle } from "@/api/vehicles";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { VehicleEditForm } from "@/components/Vehicles/VehicleEditForm";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessage } from "@/libs/errors";
 import type { UpdateVehicleData } from "@/types/vehiclesTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -24,6 +26,7 @@ export const VehicleEdit = () => {
         mutate,
         isPending,
         error: updateError,
+        isSuccess,
     } = useMutation({
         mutationFn: (data: UpdateVehicleData) => updateVehicle(data, parseInt(vehicleId as string)),
         onSuccess: () => {
@@ -33,20 +36,30 @@ export const VehicleEdit = () => {
             queryClient.invalidateQueries({
                 queryKey: ["vehicle", vehicleId],
             });
-            navigate(`/vehicles/${vehicleId}`);
         },
     });
 
     if (isLoading) return <Spinner />;
     if (vehicleError) {
-        return <p className="error-message">{vehicleError.message}</p>;
+        return <ErrorMessage messages={vehicleError.message} fallbackMessage="Could not load vehicle." />;
     }
-    if (!vehicle) return <p className="error-message">Vehicle not found</p>;
+    if (!vehicle) return <ErrorMessage messages="Vehicle not found" />;
+
+    if (isSuccess) {
+        return (
+            <SuccessMessage
+                tag="vehicle"
+                successText="Vehicle updated successfully. Returning to vehicle details shortly."
+                time={2000}
+                onComplete={() => navigate(`/vehicles/${vehicleId}`)}
+            />
+        );
+    }
 
     return (
         <div className="vehicle-edit-page">
             {updateError && (
-                <p className="error-message">{getBackendErrorMessage(updateError, "Could not update vehicle.")}</p>
+                <ErrorMessage messages={getBackendErrorMessage(updateError, "Could not update vehicle.")} />
             )}
             <VehicleEditForm
                 onSubmit={data => mutate(data)}

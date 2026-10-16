@@ -1,4 +1,5 @@
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import EventFilters from "@/components/Trips/EventFilters";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useTripEvents } from "@/hooks/useTripEvents";
@@ -197,7 +198,7 @@ export const TripTimeline = ({ tripId }: { tripId: number }) => {
                 <div id={contentId}>
                     {isLoading && <Spinner text="Loading trip history..." />}
 
-                    {!isLoading && error && <p className="error-message">{error.message}</p>}
+                    {!isLoading && error && <ErrorMessage messages={error.message} fallbackMessage="Could not load trip history." />}
 
                     {!isLoading && !error && events.length === 0 && (
                         <p className="trip-details-empty">No history events yet.</p>

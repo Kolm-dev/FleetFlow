@@ -1,4 +1,5 @@
 import { calculateTripPrice } from "@/api/pricing";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { formatCurrency, toNullableNumber } from "@/libs/utils";
 import { useState } from "react";
 
@@ -129,9 +130,7 @@ export const TripPriceCalculator = ({
                     )}
 
                 {priceCalculationStatus === "error" && (
-                    <p className="error-message">
-                        Cannot calculate price. Enter trip distance first.
-                    </p>
+                    <ErrorMessage messages="Cannot calculate price. Enter trip distance first." />
                 )}
             </div>
         </aside>

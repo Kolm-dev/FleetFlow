@@ -26,7 +26,11 @@ export const ConfirmModal = ({
     if (!isOpen) return null;
 
     return (
-        <div className="confirm-modal" role="dialog" aria-modal="true">
+        <div
+            className="confirm-modal"
+            role="dialog"
+            aria-modal="true"
+        >
             <div className="confirm-modal__content">
                 <h2>{title}</h2>
 
@@ -44,7 +48,7 @@ export const ConfirmModal = ({
                     </button>
                     <button
                         type="button"
-                        className="confirm-modal__cancel"
+                        className="confirm-modal__cancell"
                         disabled={isConfirming}
                         onClick={onCancel}
                     >

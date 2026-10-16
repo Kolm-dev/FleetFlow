@@ -1,5 +1,6 @@
 import { ClientCombobox } from "@/components/Trips/ClientCombobox";
 import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { toNullableNumber } from "@/libs/utils";
 import type { Client } from "@/types/clientTypes";
 import type { Driver } from "@/types/driversTypes";
@@ -170,13 +171,7 @@ export const TripEditForm = ({
                         <option value="cancelled">Cancelled</option>
                     </select>
                 </label>
-                {errorMessages.length > 0 && (
-                    <ul className="error-message">
-                        {errorMessages.map(message => (
-                            <li key={message}>{message}</li>
-                        ))}
-                    </ul>
-                )}
+                <ErrorMessage messages={errorMessages} />
                 <button
                     className="entity-action entity-action--update"
                     type="submit"

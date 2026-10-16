@@ -1,5 +1,6 @@
 import { ClientCombobox } from "@/components/Trips/ClientCombobox";
 import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import type { Client } from "@/types/clientTypes";
 import type { Driver } from "@/types/driversTypes";
 import type { CreateTripData } from "@/types/tripsTypes";
@@ -129,13 +130,7 @@ const TripCreateForm = ({ isCreating, availableDrivers, clients, errorMessages, 
                     )}
                 </label>
 
-                {errorMessages.length > 0 && (
-                    <ul className="error-message">
-                        {errorMessages.map(message => (
-                            <li key={message}>{message}</li>
-                        ))}
-                    </ul>
-                )}
+                <ErrorMessage messages={errorMessages} />
 
                 <button
                     className="entity-action entity-action--create"

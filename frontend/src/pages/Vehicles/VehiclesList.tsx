@@ -1,10 +1,12 @@
 import { getVehicles } from "@/api/vehicles";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDebounce } from "@/hooks/useDebounce";
 import { getValidPage } from "@/libs/utils";
 import type { VehicleDriverAssignment } from "@/types/vehiclesTypes";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { CalendarDays, ChevronRight, Hash, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useSearchParams } from "react-router";
 
@@ -159,33 +161,52 @@ const VehiclesList = () => {
                 </label>
             </div>
 
-            <div className="vehicles-list">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),20rem))] justify-start gap-3">
                 {vehicles.length > 0 ? (
                     vehicles.map((vehicle, index) => (
                         <NavLink
-                            className="vehicle-card"
+                            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             key={vehicle.id}
                             to={`/vehicles/${vehicle.id}`}
                         >
-                            <div className="vehicle-card__header">
-                                <span className="vehicle-card__number">
-                                    #{(data.current_page - 1) * data.per_page + index + 1}
-                                </span>
-                                <h2>
-                                    {vehicle.brand} {vehicle.model}
-                                </h2>
-                            </div>
-
-                            <dl className="vehicle-card__details">
-                                <div>
-                                    <dt>License plate</dt>
-                                    <dd>{vehicle.license_plate}</dd>
-                                </div>
-                                <div>
-                                    <dt>Year</dt>
-                                    <dd>{vehicle.year ?? "Not specified"}</dd>
-                                </div>
-                            </dl>
+                            <Card className="h-full gap-0 border-2 border-border bg-card py-0 shadow-sm transition-colors group-hover:border-primary/50 group-hover:bg-accent/30 group-hover:shadow-md">
+                                <CardHeader className="p-4 sm:p-5">
+                                    <div className="flex min-w-0 items-start gap-3">
+                                        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold tabular-nums text-muted-foreground">
+                                            #{(data.current_page - 1) * data.per_page + index + 1}
+                                        </span>
+                                        <div className="min-w-0 flex-1">
+                                            <CardTitle className="line-clamp-2 text-base leading-snug">
+                                                {vehicle.brand} {vehicle.model}
+                                            </CardTitle>
+                                            <CardDescription className="mt-1.5 flex min-w-0 items-center gap-1.5 font-mono text-sm">
+                                                <Hash className="size-3.5 shrink-0" aria-hidden="true" />
+                                                <span className="truncate">{vehicle.license_plate}</span>
+                                            </CardDescription>
+                                        </div>
+                                        <ChevronRight
+                                            className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                                            aria-hidden="true"
+                                        />
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="grid grid-cols-2 gap-3 rounded-b-xl border-t-2 bg-muted/20 px-4 py-3 sm:px-5">
+                                    <div className="flex min-w-0 items-start gap-2">
+                                        <CalendarDays className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                                        <div className="min-w-0">
+                                            <p className="text-xs text-muted-foreground">Year</p>
+                                            <p className="truncate text-sm font-medium">{vehicle.year ?? "Not specified"}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex min-w-0 items-start gap-2">
+                                        <UserRound className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                                        <div className="min-w-0">
+                                            <p className="text-xs text-muted-foreground">Driver</p>
+                                            <p className="truncate text-sm font-medium">{vehicle.driver?.name ?? "Unassigned"}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </NavLink>
                     ))
                 ) : (

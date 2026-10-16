@@ -1,6 +1,8 @@
 import { getClient, updateClient } from "@/api/clients";
 import { ClientForm } from "@/components/Clients/ClientForm";
 import type { ClientFormData } from "@/components/Clients/ClientForm";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { getBackendErrorMessage } from "@/libs/errors";
 import type { UpdateClientData } from "@/types/clientTypes";
@@ -27,12 +29,13 @@ export const ClientEdit = () => {
         mutate,
         isPending,
         error: updateError,
+        isSuccess,
+        data: updateResult,
     } = useMutation({
         mutationFn: (data: UpdateClientData) => updateClient(clientId, data),
-        onSuccess: response => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["clients"] });
             queryClient.invalidateQueries({ queryKey: ["client", clientId] });
-            navigate(`/clients/${response.data.id}`);
         },
     });
 
@@ -53,14 +56,23 @@ export const ClientEdit = () => {
     return (
         <div>
             {updateError && (
-                <p className="error-message">{getBackendErrorMessage(updateError, "Could not update client.")}</p>
+                <ErrorMessage messages={getBackendErrorMessage(updateError, "Could not update client.")} />
             )}
-            <ClientForm
-                client={data.data}
-                isPending={isPending}
-                onCancel={() => navigate(`/clients/${clientId}`)}
-                onSubmit={handleSubmit}
-            />
+            {isSuccess && updateResult ? (
+                <SuccessMessage
+                    tag="client"
+                    successText="Client updated successfully. Returning to client details shortly."
+                    time={2000}
+                    onComplete={() => navigate(`/clients/${updateResult.data.id}`)}
+                />
+            ) : (
+                <ClientForm
+                    client={data.data}
+                    isPending={isPending}
+                    onCancel={() => navigate(`/clients/${clientId}`)}
+                    onSubmit={handleSubmit}
+                />
+            )}
         </div>
     );
 };

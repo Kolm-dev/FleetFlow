@@ -2,6 +2,8 @@ import { getClients } from "@/api/clients";
 import { getDrivers } from "@/api/drivers";
 import { getTrip, updateTrip } from "@/api/trips";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { TripEditForm } from "@/components/Trips/TripEditForm";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import { getBackendErrorMessages } from "@/libs/errors";
@@ -30,7 +32,7 @@ const TripEdit = () => {
         queryFn: () => getClients(),
     });
 
-    const { mutate, isPending, error: updateError } = useMutation({
+    const { mutate, isPending, error: updateError, isSuccess } = useMutation({
         mutationFn: (data: UpdateTripData) =>
             updateTrip(data, tripId as number),
         onSuccess: () => {
@@ -40,18 +42,28 @@ const TripEdit = () => {
             queryClient.invalidateQueries({ queryKey: ["drivers"] });
             queryClient.invalidateQueries({ queryKey: ["vehicles"] });
             queryClient.invalidateQueries({ queryKey: ["stats"] });
-            navigate("/trips");
         },
     });
 
     if (tripId === undefined || Number.isNaN(tripId))
-        return <p className="error-message">Invalid trip id</p>;
+        return <ErrorMessage messages="Invalid trip id" />;
     if (isTripLoading || isDriversLoading || isClientsLoading) return <Spinner />;
-    if (!trip) return <p className="error-message">Trip not found</p>;
+    if (!trip) return <ErrorMessage messages="Trip not found" />;
     if (!driversResponse)
-        return <p className="error-message">No drivers data</p>;
+        return <ErrorMessage messages="No drivers data" />;
     if (!clientsResponse)
-        return <p className="error-message">No clients data</p>;
+        return <ErrorMessage messages="No clients data" />;
+
+    if (isSuccess) {
+        return (
+            <SuccessMessage
+                tag="trip"
+                successText="Trip updated successfully. Returning to the trips list shortly."
+                time={2000}
+                onComplete={() => navigate("/trips")}
+            />
+        );
+    }
 
     return (
         <TripEditForm

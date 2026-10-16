@@ -2,10 +2,12 @@ import { deleteDriver, getDriverDetails } from "@/api/drivers";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessage } from "@/libs/errors";
 import { formatCurrency, formatNumber, formatNumberWithSuffix, getValidPage } from "@/libs/utils";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
@@ -15,7 +17,6 @@ export const DriverCard = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const queryClient = useQueryClient();
-    const [redirectCountdown, setRedirectCountdown] = useState(5);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
     const page = getValidPage(searchParams.get("page"));
     const from = searchParams.get("from") ?? "";
@@ -73,26 +74,6 @@ export const DriverCard = () => {
         });
     };
 
-    useEffect(() => {
-        if (!isSuccess) return;
-
-        const intervalId = window.setInterval(() => {
-            setRedirectCountdown(currentCountdown => {
-                const nextCountdown = Number((currentCountdown - 0.1).toFixed(1));
-
-                return Math.max(nextCountdown, 0);
-            });
-        }, 100);
-
-        return () => window.clearInterval(intervalId);
-    }, [isSuccess]);
-
-    useEffect(() => {
-        if (isSuccess && redirectCountdown <= 0) {
-            navigate("/drivers");
-        }
-    }, [isSuccess, navigate, redirectCountdown]);
-
     const handleConfirmDelete = () => {
         if (!driverId) return;
 
@@ -102,24 +83,23 @@ export const DriverCard = () => {
 
     if (isSuccess) {
         return (
-            <div className="success-message">
-                <p>
-                    {driver?.name} - {driver?.phone_number} was successfully deleted!
-                </p>
-                <p>Redirecting to drivers list in {redirectCountdown.toFixed(1)}s</p>
-            </div>
+            <SuccessMessage
+                tag="driver"
+                successText={`${driver?.name} - ${driver?.phone_number} was successfully deleted. Redirecting to drivers list shortly.`}
+                onComplete={() => navigate("/drivers")}
+            />
         );
     }
 
     return (
         <div>
-            {isError && <div className="error-message">{getBackendErrorMessage(error, "Could not delete driver.")}</div>}
+            {isError && <ErrorMessage messages={getBackendErrorMessage(error, "Could not delete driver.")} />}
 
-            {driverError && <p className="error-message">{driverError.message}</p>}
+            {driverError && <ErrorMessage messages={driverError.message} fallbackMessage="Could not load driver." />}
 
             {isLoading && <Spinner />}
 
-            {!isLoading && !driver && !driverError && <p className="error-message">Driver not found</p>}
+            {!isLoading && !driver && !driverError && <ErrorMessage messages="Driver not found" />}
 
             {driver && statistics && closedTrips && (
                 <>

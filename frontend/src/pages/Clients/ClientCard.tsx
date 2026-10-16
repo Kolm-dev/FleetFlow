@@ -1,5 +1,7 @@
 import { deleteClient, getClient } from "@/api/clients";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessage } from "@/libs/errors";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router";
@@ -24,11 +26,11 @@ const ClientCard = () => {
         mutate: removeClient,
         isPending: isDeleting,
         error: deleteError,
+        isSuccess,
     } = useMutation({
         mutationFn: () => deleteClient(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["clients"] });
-            navigate("/clients");
         },
     });
 
@@ -72,7 +74,15 @@ const ClientCard = () => {
                 </dd>
             </dl>
             {deleteError && (
-                <p className="error-message">{getBackendErrorMessage(deleteError, "Could not delete client.")}</p>
+                <ErrorMessage messages={getBackendErrorMessage(deleteError, "Could not delete client.")} />
+            )}
+            {isSuccess && (
+                <SuccessMessage
+                    tag="client"
+                    successText="Client deleted successfully. Returning to the clients list shortly."
+                    time={2000}
+                    onComplete={() => navigate("/clients")}
+                />
             )}
             <button className="entity-action entity-action--edit" onClick={() => navigate(`/clients/${client.id}/edit`)}>
                 Edit

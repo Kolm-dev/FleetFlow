@@ -3,11 +3,13 @@ import {
     type RegisterCredentials,
     type ValidationErrorResponse,
 } from "@/api/auth";
+import { AuthForm, type AuthFormField } from "@/components/Auth/AuthForm";
 import { Footer } from "@/components/Footer";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router";
+import { LockKeyhole, UserRound } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router";
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -18,15 +20,13 @@ export const Register = () => {
     const { mutate, isPending, error } = useMutation({
         mutationFn: (data: RegisterCredentials) => register(data),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ["currentUser"],
-            });
+            await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
             navigate("/");
         },
     });
 
-    const handleFormSubmit = (e: React.FormEvent): void => {
-        e.preventDefault();
+    const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         mutate({
             name,
             password,
@@ -35,8 +35,7 @@ export const Register = () => {
     };
 
     const validationErrors =
-        axios.isAxiosError<ValidationErrorResponse>(error) &&
-        error.response?.status === 422
+        axios.isAxiosError<ValidationErrorResponse>(error) && error.response?.status === 422
             ? error.response.data.errors
             : null;
 
@@ -47,88 +46,59 @@ export const Register = () => {
                 : "Something went wrong"
             : null;
 
+    const fields: AuthFormField[] = [
+        {
+            id: "name",
+            label: "Name",
+            value: name,
+            type: "text",
+            autoComplete: "username",
+            placeholder: "Your name",
+            icon: UserRound,
+            error: validationErrors?.name?.[0],
+            autoFocus: true,
+            onChange: setName,
+        },
+        {
+            id: "password",
+            label: "Password",
+            value: password,
+            type: "password",
+            autoComplete: "new-password",
+            placeholder: "Create password",
+            icon: LockKeyhole,
+            error: validationErrors?.password?.[0],
+            onChange: setPassword,
+        },
+        {
+            id: "password_confirmation",
+            label: "Confirm password",
+            value: passwordConfirmation,
+            type: "password",
+            autoComplete: "new-password",
+            placeholder: "Repeat password",
+            icon: LockKeyhole,
+            error: validationErrors?.password_confirmation?.[0],
+            onChange: setPasswordConfirmation,
+        },
+    ];
+
     return (
         <>
-            {" "}
-            <section className="login">
-                <div className="login__header">
-                    <h1>Create account</h1>
-
-                    <p>Create your profile to start using FleetFlow.</p>
-                </div>
-
-                <form
-                    onSubmit={handleFormSubmit}
-                    className="login__form"
-                    method="post"
-                >
-                    <label htmlFor="name">
-                        Name
-                        <input
-                            onChange={(e) => setName(e.currentTarget.value)}
-                            value={name}
-                            name="name"
-                            type="text"
-                            autoComplete="username"
-                            placeholder="Your name"
-                        />
-                        {validationErrors?.name?.[0] && (
-                            <p className="login__error">
-                                {validationErrors.name[0]}
-                            </p>
-                        )}
-                    </label>
-
-                    <label htmlFor="password">
-                        Password
-                        <input
-                            onChange={(e) => setPassword(e.currentTarget.value)}
-                            value={password}
-                            name="password"
-                            type="password"
-                            autoComplete="new-password"
-                            placeholder="Create password"
-                        />
-                        {validationErrors?.password?.[0] && (
-                            <p className="login__error">
-                                {validationErrors.password[0]}
-                            </p>
-                        )}
-                    </label>
-
-                    <label htmlFor="password_confirmation">
-                        Confirm password
-                        <input
-                            onChange={(e) =>
-                                setPasswordConfirmation(e.currentTarget.value)
-                            }
-                            value={passwordConfirmation}
-                            name="password_confirmation"
-                            type="password"
-                            autoComplete="new-password"
-                            placeholder="Repeat password"
-                        />
-                        {validationErrors?.password_confirmation?.[0] && (
-                            <p className="login__error">
-                                {validationErrors.password_confirmation[0]}
-                            </p>
-                        )}
-                    </label>
-
-                    <button disabled={isPending} type="submit">
-                        Register
-                    </button>
-
-                    {generalErrorMessage && (
-                        <p className="login__error">{generalErrorMessage}</p>
-                    )}
-
-                    <p className="login__switch">
-                        Already have an account?{" "}
-                        <NavLink to="/authorization">Login</NavLink>
-                    </p>
-                </form>
-            </section>
+            <AuthForm
+                title="Create account"
+                description="Create your profile to start using FleetFlow."
+                fields={fields}
+                submitLabel="Register"
+                pendingLabel="Creating account..."
+                isPending={isPending}
+                isSubmitDisabled={!name || !password || !passwordConfirmation}
+                errorMessage={generalErrorMessage}
+                footerText="Already have an account?"
+                footerLinkLabel="Login"
+                footerLinkTo="/authorization"
+                onSubmit={handleFormSubmit}
+            />
             <Footer />
         </>
     );

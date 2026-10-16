@@ -1,6 +1,8 @@
 import { cancelTrip, getTrip } from "@/api/trips";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { TripAttachmentsSection } from "@/components/Trips/TripAttachmentsSection";
 import { TripTimeline } from "@/components/Trips/TripTimeline";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
@@ -45,11 +47,11 @@ export const TripCard = () => {
     });
 
     if (!isValidTripId) {
-        return <div className="error-message">Invalid trip ID.</div>;
+        return <ErrorMessage messages="Invalid trip ID." />;
     }
     if (isLoading) return <Spinner text="Wait. Loading trip details..." />;
-    if (error) return <div className="error-message">{error.message}</div>;
-    if (!trip) return <div className="error-message">Trip not found</div>;
+    if (error) return <ErrorMessage messages={error.message} fallbackMessage="Could not load trip." />;
+    if (!trip) return <ErrorMessage messages="Trip not found" />;
 
     const canCancel = trip.status === "planned" || trip.status === "pending";
 
@@ -88,11 +90,9 @@ export const TripCard = () => {
                 </div>
             </header>
 
-            {cancelMutation.isSuccess && <p className="success-message">{cancelMutation.data.message}</p>}
+            {cancelMutation.isSuccess && <SuccessMessage tag="trip" successText={cancelMutation.data.message} />}
             {cancelMutation.isError && (
-                <p className="error-message">
-                    {getBackendErrorMessage(cancelMutation.error, "Could not cancel trip.")}
-                </p>
+                <ErrorMessage messages={getBackendErrorMessage(cancelMutation.error, "Could not cancel trip.")} />
             )}
 
             <section className="trip-page__section">
