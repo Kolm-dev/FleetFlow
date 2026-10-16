@@ -225,9 +225,12 @@ export const VehicleServicesSection = ({ vehicleId, statistics }: VehicleService
             )}
 
             {isCreateOpen && (
-                <Card>
-                    <CardContent className="grid gap-4 p-4 sm:p-5">
-                        <h3 className="font-semibold">New service record</h3>
+                <Card className="gap-0 border-2 border-primary/30 bg-muted/20 py-0 shadow-sm">
+                    <CardHeader className="border-b border-primary/20 px-4 py-3 sm:px-5">
+                        <CardTitle className="text-base">New service record</CardTitle>
+                        <CardDescription>Enter the service details to add them to this vehicle’s history.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-4 sm:p-5">
                         <VehicleServiceForm
                             isPending={createMutation.isPending}
                             submitText="Create service"
