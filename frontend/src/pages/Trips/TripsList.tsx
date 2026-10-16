@@ -130,9 +130,16 @@ const TripsList = () => {
         },
     });
 
-    if (isLoading) return <Spinner />;
-    if (error) return <p>{error.message}</p>;
-    if (!data) return <p>No trips data.</p>;
+    if (isLoading)
+        return (
+            <div className="flex  items-center justify-center">
+                <Spinner text={"Loading trips..."} />
+            </div>
+        );
+    if (error) {
+        return <ErrorMessage messages={getBackendErrorMessage(error, "Couldn't load trips.")} />;
+    }
+    if (!data) return <ErrorMessage messages="No trips data." />;
 
     const { data: trips, current_page, last_page, total } = data;
     const selectedTrip = trips.find(trip => trip.id === selectedCardId);
@@ -146,33 +153,35 @@ const TripsList = () => {
                     total={total}
                 />
 
-                <TripsStatusFilter
-                    selectedStatuses={status}
-                    onStatusChange={changeStatus}
-                />
-
-                {successMessage && (
-                    <SuccessMessage
-                        tag="trip"
-                        ref={successMessageRef}
-                        successText={successMessage}
-                        onComplete={() => setSuccessMessage(null)}
+                <div className="space-y-4">
+                    <TripsStatusFilter
+                        selectedStatuses={status}
+                        onStatusChange={changeStatus}
                     />
-                )}
 
-                {errorMessage && (
-                    <ErrorMessage
-                        ref={errorMessageRef}
-                        messages={errorMessage}
+                    {successMessage && (
+                        <SuccessMessage
+                            tag="trip"
+                            ref={successMessageRef}
+                            successText={successMessage}
+                            onComplete={() => setSuccessMessage(null)}
+                        />
+                    )}
+
+                    {errorMessage && (
+                        <ErrorMessage
+                            ref={errorMessageRef}
+                            messages={errorMessage}
+                        />
+                    )}
+
+                    <TripsToolbar
+                        searchInput={searchInput}
+                        sort={sort}
+                        onSearchChange={changeSearchInput}
+                        onSortChange={changeSort}
                     />
-                )}
-
-                <TripsToolbar
-                    searchInput={searchInput}
-                    sort={sort}
-                    onSearchChange={changeSearchInput}
-                    onSortChange={changeSort}
-                />
+                </div>
 
                 {isFetching && !isLoading && <p className="trips-updating">Updating trips...</p>}
 

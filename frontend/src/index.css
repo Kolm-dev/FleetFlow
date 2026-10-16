@@ -1202,23 +1202,6 @@ Rule:
     }
 
     /* =======Trips======= */
-    .trips-toolbar {
-        display: flex;
-        align-items: flex-end;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .trips-toolbar label {
-        flex: 1 1 240px;
-        margin-bottom: 0;
-    }
-
-    .trips-toolbar input,
-    .trips-toolbar select {
-        max-width: none;
-    }
-
     .trips-updating {
         min-height: 20px;
         margin: -8px 0 0;

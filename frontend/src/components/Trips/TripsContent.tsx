@@ -22,15 +22,22 @@ export const TripsContent = ({
         return <p className="empty-state">No trips found</p>;
     }
 
-    return trips.map(trip => (
-        <TripCard
-            onStart={() => onStartTrip(trip.id)}
-            onCancel={() => onCancelTrip(trip.id)}
-            onClose={() => onCloseTrip(trip.id)}
-            onDelete={() => onDeleteTrip(trip.id)}
-            key={trip.id}
-            trip={trip}
-            onDetailsClick={() => onDetailsClick(trip.id)}
-        />
-    ));
+    return (
+        <div className="grid min-w-0 grid-cols-2 items-stretch gap-4">
+        <div className="col-span-2 grid min-w-0 grid-cols-1 items-stretch gap-4 md:grid-cols-2">
+            {trips.map(trip => (
+                <TripCard
+                    onStart={() => onStartTrip(trip.id)}
+                    onCancel={() => onCancelTrip(trip.id)}
+                    onClose={() => onCloseTrip(trip.id)}
+                    onDelete={() => onDeleteTrip(trip.id)}
+                    key={trip.id}
+                    trip={trip}
+                    onDetailsClick={() => onDetailsClick(trip.id)}
+                />
+            ))}
+        </div>
+    </div>
+
+    );
 };

@@ -57,7 +57,7 @@ class TripController extends Controller
 
         $this->sort($query, $request);
 
-        $trips = $query->paginate(5);
+        $trips = $query->paginate(10);
 
         return response()->json($trips);
     }

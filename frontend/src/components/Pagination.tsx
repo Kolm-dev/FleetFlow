@@ -11,7 +11,7 @@ export const Pagination = ({ page, lastPage, isFetching, onPreviousPage, onNextP
 
     return (
         <nav
-            className="pagination"
+            className="pagination mt-2.5 rounded border border-border bg-background p-2.5 text-sm font-medium text-foreground shadow-sm"
             aria-label="Pagination"
         >
             <button
