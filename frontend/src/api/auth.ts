@@ -8,6 +8,7 @@ export const getCSRFCookie = () => {
 type LoginCredentials = {
     name: string;
     password: string;
+    remember?: boolean;
 };
 export type RegisterCredentials = {
     name: string;
@@ -25,9 +26,7 @@ export type RegisterResponse = {
     new_user: string;
 };
 
-export type RegisterValidationErrors = Partial<
-    Record<keyof RegisterCredentials, string[]>
->;
+export type RegisterValidationErrors = Partial<Record<keyof RegisterCredentials, string[]>>;
 
 export type ValidationErrorResponse = {
     message: string;

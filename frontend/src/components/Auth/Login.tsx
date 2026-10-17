@@ -9,10 +9,11 @@ import { useNavigate } from "react-router";
 export const Login = () => {
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
+    const [rememberMe, setRememberMe] = useState(false);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { mutate, isPending, error } = useMutation({
-        mutationFn: () => login({ name, password }),
+        mutationFn: () => login({ name, password, remember: rememberMe }),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
             navigate("/");
@@ -68,6 +69,8 @@ export const Login = () => {
             footerLinkLabel="Create account"
             footerLinkTo="/registration"
             onSubmit={handleSubmitForm}
+            rememberMe={rememberMe}
+            onRememberMeChange={setRememberMe}
         />
     );
 };

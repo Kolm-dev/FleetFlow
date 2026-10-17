@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Arr;
 
 class AuthController extends Controller
 {
@@ -15,9 +16,12 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'name' => ['required', 'string'],
             'password' => ['required', 'string'],
+            'remember' => ['sometimes', 'boolean'],
+
         ]);
 
-        if (Auth::attempt($credentials)) {
+        $remember = $credentials['remember'] ?? false;
+        if (Auth::attempt(Arr::only($credentials, ['name', 'password']), $remember)) {
             $request->session()->regenerate();
 
             return response()->json([
