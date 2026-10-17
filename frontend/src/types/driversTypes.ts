@@ -11,6 +11,7 @@ export interface Driver {
     status: DriverStatus;
     photo?: string | null;
     vehicles: Vehicle[];
+    created_at: string;
 }
 
 export type CreateDriverData = {

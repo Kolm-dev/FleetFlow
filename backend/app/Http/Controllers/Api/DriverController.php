@@ -57,7 +57,9 @@ class DriverController extends Controller
             'from' => ['sometimes', 'date'],
             'to' => ['sometimes', 'date', 'after_or_equal:from'],
         ]);
-        $closedTripsBuilder = $driver->trips()->where('status', TripStatus::Closed);
+        $closedTripsBuilder = $driver->trips()
+            ->with('vehicle')
+            ->where('status', TripStatus::Closed);
         $currentTrip = $driver->trips()
             ->with('vehicle')
             ->whereIn('status', [TripStatus::Planned, TripStatus::Pending])

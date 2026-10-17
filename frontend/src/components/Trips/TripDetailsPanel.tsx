@@ -1,5 +1,6 @@
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { driverStatusStyles } from "@/components/Drivers/driverStatusStyles";
 import { tripStatusStyles } from "@/components/Trips/tripStatusStyles";
 import { cn } from "@/lib/utils";
 import { formatCurrency, formatDateTime, formatNullableValue } from "@/libs/utils";
@@ -112,8 +113,10 @@ const TripDetailsPanel = ({ onClose, trip }: TripDetailsType) => {
                                             </DetailItem>
                                             <div className="flex items-center justify-between gap-3">
                                                 <dt className="text-xs font-medium text-muted-foreground">Status</dt>
-                                                <dd className="m-0 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground capitalize">
-                                                    {trip.driver.status.replace("_", " ")}
+                                                <dd
+                                                    className={`m-0 rounded-full px-2.5 py-1 text-xs font-medium ${driverStatusStyles[trip.driver.status].badge}`}
+                                                >
+                                                    {driverStatusStyles[trip.driver.status].label}
                                                 </dd>
                                             </div>
                                         </dl>
