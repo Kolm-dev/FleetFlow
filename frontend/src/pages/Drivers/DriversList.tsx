@@ -2,7 +2,10 @@ import { getDrivers } from "@/api/drivers";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { CreateEntityButton } from "@/components/shared/CreateEntityButton";
+import { driverStatusStyles } from "@/components/Drivers/driverStatusStyles";
+import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
+import { cn } from "@/lib/utils";
 import { getValidPage } from "@/libs/utils";
 import type { DriverStatus } from "@/types/driversTypes";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -10,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
 const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
+const DRIVER_STATUSES: DriverStatus[] = ["available", "on_trip", "unavailable"];
 
 const handlerStatus = (status: DriverStatus) => {
     if (status == "on_trip") {
@@ -136,35 +140,36 @@ export const DriversList = () => {
                 {isFetching && !isLoading && <span>Searching...</span>}
             </div>
 
-            <div className="drivers-status-actions">
-                <button
-                    className={!status ? "is-active" : undefined}
+            <div className="grid w-full grid-cols-2 gap-2 rounded-md border p-3 sm:grid-cols-4" aria-label="Filter drivers by status">
+                <Button
+                    className={cn(
+                        "h-8 w-full min-w-0 border px-1 text-xs sm:px-3 sm:text-sm",
+                        !status ? "border-primary bg-primary text-primary-foreground hover:bg-primary/80" : "border-border bg-background text-foreground hover:bg-muted",
+                    )}
                     aria-pressed={!status}
+                    type="button"
+                    variant="outline"
                     onClick={() => changeStatus()}
                 >
                     All
-                </button>
-                <button
-                    className={status === "available" ? "is-active" : undefined}
-                    aria-pressed={status === "available"}
-                    onClick={() => changeStatus("available")}
-                >
-                    Available
-                </button>
-                <button
-                    className={status === "on_trip" ? "is-active" : undefined}
-                    aria-pressed={status === "on_trip"}
-                    onClick={() => changeStatus("on_trip")}
-                >
-                    On trip
-                </button>
-                <button
-                    className={status === "unavailable" ? "is-active" : undefined}
-                    aria-pressed={status === "unavailable"}
-                    onClick={() => changeStatus("unavailable")}
-                >
-                    Unavailable
-                </button>
+                </Button>
+                {DRIVER_STATUSES.map((value) => (
+                    <Button
+                        key={value}
+                        className={cn(
+                            "h-8 w-full min-w-0 border px-1 text-xs sm:px-3 sm:text-sm",
+                            status === value
+                                ? driverStatusStyles[value].selectedFilter
+                                : driverStatusStyles[value].filter,
+                        )}
+                        aria-pressed={status === value}
+                        type="button"
+                        variant="outline"
+                        onClick={() => changeStatus(value)}
+                    >
+                        {driverStatusStyles[value].label}
+                    </Button>
+                ))}
             </div>
             <div className="drivers-list">
                 {drivers.length > 0 ? (
