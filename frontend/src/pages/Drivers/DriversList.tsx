@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { getValidPage } from "@/libs/utils";
 import type { DriverStatus } from "@/types/driversTypes";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 
 const DRIVER_STATUSES: DriverStatus[] = ["available", "on_trip", "unavailable"];
@@ -22,7 +22,9 @@ export const DriversList = () => {
     const page = getValidPage(searchParams.get("page"));
     const [searchInput, setSearchInput] = useState(urlSearch);
     const [lastUrlSearch, setLastUrlSearch] = useState(urlSearch);
+    const searchInputRef = useRef<HTMLInputElement>(null);
     const debouncedSearch = useDebounce(searchInput.trim(), 500);
+    const isIdSearch = searchInput.startsWith("#");
 
     if (urlSearch !== lastUrlSearch) {
         setLastUrlSearch(urlSearch);
@@ -67,6 +69,14 @@ export const DriversList = () => {
         );
     };
 
+    const toggleIdSearch = () => {
+        setSearchInput((current) => {
+            if (current.startsWith("#")) return current.slice(1);
+            return `#${/^\d*$/.test(current) ? current : ""}`;
+        });
+        searchInputRef.current?.focus();
+    };
+
     const goToPage = (nextPage: number) => {
         setSearchParams(
             (currentParams) => {
@@ -87,6 +97,7 @@ export const DriversList = () => {
         isError,
         isLoading,
         isFetching,
+        isPlaceholderData,
         error,
         data: response,
     } = useQuery({
@@ -94,7 +105,7 @@ export const DriversList = () => {
         queryFn: () =>
             getDrivers({
                 status: status || undefined,
-                search: urlSearch || undefined,
+                search: urlSearch === "#" ? undefined : urlSearch || undefined,
                 page,
             }),
         placeholderData: keepPreviousData,
@@ -113,22 +124,46 @@ export const DriversList = () => {
             <header className="page-header entity-list-header">
                 <div>
                     <h2>Drivers</h2>
-                    <p>Total drivers: {response?.total ?? drivers.length}</p>
+                    <p>
+                        {isPlaceholderData
+                            ? "Loading results..."
+                            : `Page ${response.current_page} of ${response.last_page}. Total drivers: ${response.total}`}
+                    </p>
                 </div>
                 <CreateEntityButton entity="driver" to="/drivers/create" />
             </header>
 
             <div className="entity-search mb-4 grid w-full gap-3 rounded-lg border bg-card p-3 sm:grid-cols-2 sm:gap-4 sm:p-4">
-                <label className="grid w-full max-w-full gap-1.5 text-sm font-medium text-foreground">
-                    Search drivers
-                    <input
-                        className="mt-0 h-10 w-full min-w-0 max-w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-normal shadow-xs outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        type="search"
-                        value={searchInput}
-                        placeholder="Name, phone number or ID"
-                        onChange={(event) => setSearchInput(event.currentTarget.value)}
-                    />
-                </label>
+                <div className="w-full max-w-sm">
+                    <label className="mb-1.5 block text-sm font-medium text-foreground" htmlFor="driver-search">
+                        Search drivers
+                    </label>
+                    <div className="flex gap-2">
+                        <input
+                            ref={searchInputRef}
+                            id="driver-search"
+                            className="mt-0 h-10 w-full min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm font-normal shadow-xs outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                            type="search"
+                            value={searchInput}
+                            placeholder={isIdSearch ? "#20" : "Name or phone number"}
+                            aria-describedby="driver-search-hint"
+                            onChange={(event) => setSearchInput(event.currentTarget.value)}
+                        />
+                        <Button
+                            className="size-10 shrink-0 text-base"
+                            type="button"
+                            variant={isIdSearch ? "default" : "outline"}
+                            aria-label={isIdSearch ? "Disable ID search" : "Search by exact ID"}
+                            aria-pressed={isIdSearch}
+                            onClick={toggleIdSearch}
+                        >
+                            #
+                        </Button>
+                    </div>
+                    <p id="driver-search-hint" className="m-0 mt-1.5 text-xs text-muted-foreground">
+                        {isIdSearch ? "Enter digits after # for an exact ID match." : "For an exact ID match, enter #20 or press #."}
+                    </p>
+                </div>
                 {isFetching && !isLoading && <span>Searching...</span>}
             </div>
 
@@ -164,7 +199,9 @@ export const DriversList = () => {
                 ))}
             </div>
             <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {drivers.length > 0 ? (
+                {isPlaceholderData ? (
+                    <p className="col-span-full text-sm text-muted-foreground">Searching...</p>
+                ) : drivers.length > 0 ? (
                     drivers.map((driver) => (
                         <DriverListCard
                             key={driver.id}
@@ -176,7 +213,7 @@ export const DriversList = () => {
                 )}
             </div>
 
-            {response && (
+            {!isPlaceholderData && (
                 <Pagination
                     page={response.current_page}
                     lastPage={response.last_page}

@@ -71,6 +71,47 @@ class FilterTest extends TestCase
         $response->assertJsonPath('per_page', 15);
     }
 
+    public function test_drivers_can_be_searched_by_exact_id_with_hash_prefix(): void
+    {
+        $matchedDriver = Driver::factory()->create(['phone_number' => '555-0100']);
+        $otherDriver = Driver::factory()->create([
+            'phone_number' => "555-{$matchedDriver->id}-9999",
+        ]);
+
+        $response = $this->getJson("/api/drivers?search=%23{$matchedDriver->id}");
+
+        $response->assertOk();
+        $response->assertJsonPath('total', 1);
+        $response->assertJsonFragment(['id' => $matchedDriver->id]);
+        $response->assertJsonMissing(['id' => $otherDriver->id]);
+    }
+
+    public function test_numeric_driver_search_still_matches_phone_numbers(): void
+    {
+        $matchedDriver = Driver::factory()->create(['phone_number' => '555-209-0100']);
+        $otherDriver = Driver::factory()->create(['phone_number' => '555-333-0100']);
+
+        $response = $this->getJson('/api/drivers?search=209');
+
+        $response->assertOk();
+        $response->assertJsonPath('total', 1);
+        $response->assertJsonFragment(['id' => $matchedDriver->id]);
+        $response->assertJsonMissing(['id' => $otherDriver->id]);
+    }
+
+    public function test_driver_name_search_is_case_insensitive(): void
+    {
+        $matchedDriver = Driver::factory()->create(['name' => 'Euna Crona Del Paso']);
+        $otherDriver = Driver::factory()->create(['name' => 'Another Driver']);
+
+        $response = $this->getJson('/api/drivers?search=euna');
+
+        $response->assertOk();
+        $response->assertJsonPath('total', 1);
+        $response->assertJsonFragment(['id' => $matchedDriver->id]);
+        $response->assertJsonMissing(['id' => $otherDriver->id]);
+    }
+
     public function test_trips_can_be_filtered_by_status(): void
     {
         $driver = Driver::factory()->create();

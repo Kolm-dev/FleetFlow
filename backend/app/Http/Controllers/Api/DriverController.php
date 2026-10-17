@@ -28,16 +28,16 @@ class DriverController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = $request->input('search');
+            $search = trim($request->input('search'));
 
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'ILIKE', "%{$search}%")
-                    ->orWhere('phone_number', 'ILIKE', "%{$search}%");
-
-                if (ctype_digit($search)) {
-                    $q->orWhere('id', (int) $search);
-                }
-            });
+            if (preg_match('/^#\d+$/', $search)) {
+                $query->whereKey((int) substr($search, 1));
+            } else {
+                $query->where(function ($q) use ($search) {
+                    $q->whereLike('name', "%{$search}%")
+                        ->orWhereLike('phone_number', "%{$search}%");
+                });
+            }
         }
 
         $drivers = $query->orderBy('id')->paginate(15);

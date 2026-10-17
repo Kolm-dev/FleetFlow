@@ -3580,11 +3580,6 @@ Rule:
             gap: var(--mobile-content-gap);
         }
 
-        .container > div > div,
-        .container form > div {
-            padding: var(--mobile-panel-padding);
-        }
-
         .page-header.entity-list-header {
             align-items: center;
             flex-direction: row;

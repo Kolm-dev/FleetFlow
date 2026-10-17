@@ -120,12 +120,17 @@ const VehiclesList = () => {
             <header className="page-header entity-list-header">
                 <div>
                     <h2>Vehicles</h2>
-                    <p>Total found: {data.total}</p>
+                    <p>
+                        Page {data.current_page} of {data.last_page}. Total vehicles: {data.total}
+                    </p>
                 </div>
-                <CreateEntityButton entity="vehicle" to="/vehicles/create" />
+                <CreateEntityButton
+                    entity="vehicle"
+                    to="/vehicles/create"
+                />
             </header>
 
-            <div className="entity-search grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-[minmax(0,1fr)_16rem] sm:items-end sm:p-5 mt-3.5">
+            <div className="entity-search grid-cols-1 grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-[minmax(0,1fr)_16rem] sm:items-end sm:p-5 mt-3.5">
                 <label className="mb-0 grid max-w-none gap-1.5 text-sm font-medium text-foreground">
                     Search vehicles
                     <input
@@ -161,7 +166,7 @@ const VehiclesList = () => {
                 )}
             </div>
 
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),20rem))] gap-3 py-4 justify-center">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-3 py-4">
                 {vehicles.length > 0 ? (
                     vehicles.map((vehicle, index) => (
                         <NavLink
