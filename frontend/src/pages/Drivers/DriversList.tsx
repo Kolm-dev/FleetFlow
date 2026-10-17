@@ -122,10 +122,11 @@ export const DriversList = () => {
                 <CreateEntityButton entity="driver" to="/drivers/create" />
             </header>
 
-            <div className="entity-search">
-                <label>
+            <div className="entity-search mb-4 grid w-full gap-3 rounded-lg border bg-card p-3 sm:grid-cols-2 sm:gap-4 sm:p-4">
+                <label className="grid w-full max-w-full gap-1.5 text-sm font-medium text-foreground">
                     Search drivers
                     <input
+                        className="mt-0 h-10 w-full min-w-0 max-w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-normal shadow-xs outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                         type="search"
                         value={searchInput}
                         placeholder="Name, phone number or ID"
