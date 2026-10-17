@@ -21,7 +21,7 @@ import { Register } from "@/components/Auth/Register";
 import { PricingSettings } from "@/pages/PricingSettings";
 import { TripCard } from "@/pages/Trips/TripCard";
 import ClientsList from "@/pages/Clients/ClientsList";
-import ClientCard from "@/pages/Clients/ClientCard";
+// import ClientCard from "@/pages/Clients/ClientCard";
 import { ClientEdit } from "@/components/Clients/ClientEdit";
 import { ClientCreate } from "@/components/Clients/ClientCreate";
 
@@ -65,10 +65,11 @@ export const App = () => {
                             element={<VehicleCreate />}
                         />
                         <Route path="clients" element={<ClientsList />} />
+                        {/* Client details page is reserved for a future expanded client profile.
                         <Route
                             path="clients/:clientId"
                             element={<ClientCard />}
-                        />
+                        /> */}
                         <Route
                             path="clients/:id/edit"
                             element={<ClientEdit />}

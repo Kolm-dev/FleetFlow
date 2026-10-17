@@ -30,7 +30,6 @@ export const ClientEdit = () => {
         isPending,
         error: updateError,
         isSuccess,
-        data: updateResult,
     } = useMutation({
         mutationFn: (data: UpdateClientData) => updateClient(clientId, data),
         onSuccess: () => {
@@ -58,18 +57,18 @@ export const ClientEdit = () => {
             {updateError && (
                 <ErrorMessage messages={getBackendErrorMessage(updateError, "Could not update client.")} />
             )}
-            {isSuccess && updateResult ? (
+            {isSuccess ? (
                 <SuccessMessage
                     tag="client"
-                    successText="Client updated successfully. Returning to client details shortly."
+                    successText="Client updated successfully. Returning to the clients list shortly."
                     time={2000}
-                    onComplete={() => navigate(`/clients/${updateResult.data.id}`)}
+                    onComplete={() => navigate("/clients")}
                 />
             ) : (
                 <ClientForm
                     client={data.data}
                     isPending={isPending}
-                    onCancel={() => navigate(`/clients/${clientId}`)}
+                    onCancel={() => navigate("/clients")}
                     onSubmit={handleSubmit}
                 />
             )}

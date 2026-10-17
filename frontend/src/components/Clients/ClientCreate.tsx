@@ -12,7 +12,7 @@ export const ClientCreate = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const { mutate, isPending, error, isSuccess, data } = useMutation({
+    const { mutate, isPending, error, isSuccess } = useMutation({
         mutationFn: (data: CreateClientData) => createClient(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["clients"] });
@@ -26,12 +26,12 @@ export const ClientCreate = () => {
     return (
         <div>
             {error && <ErrorMessage messages={getBackendErrorMessage(error, "Could not create client.")} />}
-            {isSuccess && data ? (
+            {isSuccess ? (
                 <SuccessMessage
                     tag="client"
-                    successText="Client created successfully. Opening client details shortly."
+                    successText="Client created successfully. Returning to the clients list shortly."
                     time={2000}
-                    onComplete={() => navigate(`/clients/${data.data.id}`)}
+                    onComplete={() => navigate("/clients")}
                 />
             ) : (
                 <ClientForm

@@ -163,12 +163,7 @@ const TripDetailsPanel = ({ onClose, trip }: TripDetailsType) => {
                                     {trip.client ? (
                                         <dl className="grid gap-3 sm:grid-cols-2">
                                             <DetailItem label="Name">
-                                                <Link
-                                                    className="underline-offset-4 hover:underline"
-                                                    to={`/clients/${trip.client.id}`}
-                                                >
-                                                    {trip.client.name}
-                                                </Link>
+                                                {trip.client.name}
                                             </DetailItem>
                                             {trip.client.email && (
                                                 <DetailItem label="Email">
