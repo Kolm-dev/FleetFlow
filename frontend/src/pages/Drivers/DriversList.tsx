@@ -2,6 +2,7 @@ import { getDrivers } from "@/api/drivers";
 import { Pagination } from "@/components/Pagination";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { CreateEntityButton } from "@/components/shared/CreateEntityButton";
+import { DriverListCard } from "@/components/Drivers/DriverListCard";
 import { driverStatusStyles } from "@/components/Drivers/driverStatusStyles";
 import { Button } from "@/components/ui/button";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -10,20 +11,11 @@ import { getValidPage } from "@/libs/utils";
 import type { DriverStatus } from "@/types/driversTypes";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
-const DRIVER_PHOTO_PLACEHOLDER = "/icons/non-photo.svg";
 const DRIVER_STATUSES: DriverStatus[] = ["available", "on_trip", "unavailable"];
 
-const handlerStatus = (status: DriverStatus) => {
-    if (status == "on_trip") {
-        return "on trip";
-    }
-    return status;
-};
-
 export const DriversList = () => {
-    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const status = searchParams.get("status") as DriverStatus;
     const urlSearch = searchParams.get("search")?.trim() ?? "";
@@ -171,49 +163,16 @@ export const DriversList = () => {
                     </Button>
                 ))}
             </div>
-            <div className="drivers-list">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {drivers.length > 0 ? (
-                    drivers.map((driver, index) => (
-                        <article className="driver-card" key={driver.id}>
-                            <img
-                                className="driver-card__photo"
-                                src={driver.photo ?? DRIVER_PHOTO_PLACEHOLDER}
-                                alt={driver.photo ? driver.name : ""}
-                            />
-
-                            <div className="driver-card__content">
-                                <div className="driver-card__header">
-                                    <span className="driver-card__number">
-                                    #{(response.current_page - 1) * response.per_page + index + 1}
-                                    </span>
-                                    <h2>{driver.name}</h2>
-                                </div>
-
-                                <dl className="driver-card__details">
-                                    <div>
-                                        <dt>Phone</dt>
-                                        <dd>{driver.phone_number}</dd>
-                                    </div>
-                                    <div>
-                                        <dt>Status</dt>
-                                        <dd>{handlerStatus(driver.status)}</dd>
-                                    </div>
-                                </dl>
-
-                                <button
-                                    className="entity-action entity-action--driver entity-action--details driver-card__button"
-                                    type="button"
-                                    onClick={() =>
-                                        navigate(`/drivers/${driver.id}`)
-                                    }
-                                >
-                                    View profile
-                                </button>
-                            </div>
-                        </article>
+                    drivers.map((driver) => (
+                        <DriverListCard
+                            key={driver.id}
+                            driver={driver}
+                        />
                     ))
                 ) : (
-                    <p className="empty-state">No drivers found</p>
+                    <p className="empty-state col-span-full">No drivers found</p>
                 )}
             </div>
 

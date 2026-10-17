@@ -2124,49 +2124,11 @@ Rule:
     }
 
     /* =======Drivers======= */
-    .drivers-status-container,
-    .drivers-list {
+    .drivers-status-container {
         display: grid;
         gap: 16px;
     }
 
-    .driver-card {
-        display: grid;
-        grid-template-columns: 120px 1fr;
-        gap: 16px;
-        border: 1px solid var(--color-border);
-        padding: 16px;
-        background: var(--color-bg);
-    }
-
-    .driver-card__photo {
-        width: 120px;
-        height: 120px;
-        border: 1px solid var(--color-border);
-        object-fit: cover;
-    }
-
-    .driver-card__content {
-        display: flex;
-        min-width: 0;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .driver-card__header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .driver-card__header h2 {
-        margin-bottom: 0;
-        overflow-wrap: anywhere;
-        font-weight: 600;
-    }
-
-    .driver-card__number,
     .vehicle-card__number {
         flex-shrink: 0;
         border: 1px solid var(--color-border);
@@ -2176,59 +2138,21 @@ Rule:
         font-weight: 600;
     }
 
-    .driver-card__details {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-        margin: 0;
-    }
-
-    .driver-card__details div,
     .vehicle-card__details div {
         display: grid;
         gap: 4px;
         min-width: 0;
     }
 
-    .driver-card__details dt,
     .vehicle-card__details dt {
         color: var(--color-muted);
         font-size: 13px;
     }
 
-    .driver-card__details dd,
     .vehicle-card__details dd {
         margin: 0;
         color: var(--color-text);
         font-weight: 500;
-    }
-
-    .driver-card__details dd {
-        overflow-wrap: anywhere;
-    }
-
-    .driver-card__button {
-        width: fit-content;
-        margin-top: auto;
-        border-color: var(--color-border);
-        background: var(--color-bg);
-        box-shadow: var(--shadow-sm);
-        color: var(--color-text);
-        font-weight: 500;
-    }
-
-    .driver-card__button::after {
-        content: "→";
-        margin-left: 8px;
-    }
-
-    .driver-card__button:hover,
-    .driver-card__button:focus-visible {
-        border-color: var(--color-text);
-        background: var(--color-text);
-        box-shadow: var(--shadow-md);
-        color: var(--color-bg);
-        outline: none;
     }
 
     .driver-profile {
@@ -4145,60 +4069,6 @@ Rule:
             font-size: var(--mobile-control-font-size);
         }
 
-        .driver-card {
-            grid-template-columns: var(--mobile-card-image-size) minmax(0, 1fr);
-            gap: var(--mobile-card-gap);
-            padding: var(--mobile-panel-padding);
-        }
-
-        .driver-card__photo {
-            width: var(--mobile-card-image-size);
-            height: var(--mobile-card-image-size);
-        }
-
-        .driver-card__content {
-            gap: var(--mobile-card-content-gap);
-        }
-
-        .driver-card__header {
-            align-items: center;
-            gap: 6px;
-        }
-
-        .driver-card__header h2 {
-            font-size: var(--mobile-card-title-size);
-        }
-
-        .driver-card__number {
-            padding: 2px 5px;
-            font-size: var(--mobile-small-font-size);
-        }
-
-        .driver-card__details {
-            grid-template-columns: 1fr;
-            gap: 6px;
-        }
-
-        .driver-card__details div {
-            gap: 1px;
-        }
-
-        .driver-card__details dt {
-            font-size: var(--mobile-small-font-size);
-        }
-
-        .driver-card__details dd {
-            font-size: var(--mobile-control-font-size);
-        }
-
-        .driver-card__button {
-            width: 100%;
-            min-height: var(--mobile-action-height);
-            padding: 5px 8px;
-            font-size: var(--mobile-action-font-size);
-        }
-
-        .container .drivers-list,
         .container .vehicles-list {
             gap: 8px;
             border: 0;
