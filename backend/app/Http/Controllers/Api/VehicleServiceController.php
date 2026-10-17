@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\VehicleServiceType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreVehicleServiceRequest;
-use App\Http\Requests\UpdateVehicleServiceRequest;
-use App\Models\Vehicle;
+use App\Http\Requests\Vehicles\StoreVehicleServiceRequest;
+use App\Http\Requests\Vehicles\UpdateVehicleServiceRequest;
+use App\Models\Vehicles\Vehicle;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;

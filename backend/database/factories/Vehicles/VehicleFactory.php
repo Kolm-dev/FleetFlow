@@ -1,0 +1,32 @@
+<?php
+
+namespace Database\Factories\Vehicles;
+
+use App\Models\Drivers\Driver;
+use App\Models\Vehicles\Vehicle;
+use App\Enums\FuelType;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Vehicle>
+ */
+class VehicleFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'brand' => fake()->word(),
+            'model' => fake()->word(),
+            'license_plate' => strtoupper(fake()->unique()->bothify('??####')),
+            'year' => fake()->numberBetween(2000, 2026),
+            'driver_id' => Driver::factory(),
+            'fuel_type' => FuelType::Diesel,
+            'fuel_consumption' => 10,
+        ];
+    }
+}

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Driver;
-use App\Models\Trip;
-use App\Models\Vehicle;
+use App\Models\Drivers\Driver;
+use App\Models\Trips\Trip;
+use App\Models\Vehicles\Vehicle;
 use Illuminate\Database\Seeder;
 
 class FleetSeeder extends Seeder

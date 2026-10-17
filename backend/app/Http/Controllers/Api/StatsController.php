@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Enums\DriverStatus;
 use App\Enums\TripStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Driver;
-use App\Models\Trip;
-use App\Models\Vehicle;
+use App\Models\Drivers\Driver;
+use App\Models\Trips\Trip;
+use App\Models\Vehicles\Vehicle;
 
 class StatsController extends Controller
 {

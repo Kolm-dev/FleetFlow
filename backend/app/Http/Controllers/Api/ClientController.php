@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreClientRequest;
-use App\Http\Resources\ClientResource;
-use App\Models\Client;
+use App\Http\Requests\Clients\StoreClientRequest;
+use App\Http\Resources\Clients\ClientResource;
+use App\Models\Clients\Client;
 use App\Enums\ClientType;
-use App\Http\Requests\UpdateClientRequest;
+use App\Http\Requests\Clients\UpdateClientRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\PricingSetting;
+use App\Models\Pricing\PricingSetting;
 use Illuminate\Http\Request;
 
 class PricingSettingController extends Controller

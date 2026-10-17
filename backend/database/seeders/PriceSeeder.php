@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\PricingSetting;
+use App\Models\Pricing\PricingSetting;
 use Illuminate\Database\Seeder;
 
 class PriceSeeder extends Seeder

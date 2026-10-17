@@ -7,9 +7,9 @@ use App\Http\Controllers\Api\StatsController;
 use App\Http\Controllers\Api\TripController;
 use App\Http\Controllers\Api\VehicleController;
 use App\Http\Controllers\Api\VehicleServiceController;
-use App\Http\Controllers\TripAttachmentController;
-use App\Http\Controllers\TripEventController;
-use App\Http\Controllers\VehicleServiceAttachmentController;
+use App\Http\Controllers\Api\TripAttachmentController;
+use App\Http\Controllers\Api\TripEventController;
+use App\Http\Controllers\Api\VehicleServiceAttachmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

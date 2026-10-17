@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\PricingSetting;
+use App\Models\Pricing\PricingSetting;
 
 class TripPriceCalculator
 {

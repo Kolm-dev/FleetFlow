@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Driver;
-use App\Models\Vehicle;
-use App\Models\User;
+use App\Models\Drivers\Driver;
+use App\Models\Vehicles\Vehicle;
+use App\Models\Users\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

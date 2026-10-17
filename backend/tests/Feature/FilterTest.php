@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use App\Enums\DriverStatus;
 use App\Enums\TripStatus;
-use App\Models\Driver;
-use App\Models\Trip;
-use App\Models\User;
-use App\Models\Vehicle;
+use App\Models\Drivers\Driver;
+use App\Models\Trips\Trip;
+use App\Models\Users\User;
+use App\Models\Vehicles\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

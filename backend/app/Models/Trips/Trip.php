@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Models\Trips;
+
+use App\Enums\TripStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Clients\Client;
+use App\Models\Drivers\Driver;
+use App\Models\Vehicles\Vehicle;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Trip extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'title',
+        'distance',
+        'price',
+        'status',
+        'driver_id',
+        'vehicle_id',
+        'client_id',
+        'completed_at',
+        'fuel_liters',
+        'fuel_type_snapshot',
+        'fuel_price_per_liter',
+        'fuel_consumption_snapshot',
+        'fuel_cost',
+        'estimated_profit',
+        'started_at',
+    ];
+
+    public function driver(): BelongsTo
+    {
+        return $this->belongsTo(Driver::class, 'driver_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'price' => 'float',
+            'status' => TripStatus::class,
+            'completed_at' => 'datetime',
+            'started_at' => 'datetime',
+            'fuel_liters' => 'float',
+            'fuel_price_per_liter' => 'float',
+            'fuel_consumption_snapshot' => 'float',
+            'fuel_cost' => 'float',
+            'estimated_profit' => 'float',
+        ];
+    }
+
+    public function vehicle(): BelongsTo
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
+    }
+
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(TripAttachment::class);
+    }
+
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(TripEvent::class);
+    }
+
+    public function client():BelongsTo
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+}

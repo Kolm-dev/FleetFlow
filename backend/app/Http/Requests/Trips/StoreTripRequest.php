@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Http\Requests\Trips;
+
+use App\Enums\DriverStatus;
+use App\Enums\TripStatus;
+use App\Models\Drivers\Driver;
+use App\Models\Vehicles\Vehicle;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class StoreTripRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+
+        return [
+            'title' => 'required|string|max:255',
+            'distance' => 'required|integer|gt:0',
+            'price' => 'nullable|numeric|min:0',
+            'driver_id' => 'required|integer|exists:drivers,id',
+            'vehicle_id' => 'required|integer|exists:vehicles,id',
+            'client_id' => 'required|integer|exists:clients,id',
+            'status' => 'prohibited',
+
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function ($validator) {
+                $driver = Driver::find($this->input('driver_id'));
+                $vehicle = Vehicle::find($this->input('vehicle_id'));
+
+                if (! $driver || ! $vehicle) {
+                    return;
+                }
+
+                if ($driver->status !== DriverStatus::Available) {
+                    $validator->errors()->add(
+                        'driver_id',
+                        'Driver is not available.'
+                    );
+                }
+
+                if ($vehicle->driver_id !== $driver->id) {
+                    $validator->errors()->add(
+                        'vehicle_id',
+                        'Vehicle does not belong to this driver.'
+                    );
+                }
+            },
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'driver_id.exists' => 'Driver does not exist.',
+            'vehicle_id.exists' => 'Vehicle does not exist.',
+            'client_id.exists' => 'Client does not exist.',
+        ];
+    }
+}

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Enums\DriverStatus;
 use App\Enums\TripStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreDriverRequest;
-use App\Http\Requests\UpdateDriverRequest;
-use App\Models\Driver;
+use App\Http\Requests\Drivers\StoreDriverRequest;
+use App\Http\Requests\Drivers\UpdateDriverRequest;
+use App\Models\Drivers\Driver;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
