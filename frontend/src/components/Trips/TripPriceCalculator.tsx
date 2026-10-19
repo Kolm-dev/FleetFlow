@@ -1,5 +1,7 @@
 import { calculateTripPrice } from "@/api/pricing";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { formControlClass, formFieldClass } from "@/components/shared/EntityForm";
+import { Button } from "@/components/ui/button";
 import { formatCurrency, toNullableNumber } from "@/libs/utils";
 import { useState } from "react";
 
@@ -61,14 +63,15 @@ export const TripPriceCalculator = ({
     };
 
     return (
-        <aside className="trip-price-tools">
-            <h2>Price recommendation</h2>
-            <p className="trip-price-tools__distance">
+        <aside className="grid gap-3 rounded-lg border border-border bg-muted/30 p-4">
+            <h2 className="m-0 text-base font-semibold text-foreground">Price recommendation</h2>
+            <p className="m-0 text-sm text-muted-foreground">
                 Distance: <strong>{distance || "not specified"} km</strong>
             </p>
-            <label>
+            <label className={formFieldClass}>
                 Price (USD)
                 <input
+                    className={formControlClass}
                     type="number"
                     min="0"
                     step="0.01"
@@ -77,17 +80,18 @@ export const TripPriceCalculator = ({
                 />
             </label>
 
-            <button
+            <Button
                 type="button"
+                variant="outline"
                 onClick={handleRecalculatePrice}
                 disabled={priceCalculationStatus === "loading"}
             >
                 {priceCalculationStatus === "loading"
                     ? "Recalculating..."
                     : "Recalculate"}
-            </button>
+            </Button>
 
-            <div className="trip-price-tools__status">
+            <div className="text-sm text-muted-foreground [&_p]:m-0">
                 {priceCalculationStatus === "idle" && (
                     <p>
                         Recommended price has not been calculated yet. You can
@@ -113,19 +117,20 @@ export const TripPriceCalculator = ({
                                 </strong>
                             </p>
                             {isManualPrice && (
-                                <p className="trip-price-tools__manual">
+                                <p className="font-semibold text-amber-700 dark:text-amber-300">
                                     You changed the calculated price manually.
                                 </p>
                             )}
-                            <button
+                            <Button
                                 type="button"
+                                variant="outline"
                                 onClick={handleUseRecommendedPrice}
                                 disabled={
                                     toNullableNumber(price) === recommendedPrice
                                 }
                             >
                                 Use recommended
-                            </button>
+                            </Button>
                         </>
                     )}
 

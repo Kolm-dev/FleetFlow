@@ -1,7 +1,9 @@
 import { getClients } from "@/api/clients";
 import { getDrivers } from "@/api/drivers";
 import { createTrip } from "@/api/trips";
-import TripCreateForm from "@/components/Trips/TripCreateForm";
+import { TripForm } from "@/components/Trips/TripForm";
+import { Spinner } from "@/components/Spinner/Spinner";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import { getBackendErrorMessages } from "@/libs/errors";
@@ -12,11 +14,11 @@ import { useNavigate } from "react-router";
 export const TripCreate = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const { data } = useQuery({
-        queryKey: ["drivers"],
+    const { data, isLoading: isDriversLoading, error: driversError } = useQuery({
+        queryKey: ["drivers", { status: "available" }],
         queryFn: () => getDrivers({ status: "available" }),
     });
-    const { data: clientsData } = useQuery({
+    const { data: clientsData, isLoading: isClientsLoading, error: clientsError } = useQuery({
         queryKey: ["clients"],
         queryFn: () => getClients(),
     });
@@ -63,13 +65,19 @@ export const TripCreate = () => {
         );
     }
 
+    if (isDriversLoading || isClientsLoading) return <Spinner />;
+    if (driversError) return <ErrorMessage messages={getBackendErrorMessages(driversError, "Could not load drivers.")} />;
+    if (clientsError) return <ErrorMessage messages={getBackendErrorMessages(clientsError, "Could not load clients.")} />;
+
     return (
         <>
-            <TripCreateForm
+            <TripForm
+                mode="create"
                 availableDrivers={availableDrivers}
                 clients={clients}
-                isCreating={isCreating}
+                isPending={isCreating}
                 errorMessages={errorMessages}
+                onCancel={() => navigate("/trips")}
                 onSubmit={(newTrip) => mutate(newTrip)}
             />
         </>

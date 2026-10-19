@@ -4,7 +4,7 @@ import { getTrip, updateTrip } from "@/api/trips";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { SuccessMessage } from "@/components/shared/SuccessMessage";
-import { TripEditForm } from "@/components/Trips/TripEditForm";
+import { TripForm } from "@/components/Trips/TripForm";
 import { tripEventsQueryKey } from "@/hooks/useTripEvents";
 import { getBackendErrorMessages } from "@/libs/errors";
 import type { UpdateTripData } from "@/types/tripsTypes";
@@ -66,12 +66,14 @@ const TripEdit = () => {
     }
 
     return (
-        <TripEditForm
+        <TripForm
+            mode="edit"
             trip={trip}
             availableDrivers={driversResponse.drivers}
             clients={clientsResponse.data}
             isPending={isPending}
             errorMessages={getBackendErrorMessages(updateError, "Could not update trip. Please try again.")}
+            onCancel={() => navigate("/trips")}
             onSubmit={(data) => mutate(data)}
         />
     );

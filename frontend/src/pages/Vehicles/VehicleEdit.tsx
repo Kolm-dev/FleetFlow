@@ -1,6 +1,6 @@
 import { getVehicle, updateVehicle } from "@/api/vehicles";
 import { Spinner } from "@/components/Spinner/Spinner";
-import { VehicleEditForm } from "@/components/Vehicles/VehicleEditForm";
+import { VehicleForm } from "@/components/Vehicles/VehicleForm";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { SuccessMessage } from "@/components/shared/SuccessMessage";
 import { getBackendErrorMessage } from "@/libs/errors";
@@ -61,7 +61,8 @@ export const VehicleEdit = () => {
             {updateError && (
                 <ErrorMessage messages={getBackendErrorMessage(updateError, "Could not update vehicle.")} />
             )}
-            <VehicleEditForm
+            <VehicleForm
+                mode="edit"
                 onSubmit={data => mutate(data)}
                 onCancel={() => navigate(`/vehicles/${vehicleId}`)}
                 isPending={isPending}

@@ -1,6 +1,8 @@
 import { createDriver } from "@/api/drivers";
-import { DriverCreateForm } from "@/components/Drivers/DriverCreateForm";
+import { DriverForm } from "@/components/Drivers/DriverForm";
+import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { SuccessMessage } from "@/components/shared/SuccessMessage";
+import { getBackendErrorMessage } from "@/libs/errors";
 import type { CreateDriverData } from "@/types/driversTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
@@ -9,7 +11,7 @@ export const DriverCreate = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
-    const { mutate, isPending, isSuccess, data: createResult } = useMutation({
+    const { mutate, isPending, isSuccess, data: createResult, error: createError } = useMutation({
         mutationFn: (data: CreateDriverData) => createDriver(data),
         onSuccess() {
             queryClient.invalidateQueries({
@@ -31,9 +33,14 @@ export const DriverCreate = () => {
     }
 
     return (
-        <DriverCreateForm
-            isPending={isPending}
-            onSubmit={(data) => mutate(data)}
-        />
+        <>
+            {createError && <ErrorMessage messages={getBackendErrorMessage(createError, "Could not create driver.")} />}
+            <DriverForm
+                mode="create"
+                isPending={isPending}
+                onCancel={() => navigate("/drivers")}
+                onSubmit={(data) => mutate(data)}
+            />
+        </>
     );
 };

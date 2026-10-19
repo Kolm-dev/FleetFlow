@@ -1,6 +1,7 @@
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { EntityForm, formControlClass, formFieldClass, formGridClass } from "@/components/shared/EntityForm";
+import { Button } from "@/components/ui/button";
 import type { Client, ClientPhone, ClientType } from "@/types/clientTypes";
+import { useState, type FormEvent } from "react";
 
 export type ClientFormData = {
     name: string;
@@ -22,28 +23,22 @@ const emptyPhone: ClientPhone = { phone_number: "", label: null };
 
 export const ClientForm = ({ client, isPending = false, onCancel, onSubmit }: ClientFormProps) => {
     const isEdit = client !== undefined;
-    const initialPhones = client?.phones.length ? client.phones : [{ ...emptyPhone }];
-
     const [name, setName] = useState(client?.name ?? "");
     const [type, setType] = useState<ClientType>(client?.type ?? "individual");
     const [email, setEmail] = useState(client?.email ?? "");
     const [address, setAddress] = useState(client?.address ?? "");
     const [notes, setNotes] = useState(client?.notes ?? "");
-    const [phones, setPhones] = useState<ClientPhone[]>(initialPhones);
+    const [phones, setPhones] = useState<ClientPhone[]>(client?.phones.length ? client.phones : [{ ...emptyPhone }]);
 
     const removePhone = (index: number) => {
-        setPhones(prev => (prev.length === 1 ? [{ ...emptyPhone }] : prev.filter((_, i) => i !== index)));
+        setPhones(previous => previous.length === 1 ? [{ ...emptyPhone }] : previous.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         const phonesPayload = phones
-            .filter(p => p.phone_number.trim() !== "")
-            .map(p => ({
-                phone_number: p.phone_number.trim(),
-                label: p.label?.trim() || null,
-            }));
+            .filter(phone => phone.phone_number.trim() !== "")
+            .map(phone => ({ phone_number: phone.phone_number.trim(), label: phone.label?.trim() || null }));
 
         onSubmit({
             name: name.trim(),
@@ -56,131 +51,85 @@ export const ClientForm = ({ client, isPending = false, onCancel, onSubmit }: Cl
     };
 
     return (
-        <form className="client-form" onSubmit={handleSubmit}>
-            <header className="client-form__header">
-                <h1>{isEdit ? "Edit Client" : "Create Client"}</h1>
-                {isEdit && <p>{client.name}</p>}
-            </header>
-
-            <div className="client-form__fields">
-                <div>
-                    <label htmlFor="client-name">Name</label>
-                    <input
-                        id="client-name"
-                        type="text"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        required
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="client-email">Email</label>
-                    <input
-                        id="client-email"
-                        type="email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="client-type">Type</label>
+        <EntityForm
+            title={isEdit ? "Edit client" : "Create client"}
+            description={client?.name}
+            submitLabel={isEdit ? "Save client" : "Create client"}
+            pendingLabel="Saving..."
+            isPending={isPending}
+            onCancel={onCancel}
+            onSubmit={handleSubmit}
+        >
+            <div className={formGridClass}>
+                <label className={formFieldClass}>
+                    Name
+                    <input className={formControlClass} required value={name} onChange={event => setName(event.currentTarget.value)} />
+                </label>
+                <label className={formFieldClass}>
+                    Email
+                    <input className={formControlClass} type="email" value={email} onChange={event => setEmail(event.currentTarget.value)} />
+                </label>
+                <label className={formFieldClass}>
+                    Type
                     {isEdit ? (
-                        <input
-                            id="client-type"
-                            type="text"
-                            value={type}
-                            readOnly
-                        />
+                        <input className={formControlClass} value={type} readOnly />
                     ) : (
-                        <select
-                            id="client-type"
-                            value={type}
-                            onChange={e => setType(e.target.value as ClientType)}
-                        >
+                        <select className={formControlClass} value={type} onChange={event => setType(event.currentTarget.value as ClientType)}>
                             <option value="individual">Individual</option>
                             <option value="company">Company</option>
                         </select>
                     )}
-                </div>
-
-                <div>
-                    <label htmlFor="client-address">Address</label>
-                    <input
-                        id="client-address"
-                        type="text"
-                        value={address}
-                        onChange={e => setAddress(e.target.value)}
-                        required
-                    />
-                </div>
+                </label>
+                <label className={formFieldClass}>
+                    Address
+                    <input className={formControlClass} required value={address} onChange={event => setAddress(event.currentTarget.value)} />
+                </label>
             </div>
 
-            <fieldset className="client-form__phones">
-                <legend>Phones</legend>
-                {phones.map((phone, index) => (
-                    <div className="client-form__phone-row" key={index}>
-                        <input
-                            type="tel"
-                            placeholder="Phone number"
-                            value={phone.phone_number}
-                            onChange={e =>
-                                setPhones(prev =>
-                                    prev.map((item, i) =>
-                                        i === index ? { ...item, phone_number: e.target.value } : item,
-                                    ),
-                                )
-                            }
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Label"
-                            value={phone.label ?? ""}
-                            onChange={e =>
-                                setPhones(prev =>
-                                    prev.map((item, i) =>
-                                        i === index ? { ...item, label: e.target.value } : item,
-                                    ),
-                                )
-                            }
-                        />
-                        <button
-                            className="entity-action entity-action--delete"
-                            type="button"
-                            onClick={() => removePhone(index)}
-                        >
-                            Remove
-                        </button>
-                    </div>
-                ))}
-                <button
-                    className="entity-action entity-action--create"
-                    type="button"
-                    onClick={() => setPhones(prev => [...prev, { ...emptyPhone }])}
-                >
-                    Add phone
-                </button>
+            <fieldset className="min-w-0 rounded-lg border border-border p-4">
+                <legend className="px-1 text-sm font-semibold text-foreground">Phones</legend>
+                <div className="grid gap-3">
+                    {phones.map((phone, index) => (
+                        <div className="grid min-w-0 items-end gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]" key={index}>
+                            <label className={formFieldClass}>
+                                Phone number
+                                <input
+                                    className={formControlClass}
+                                    type="tel"
+                                    required
+                                    value={phone.phone_number}
+                                    onChange={event => {
+                                        const value = event.currentTarget.value;
+                                        setPhones(previous => previous.map((item, i) => i === index ? { ...item, phone_number: value } : item));
+                                    }}
+                                />
+                            </label>
+                            <label className={formFieldClass}>
+                                Label
+                                <input
+                                    className={formControlClass}
+                                    value={phone.label ?? ""}
+                                    onChange={event => {
+                                        const value = event.currentTarget.value;
+                                        setPhones(previous => previous.map((item, i) => i === index ? { ...item, label: value } : item));
+                                    }}
+                                />
+                            </label>
+                            <Button className="w-full sm:w-auto" type="button" variant="outline" onClick={() => removePhone(index)}>
+                                Remove
+                            </Button>
+                        </div>
+                    ))}
+                    <Button className="w-fit" type="button" variant="outline" onClick={() => setPhones(previous => [...previous, { ...emptyPhone }])}>
+                        Add phone
+                    </Button>
+                </div>
             </fieldset>
 
-            <div className="client-form__notes">
-                <label htmlFor="client-notes">Notes</label>
-                <textarea
-                    id="client-notes"
-                    value={notes}
-                    onChange={e => setNotes(e.target.value)}
-                />
-            </div>
-
-            <footer className="client-form__actions">
-                <button className="entity-action entity-action--update" type="submit" disabled={isPending}>
-                    {isPending ? "Saving..." : isEdit ? "Save" : "Create"}
-                </button>
-                <button type="button" onClick={onCancel} disabled={isPending}>
-                    Cancel
-                </button>
-            </footer>
-        </form>
+            <label className={formFieldClass}>
+                Notes
+                <textarea className={`${formControlClass} min-h-28 resize-y`} value={notes} onChange={event => setNotes(event.currentTarget.value)} />
+            </label>
+        </EntityForm>
     );
 };

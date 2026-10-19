@@ -1,6 +1,6 @@
 import { getDriver, updateDriver } from "@/api/drivers";
 import { getVehicles, updateVehicle } from "@/api/vehicles";
-import { DriverEditForm } from "@/components/Drivers/DriverEditForm";
+import { DriverForm } from "@/components/Drivers/DriverForm";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { SuccessMessage } from "@/components/shared/SuccessMessage";
@@ -91,7 +91,8 @@ export const DriverEdit = () => {
             {updateError && (
                 <ErrorMessage messages={getBackendErrorMessage(updateError, "Could not update driver.")} />
             )}
-            <DriverEditForm
+            <DriverForm
+                mode="edit"
                 onSubmit={(data) => mutate(data)}
                 onCancel={() => navigate(`/drivers/${driverId}`)}
                 driver={driver}
