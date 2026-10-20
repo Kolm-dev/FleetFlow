@@ -1,9 +1,11 @@
-import { calculateTripPrice } from "@/api/pricing";
+import { calculateTripPrice, getPricingSettings } from "@/api/pricing";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
 import { formControlClass, formFieldClass } from "@/components/shared/EntityForm";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, toNullableNumber } from "@/libs/utils";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router";
 
 type TripPriceCalculatorProps = {
     distance: string;
@@ -22,6 +24,10 @@ export const TripPriceCalculator = ({
     const [priceCalculationStatus, setPriceCalculationStatus] =
         useState<PriceCalculationStatus>("idle");
     const [isManualPrice, setIsManualPrice] = useState(false);
+    const { data: pricing } = useQuery({
+        queryKey: ["pricingSettings"],
+        queryFn: () => getPricingSettings(),
+    });
 
     const handlePriceChange = (value: string) => {
         onPriceChange(value);
@@ -65,6 +71,11 @@ export const TripPriceCalculator = ({
     return (
         <aside className="grid gap-3 rounded-lg border border-border bg-muted/30 p-4">
             <h2 className="m-0 text-base font-semibold text-foreground">Price recommendation</h2>
+            {pricing?.configured === false && (
+                <p className="m-0 text-sm font-semibold text-amber-700 dark:text-amber-300">
+                    Pricing uses default values. <Link to="/pricing-settings">Review pricing</Link>
+                </p>
+            )}
             <p className="m-0 text-sm text-muted-foreground">
                 Distance: <strong>{distance || "not specified"} km</strong>
             </p>

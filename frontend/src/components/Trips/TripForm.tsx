@@ -1,4 +1,6 @@
+import { CreateEntityButton } from "@/components/shared/CreateEntityButton";
 import { ErrorMessage } from "@/components/shared/ErrorMessage";
+import { NoAvailableDrivers } from "@/components/shared/NoAvailableDrivers";
 import { EntityForm, formControlClass, formFieldClass, formGridClass } from "@/components/shared/EntityForm";
 import { ClientCombobox } from "@/components/Trips/ClientCombobox";
 import { TripPriceCalculator } from "@/components/Trips/TripPriceCalculator";
@@ -7,6 +9,7 @@ import type { Client } from "@/types/clientTypes";
 import type { Driver } from "@/types/driversTypes";
 import type { CreateTripData, Trip, UpdateTripData } from "@/types/tripsTypes";
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router";
 
 type TripFormProps = {
     availableDrivers: Driver[];
@@ -24,7 +27,8 @@ export const TripForm = (props: TripFormProps) => {
     const [title, setTitle] = useState(trip?.title ?? "");
     const [distance, setDistance] = useState(trip?.distance?.toString() ?? "");
     const [price, setPrice] = useState(trip?.price?.toString() ?? "");
-    const [driverId, setDriverId] = useState<number | undefined>(trip?.driver_id ?? props.availableDrivers[0]?.id);
+    const defaultDriver = props.availableDrivers.find(driver => driver.vehicles?.length) ?? props.availableDrivers[0];
+    const [driverId, setDriverId] = useState<number | undefined>(trip?.driver_id ?? defaultDriver?.id);
     const [vehicleId, setVehicleId] = useState<number | undefined>(trip?.vehicle_id);
     const [clientId, setClientId] = useState<number | undefined>(trip?.client_id ?? props.clients[0]?.id);
     const canEditAssignment = !trip || trip.status === "planned";
@@ -69,8 +73,17 @@ export const TripForm = (props: TripFormProps) => {
         }
     };
 
-    if (!trip && props.availableDrivers.length === 0) return <p>No available drivers</p>;
-    if (!trip && props.clients.length === 0) return <p>No clients</p>;
+    if (!trip && props.availableDrivers.length === 0) {
+        return <NoAvailableDrivers context="trip" />;
+    }
+    if (!trip && props.clients.length === 0) {
+        return (
+            <div className="grid justify-items-start gap-3">
+                <p className="m-0">No clients. Add a client before creating a trip.</p>
+                <CreateEntityButton entity="client" to="/clients/create" />
+            </div>
+        );
+    }
 
     return (
         <EntityForm
@@ -130,7 +143,11 @@ export const TripForm = (props: TripFormProps) => {
                             <option key={vehicle.id} value={vehicle.id}>{vehicle.brand} {vehicle.model} - {vehicle.license_plate}</option>
                         ))}
                     </select>
-                    {vehiclesForSelect.length === 0 && <span className="text-xs text-destructive">This driver has no vehicles</span>}
+                    {vehiclesForSelect.length === 0 && (
+                        <span className="text-xs text-destructive">
+                            This driver has no vehicles. <Link to="/vehicles/create">Add a vehicle</Link>
+                        </span>
+                    )}
                 </label>
             </div>
             <TripPriceCalculator distance={distance} price={price} onPriceChange={setPrice} />

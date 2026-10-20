@@ -32,6 +32,9 @@ export const PricingSettings = () => {
             queryClient.invalidateQueries({
                 queryKey: ["pricingSettings"],
             });
+            queryClient.invalidateQueries({
+                queryKey: ["stats"],
+            });
             setShowForm(false);
             setOnSuccess(true);
         },
@@ -56,7 +59,9 @@ export const PricingSettings = () => {
                     />
                 )}
                 <button
-                    className="entity-action pricing-settings-edit-button entity-action--edit"
+                    className={`entity-action pricing-settings-edit-button entity-action--edit${
+                        pricing?.configured === false && !showForm ? " attention-pulse" : ""
+                    }`}
                     onClick={() => {
                         setShowForm(!showForm);
                         setOnSuccess(false);
@@ -66,6 +71,11 @@ export const PricingSettings = () => {
                     Edit pricing
                 </button>
             </header>
+            {pricing?.configured === false && (
+                <p className="m-0 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200">
+                    Default pricing values are used. Review and save trip and fuel prices for your company.
+                </p>
+            )}
             <section className="pricing-settings-summary trips">
                 <dl>
                     <div>
@@ -114,9 +124,7 @@ export const PricingSettings = () => {
             {isFetched && showForm && (
                 <section className="pricing-settings-editor">
                     {error && (
-                        <ErrorMessage
-                            messages={getBackendErrorMessages(error, "Could not update pricing settings.")}
-                        />
+                        <ErrorMessage messages={getBackendErrorMessages(error, "Could not update pricing settings.")} />
                     )}
                     <PricingSettingsForm
                         handleSubmit={data => {
@@ -124,6 +132,7 @@ export const PricingSettings = () => {
                             mutate(data);
                         }}
                         onClose={() => setShowForm(false)}
+                        highlightSave={pricing?.configured === false}
                         pricingSettingsTrips={pricing?.trips}
                         pricingSettingsFuel={pricing?.fuel}
                     />

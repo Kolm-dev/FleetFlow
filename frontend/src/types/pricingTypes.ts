@@ -8,9 +8,10 @@ export type PricingSettingTrips = {
 export type PricingSettingFuel = {
     diesel_price: number;
     gasoline_price: number;
-    updated_at: string;
+    updated_at: string | null;
 };
 export type PricingSetting = {
+    configured: boolean;
     fuel: PricingSettingFuel;
     trips: PricingSettingTrips;
 };

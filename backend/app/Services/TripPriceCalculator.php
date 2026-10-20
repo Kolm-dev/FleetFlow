@@ -8,7 +8,7 @@ class TripPriceCalculator
 {
     public function calculate(float $distance): float
     {
-        $priceSetting = PricingSetting::firstOrFail();
+        $priceSetting = PricingSetting::current();
 
         $recommendedPrice = $priceSetting->base_price
             + ($distance * $priceSetting->price_per_km);

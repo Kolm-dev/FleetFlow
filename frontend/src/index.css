@@ -3061,6 +3061,136 @@ Rule:
         outline: none;
     }
 
+    .attention-pulse {
+        animation: attention-pulse 2.8s cubic-bezier(0.33, 1, 0.68, 1) infinite;
+    }
+
+    .attention-pulse:hover,
+    .attention-pulse:focus-visible {
+        animation-play-state: paused;
+    }
+
+    @keyframes attention-pulse {
+        0% {
+            border-color: var(--color-border-strong);
+            box-shadow:
+                0 0 0 0 rgb(245 158 11 / 0.6),
+                0 0 0 0 rgb(245 158 11 / 0);
+            transform: scale(1) rotate(0);
+        }
+
+        6% {
+            border-color: rgb(245 158 11);
+            transform: scale(1.06) rotate(-2deg);
+        }
+
+        12% {
+            transform: scale(1.04) rotate(2deg);
+        }
+
+        18% {
+            box-shadow:
+                0 0 0 6px rgb(245 158 11 / 0.35),
+                0 0 0 0 rgb(245 158 11 / 0.6);
+            transform: scale(1.05) rotate(-1deg);
+        }
+
+        24% {
+            transform: scale(1) rotate(0);
+        }
+
+        36% {
+            border-color: rgb(245 158 11);
+            box-shadow:
+                0 0 0 12px rgb(245 158 11 / 0),
+                0 0 0 7px rgb(245 158 11 / 0.3);
+        }
+
+        52% {
+            box-shadow:
+                0 0 0 12px rgb(245 158 11 / 0),
+                0 0 0 14px rgb(245 158 11 / 0);
+        }
+
+        62% {
+            border-color: rgb(245 158 11 / 0.6);
+            box-shadow: 0 0 18px 2px rgb(245 158 11 / 0.25);
+            transform: scale(1.02);
+        }
+
+        78%,
+        100% {
+            border-color: var(--color-border-strong);
+            box-shadow:
+                0 0 0 0 rgb(245 158 11 / 0),
+                0 0 0 0 rgb(245 158 11 / 0);
+            transform: scale(1);
+        }
+    }
+
+    .attention-hint {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .attention-hint__dot {
+        position: relative;
+        flex: 0 0 10px;
+        width: 10px;
+        height: 10px;
+        margin-top: 5px;
+        border-radius: 50%;
+        background: rgb(245 158 11);
+    }
+
+    .attention-hint__dot::after {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: inherit;
+        content: "";
+        animation: attention-hint-dot 2.8s ease-out infinite;
+    }
+
+    @keyframes attention-hint-dot {
+        0%,
+        20% {
+            opacity: 0.7;
+            transform: scale(1);
+        }
+
+        55% {
+            opacity: 0;
+            transform: scale(2.6);
+        }
+
+        100% {
+            opacity: 0;
+            transform: scale(2.6);
+        }
+    }
+
+    .attention-hint mark {
+        padding: 0 4px;
+        border-radius: 4px;
+        background: rgb(245 158 11 / 0.2);
+        color: inherit;
+        font-weight: 700;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .attention-pulse,
+        .attention-hint__dot::after {
+            animation: none;
+        }
+
+        .attention-pulse {
+            border-color: rgb(245 158 11);
+            box-shadow: 0 0 0 3px rgb(245 158 11 / 0.55);
+        }
+    }
+
     /* =======Footer======= */
     .footer {
         display: flex;

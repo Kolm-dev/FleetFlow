@@ -17,6 +17,22 @@ class PricingSetting extends Model
 
     ];
 
+    public static function current(): self
+    {
+        return static::firstOrCreate([], [
+            'price_per_km' => 1,
+            'base_price' => 1,
+            'minimum_price' => 1,
+            'diesel_price' => 1,
+            'gasoline_price' => 1,
+        ]);
+    }
+
+    public function isConfigured(): bool
+    {
+        return $this->trip_pricing_updated_at !== null && $this->fuel_pricing_updated_at !== null;
+    }
+
     protected function casts(): array
     {
         return [

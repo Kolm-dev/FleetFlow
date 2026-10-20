@@ -15,6 +15,11 @@ export type Stats = {
         closed: number;
         cancelled: number;
     };
+    setup: {
+        pricing_configured: boolean;
+        clients_total: number;
+        drivers_ready: number;
+    };
 };
 
 

@@ -92,7 +92,8 @@ class ClientController extends Controller
         return new ClientResource($client->load('phones'));
     }
 
-    public function destroy(Client $client) {
+    public function destroy(Client $client)
+    {
         if ($client->trips()->exists()) {
             return response()->json(['message' => 'Cannot delete client with associated trips.'], 409);
         }

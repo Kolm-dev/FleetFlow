@@ -1,4 +1,5 @@
 import { getDrivers } from "@/api/drivers";
+import { NoAvailableDrivers } from "@/components/shared/NoAvailableDrivers";
 import { createVehicle } from "@/api/vehicles";
 import { VehicleForm } from "@/components/Vehicles/VehicleForm";
 import { Spinner } from "@/components/Spinner/Spinner";
@@ -41,7 +42,9 @@ const VehicleCreate = () => {
     if (isDriversLoading) return <Spinner />;
     if (driversError) return <ErrorMessage messages={getBackendErrorMessage(driversError, "Could not load drivers.")} />;
     const availableDrivers = availablesDrivers?.drivers;
-    if (!availableDrivers?.length) return <p>No available drivers</p>;
+    if (!availableDrivers?.length) {
+        return <NoAvailableDrivers context="vehicle" />;
+    }
 
     return (
         <>

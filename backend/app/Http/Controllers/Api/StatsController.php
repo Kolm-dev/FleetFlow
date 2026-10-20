@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Enums\DriverStatus;
 use App\Enums\TripStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Clients\Client;
 use App\Models\Drivers\Driver;
+use App\Models\Pricing\PricingSetting;
 use App\Models\Trips\Trip;
 use App\Models\Vehicles\Vehicle;
 
@@ -17,7 +19,17 @@ class StatsController extends Controller
             'drivers' => $this->driversStats(),
             'vehicles' => $this->vehiclesStats(),
             'trips' => $this->tripsStats(),
+            'setup' => $this->setupStats(),
         ]);
+    }
+
+    private function setupStats()
+    {
+        return [
+            'pricing_configured' => PricingSetting::current()->isConfigured(),
+            'clients_total' => Client::count(),
+            'drivers_ready' => Driver::where('status', DriverStatus::Available)->has('vehicles')->count(),
+        ];
     }
 
     private function tripsStats()

@@ -7,6 +7,7 @@ type PricingSettingsFormProps = {
 
     handleSubmit: (data: UpdatePricingType) => void;
     onClose: () => void;
+    highlightSave?: boolean;
 };
 
 export const PricingSettingsForm = ({
@@ -14,6 +15,7 @@ export const PricingSettingsForm = ({
     pricingSettingsTrips: tripSettings,
     handleSubmit,
     onClose,
+    highlightSave = false,
 }: PricingSettingsFormProps) => {
     const [basePrice, setBasePrice] = useState(tripSettings?.base_price);
     const [pricePerKm, setPPK] = useState(tripSettings?.price_per_km);
@@ -106,9 +108,24 @@ export const PricingSettingsForm = ({
                     />
                 </label>
             </div>
+            {highlightSave && (
+                <p
+                    role="status"
+                    className="attention-hint col-span-full m-0 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 animate-in fade-in slide-in-from-top-1 duration-200 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-200"
+                >
+                    <span
+                        className="attention-hint__dot"
+                        aria-hidden="true"
+                    />
+                    <span>
+                        <strong>One last step.</strong> These prices are still defaults. Adjust them if needed, then
+                        press <mark>Save settings</mark> to confirm them for your company.
+                    </span>
+                </p>
+            )}
             <div className="pricing-settings-form__actions">
                 <button
-                    className="entity-action entity-action--update"
+                    className={`entity-action entity-action--update${highlightSave ? " attention-pulse" : ""}`}
                     type="submit"
                 >
                     Save settings

@@ -10,9 +10,10 @@ class PricingSettingController extends Controller
 {
     public function show()
     {
-        $setting = PricingSetting::firstOrFail();
+        $setting = PricingSetting::current();
 
         return response()->json([
+            'configured' => $setting->isConfigured(),
             'fuel' => [
                 'diesel_price' => (float) $setting->diesel_price,
                 'gasoline_price' => (float) $setting->gasoline_price,
@@ -40,11 +41,16 @@ class PricingSettingController extends Controller
 
         ]);
 
-        $setting = PricingSetting::firstOrFail();
+        $setting = PricingSetting::current();
         $setting->fill($data);
 
-        $tripPricingChanged = $setting->isDirty(['price_per_km', 'base_price', 'minimum_price']);
-        $fuelPricingChanged = $setting->isDirty(['diesel_price', 'gasoline_price']);
+        $tripPricingFields = ['price_per_km', 'base_price', 'minimum_price'];
+        $fuelPricingFields = ['diesel_price', 'gasoline_price'];
+
+        $tripPricingChanged = $setting->isDirty($tripPricingFields)
+            || ($setting->trip_pricing_updated_at === null && $request->hasAny($tripPricingFields));
+        $fuelPricingChanged = $setting->isDirty($fuelPricingFields)
+            || ($setting->fuel_pricing_updated_at === null && $request->hasAny($fuelPricingFields));
 
         if ($tripPricingChanged) {
             $setting->trip_pricing_updated_at = now();
@@ -60,6 +66,7 @@ class PricingSettingController extends Controller
 
         return response()->json([
             'message' => 'Pricing settings updated successfully.',
+            'configured' => $setting->isConfigured(),
 
             'fuel' => [
                 'diesel_price' => (float) $setting->diesel_price,
