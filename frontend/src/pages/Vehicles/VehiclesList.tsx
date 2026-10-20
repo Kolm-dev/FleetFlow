@@ -119,8 +119,8 @@ const VehiclesList = () => {
         <div>
             <header className="page-header entity-list-header">
                 <div>
-                    <h2>Vehicles</h2>
-                    <p>
+                    <h2 className="m-0 text-xl font-semibold tracking-tight text-foreground">Vehicles</h2>
+                    <p className="m-0 mt-1 text-sm text-muted-foreground">
                         Page {data.current_page} of {data.last_page}. Total vehicles: {data.total}
                     </p>
                 </div>

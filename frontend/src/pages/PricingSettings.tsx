@@ -48,8 +48,8 @@ export const PricingSettings = () => {
         <div className="pricing-settings-page">
             <header className="page-header entity-list-header">
                 <div>
-                    <h2>Pricing settings</h2>
-                    <p>Current pricing values</p>
+                    <h2 className="m-0 text-xl font-semibold tracking-tight text-foreground">Pricing settings</h2>
+                    <p className="m-0 mt-1 text-sm text-muted-foreground">Current pricing values</p>
                 </div>
                 {onSuccess && (
                     <SuccessMessage

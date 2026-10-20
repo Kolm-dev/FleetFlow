@@ -70,8 +70,8 @@ const ClientsList = () => {
         <div className="space-y-4">
             <header className="page-header entity-list-header">
                 <div>
-                    <h2>Clients</h2>
-                    <p>Total found: {clients.length}</p>
+                    <h2 className="m-0 text-xl font-semibold tracking-tight text-foreground">Clients</h2>
+                    <p className="m-0 mt-1 text-sm text-muted-foreground">Total clients: {clients.length}</p>
                 </div>
                 <CreateEntityButton entity="client" to="/clients/create" />
             </header>

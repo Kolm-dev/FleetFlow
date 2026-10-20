@@ -123,8 +123,8 @@ export const DriversList = () => {
         <div className="drivers-status-container">
             <header className="page-header entity-list-header">
                 <div>
-                    <h2>Drivers</h2>
-                    <p>
+                    <h2 className="m-0 text-xl font-semibold tracking-tight text-foreground">Drivers</h2>
+                    <p className="m-0 mt-1 text-sm text-muted-foreground">
                         {isPlaceholderData
                             ? "Loading results..."
                             : `Page ${response.current_page} of ${response.last_page}. Total drivers: ${response.total}`}
