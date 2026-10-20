@@ -23,7 +23,7 @@ export type PricingSettingActionResponse = PricingSettingResponse & {
     
 };
 
-export type CalculePriceResponse = {
+export type CalculatePriceResponse = {
     recommended_price: number;
 };
 

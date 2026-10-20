@@ -1,7 +1,6 @@
 export type ClientType = "individual" | "company";
 
 export type ClientPhone = {
-    phone?: string;
     phone_number: string;
     label: string | null;
 };
@@ -19,6 +18,11 @@ export type Client = {
     notes: string | null;
     type: ClientType;
     phones: ClientPhone[];
+};
+
+/** Client embedded in a trip response; phones may be absent if the relation was not loaded. */
+export type TripClient = Omit<Client, "phones"> & {
+    phones?: ClientPhone[];
 };
 
 export type ClientsResponse = {

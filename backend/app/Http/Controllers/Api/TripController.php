@@ -9,6 +9,7 @@ use App\Enums\TripStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Trips\StoreTripRequest;
 use App\Http\Requests\Trips\UpdateTripRequest;
+use App\Http\Resources\Clients\ClientPhoneResource;
 use App\Models\Drivers\Driver;
 use App\Models\Pricing\PricingSetting;
 use App\Models\Trips\Trip;
@@ -58,9 +59,11 @@ class TripController extends Controller
         $this->sort($query, $request);
 
         $trips = $query->paginate(10);
+        $trips->through(fn (Trip $trip) => $this->tripPayload($trip));
 
         return response()->json($trips);
     }
+
     public function show(Trip $trip)
     {
 
@@ -68,10 +71,11 @@ class TripController extends Controller
 
         return response()->json(
             [
-                'trip' => $trip,
+                'trip' => $this->tripPayload($trip),
             ]
         );
     }
+
     private function sort(Builder $query, Request $request)
     {
         if (! $request->has('sort')) {
@@ -132,11 +136,9 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip created successfully.',
-            'trip' => $trip->load(['driver', 'vehicle', 'client.phones']),
+            'trip' => $this->tripPayload($trip->load(['driver', 'vehicle', 'client.phones'])),
         ], 201);
     }
-
-
 
     public function update(UpdateTripRequest $request, int $id)
     {
@@ -172,7 +174,6 @@ class TripController extends Controller
                     ]);
                 }
             }
-
 
             if ($assignmentWasChanged && ! $tripIsPlanned) {
                 $errors = [];
@@ -276,7 +277,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip updated successfully.',
-            'trip' => $trip->load(['driver', 'vehicle', 'client.phones']),
+            'trip' => $this->tripPayload($trip->load(['driver', 'vehicle', 'client.phones'])),
         ]);
     }
 
@@ -297,8 +298,8 @@ class TripController extends Controller
 
         if ($reasons) {
             return response()->json([
-                'message' => 'Trip cannot be started because ' . implode(' and ', $reasons) . '.',
-                'trip' => $trip,
+                'message' => 'Trip cannot be started because '.implode(' and ', $reasons).'.',
+                'trip' => $this->tripPayload($trip),
             ], 422);
         }
 
@@ -307,8 +308,6 @@ class TripController extends Controller
                 'status' => TripStatus::Pending,
                 'started_at' => now(),
             ]);
-
-
 
             $trip->events()->create([
                 'type' => TripEventEnum::STARTED,
@@ -322,7 +321,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip was started successfully.',
-            'trip' => $trip->load(['driver', 'vehicle', 'client.phones']),
+            'trip' => $this->tripPayload($trip->load(['driver', 'vehicle', 'client.phones'])),
 
         ]);
     }
@@ -407,7 +406,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip closed successfully.',
-            'trip' => $trip->fresh(['driver', 'vehicle', 'client.phones']),
+            'trip' => $this->tripPayload($trip->fresh(['driver', 'vehicle', 'client.phones'])),
         ]);
     }
 
@@ -442,7 +441,7 @@ class TripController extends Controller
 
         return response()->json([
             'message' => 'Trip cancelled successfully.',
-            'trip' => $trip->fresh(['driver', 'vehicle']),
+            'trip' => $this->tripPayload($trip->fresh(['driver', 'vehicle'])),
         ]);
     }
 
@@ -477,7 +476,7 @@ class TripController extends Controller
 
             $attachmentsToDelete = $actualTrip->attachments()
                 ->get(['disk', 'path'])
-                ->map(fn($attachment) => [
+                ->map(fn ($attachment) => [
                     'disk' => $attachment->disk,
                     'path' => $attachment->path,
                 ])
@@ -514,5 +513,18 @@ class TripController extends Controller
         return response()->json([
             'recommended_price' => $calculator->calculate($data['distance']),
         ]);
+    }
+
+    private function tripPayload(Trip $trip): array
+    {
+        $trip->loadMissing('client.phones');
+
+        $payload = $trip->toArray();
+
+        if ($trip->client !== null) {
+            $payload['client']['phones'] = ClientPhoneResource::collection($trip->client->phones)->resolve();
+        }
+
+        return $payload;
     }
 }

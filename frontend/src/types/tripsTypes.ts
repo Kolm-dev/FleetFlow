@@ -1,12 +1,6 @@
 import type { Driver } from "@/types/driversTypes";
 import type { FuelType, Vehicle } from "@/types/vehiclesTypes";
-import type { Client } from "@/types/clientTypes";
-
-type TripClient = Omit<Client, "phones"> & {
-    // Trip endpoints serialize the related Eloquent model directly (`phone`),
-    // while client endpoints serialize it as `phone_number`.
-    phones?: { phone?: string; phone_number?: string; label: string | null }[];
-};
+import type { TripClient } from "@/types/clientTypes";
 
 export interface Trip {
     id: number;

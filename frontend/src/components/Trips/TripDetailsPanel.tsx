@@ -180,7 +180,7 @@ const TripDetailsPanel = ({ onClose, trip }: TripDetailsType) => {
                                                 </DetailItem>
                                             )}
                                             {clientPhones.map((phone, index) => {
-                                                const phoneNumber = phone.phone_number ?? phone.phone;
+                                                const phoneNumber = phone.phone_number;
 
                                                 if (!phoneNumber) return null;
 

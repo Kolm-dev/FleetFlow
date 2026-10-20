@@ -33,6 +33,33 @@ class TripBusinessRulesTest extends TestCase
 
     }
 
+    public function test_trip_responses_serialize_client_phones_as_phone_number(): void
+    {
+        $driver = Driver::factory()->create(['status' => DriverStatus::OnTrip]);
+        $vehicle = Vehicle::factory()->create(['driver_id' => $driver->id]);
+        $client = $this->createClient();
+        $client->phones()->create([
+            'phone' => '555-0100',
+            'label' => 'Work',
+        ]);
+        $trip = Trip::factory()->create([
+            'driver_id' => $driver->id,
+            'vehicle_id' => $vehicle->id,
+            'client_id' => $client->id,
+            'status' => TripStatus::Pending,
+        ]);
+
+        $this->getJson('/api/trips')
+            ->assertOk()
+            ->assertJsonPath('data.0.client.phones.0.phone_number', '555-0100')
+            ->assertJsonMissingPath('data.0.client.phones.0.phone');
+
+        $this->getJson("/api/trips/{$trip->id}")
+            ->assertOk()
+            ->assertJsonPath('trip.client.phones.0.phone_number', '555-0100')
+            ->assertJsonMissingPath('trip.client.phones.0.phone');
+    }
+
     public function test_can_create_trip_with_available_driver_and_his_vehicle(): void
     {
         $driver = Driver::factory()->create(['status' => DriverStatus::Available]);
